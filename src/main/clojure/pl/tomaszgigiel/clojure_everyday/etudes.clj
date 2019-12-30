@@ -4,7 +4,9 @@
   (:gen-class))
 
 (defmacro q "question" [s] s)
-(defmacro a "answer" [form message] (list 'tst/is form message))
+(defmacro a "answer"
+  ([test message] `(tst/is ~test ~message))
+  ([message] `(a true ~message)))
 (defmacro m "metadata" [s] s)
 
 (defmacro qam
