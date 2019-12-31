@@ -91,6 +91,18 @@
   (m "https://en.wikipedia.org/wiki/First-class_function"))
 
 (qam
-  (q "Create function on demand using composition.")
-  (a (= ((def third (comp first rest rest)) [1 2 3]) 3) "built from existing parts using the comp (compose) function")
+  (q "Create function using composition.")
+  (a (= ((comp first rest rest) [1 2 3]) 3) "built from existing parts using the comp (compose) function")
+  (a (= ((def third (comp first rest rest)) [1 2 3]) 3))
+  (a (= (((defn fnth [n] (apply comp (cons first (take (dec n) (repeat rest))))) 3) [1 2 3]) 3) "the function fnth builds new functions on the fly based on its arguments")
   (m "Michael Fogus, Chris Houser: The Joy of Clojure, 2nd, page 137"))
+
+(qam
+  (q "When are more than one open parenthesis in a row?")
+  (a (= ((comp first rest rest) [1 2 3]) 3) "it is almost always because a function is creating and returning a function that is called immediately")
+  (m "Michael Fogus, Chris Houser: The Joy of Clojure, 2nd, page 138"))
+
+(qam
+  (q "When to use the comp (compose) function?")
+  (a (= (map (comp keyword #(.toLowerCase %) name) '(a B C)) '(:a :b :c)) "A general rule of thumb is that if you need a function that applies a number of functions serially to the return of the former, then composition is a good fit.")
+  (m "Michael Fogus, Chris Houser: The Joy of Clojure, 2nd, page 138"))

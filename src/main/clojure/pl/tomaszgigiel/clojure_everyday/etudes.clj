@@ -4,9 +4,21 @@
   (:gen-class))
 
 (defmacro q "question" [s] s)
+
+(defmulti answer
+  "answer"
+  (fn
+    ([x] (type x))
+    ([test message] :multi)))
+
+(defmethod answer java.lang.String [message] (tst/is true message))
+(defmethod answer java.lang.Boolean [test] (tst/is test))
+(defmethod answer :multi [test message] (tst/is test message))
+
 (defmacro a "answer"
-  ([test message] `(tst/is ~test ~message))
-  ([message] `(a true ~message)))
+  ([x] `(answer ~x))
+  ([test message] `(answer ~test ~message)))
+
 (defmacro m "metadata" [s] s)
 
 (defmacro qam
