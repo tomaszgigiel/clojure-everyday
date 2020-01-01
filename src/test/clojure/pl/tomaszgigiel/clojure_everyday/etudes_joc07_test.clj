@@ -100,9 +100,46 @@
 (qam
   (q "When are more than one open parenthesis in a row?")
   (a (= ((comp first rest rest) [1 2 3]) 3) "it is almost always because a function is creating and returning a function that is called immediately")
+  (a (= ((partial + 5) 100 200) 305))
   (m "Michael Fogus, Chris Houser: The Joy of Clojure, 2nd, page 138"))
 
 (qam
   (q "When to use the comp (compose) function?")
-  (a (= (map (comp keyword #(.toLowerCase %) name) '(a B C)) '(:a :b :c)) "A general rule of thumb is that if you need a function that applies a number of functions serially to the return of the former, then composition is a good fit.")
+  (a (= (map (comp keyword #(.toLowerCase %) name) '(a B C)) '(:a :b :c)) "if you need a function that applies a number of functions serially to the return of the former")
   (m "Michael Fogus, Chris Houser: The Joy of Clojure, 2nd, page 138"))
+
+(qam
+  (q "Create function using partial function.")
+  (a (= ((partial + 5) 100 200) 305) "built from the partial application of another function")
+  (m "Michael Fogus, Chris Houser: The Joy of Clojure, 2nd, page 138"))
+
+(qam
+  (q "Write equivalent to ((partial + 5) 100 200) with apply.")
+  (a (= ((partial + 5) 100 200) (#(apply + 5 %&) 100 200) 305))
+  (m "Michael Fogus, Chris Houser: The Joy of Clojure, 2nd, page 139"))
+
+(qam
+  (q "What is a currying?")
+  (a "Currying is the technique of translating the evaluation of a function that takes multiple arguments into evaluating a sequence of functions, each with a single argument.")
+  (m "https://en.wikipedia.org/wiki/Currying"))
+
+(qam
+  (q "Why use currying?")
+  (a false "todo")
+  (m ""))
+
+(qam
+  (q "How to implement currying in clojure?")
+  (a false "todo")
+  (m ""))
+
+(qam
+  (q "Why no currying in clojure?")
+  (a false "todo")
+  (m "Michael Fogus, Chris Houser: The Joy of Clojure, 2nd, page 139")
+  (m "https://stackoverflow.com/questions/31373507/rich-hickeys-reason-for-not-auto-currying-clojure-functions"))
+
+(qam
+  (q "What is the difference between partial application and currying?")
+  (a false "todo")
+  (m ""))

@@ -1,0 +1,7 @@
+https://news.ycombinator.com/item?id=13322402
+Lack of automatic currying provides benefits like:
+- optional arguments with default values
+- variadic arguments: you can have a single function zip, rather than zip, zip2, zip3, ...
+- if you pass too few parameters to a function, it is nicely pinpointed as an error right there rather than producing a functional value.
+Manual currying can be reasonably slick with a few macros, like TXR Lisp's op, ap and ret, plus various combinators. Thanks to the unambiguous syntax, it remains readable.
+Manual currying can be more fully featured compared to automatic. You can insert the arguments anywhere in any order. Implicit currying only handles the rightmost args.

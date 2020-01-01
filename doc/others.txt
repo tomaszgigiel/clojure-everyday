@@ -1,1 +1,0 @@
-Michael Fogus, Chris Houser: The Joy of Clojure, 2nd ed., May 2014, ISBN 9781617291418, 520 pages
