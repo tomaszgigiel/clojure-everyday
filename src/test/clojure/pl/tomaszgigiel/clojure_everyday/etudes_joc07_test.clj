@@ -1,5 +1,6 @@
 (ns pl.tomaszgigiel.clojure-everyday.etudes-joc07-test
   (:require [clojure.test :as tst])
+  (:require [uncomplicate.fluokitten.core :as fluokitten])
   (:require [pl.tomaszgigiel.clojure-everyday.test-config :as test-config])
   (:require [pl.tomaszgigiel.clojure-everyday.etudes :refer [qam q a m]])
   (:require [pl.tomaszgigiel.utils.misc :as misc]))
@@ -121,6 +122,7 @@
 (qam
   (q "What is a currying?")
   (a "Currying is the technique of translating the evaluation of a function that takes multiple arguments into evaluating a sequence of functions, each with a single argument.")
+  (a "Currying is the process of taking a function that accepts n arguments and turning it into n functions that each accepts a single argument.")
   (m "https://en.wikipedia.org/wiki/Currying"))
 
 (qam
@@ -130,16 +132,39 @@
 
 (qam
   (q "How to implement currying in clojure?")
-  (a false "todo")
-  (m ""))
+  (a (= ((defn add [a b c] (+ a b c)) 1 2 3) 6) "the function")
+  (a (= ((((defn add-curried [a] (fn [b] (fn [c] (+ a b c)))) 1) 2) 3) 6) "the curried version")
+  (a false "verify")
+  (m "https://stackoverflow.com/questions/36314/what-is-currying")
+  (m "https://dragan.rocks/articles/18/Fluokitten-080-Fast-function-currying-in-Clojure"))
 
 (qam
-  (q "Why no currying in clojure?")
-  (a false "todo")
+  (q "How to implement automatic currying in clojure?")
+  (a "use Fluokitten")
+  (a "i.e. [uncomplicate/fluokitten \"0.9.1\"]")
+  (a "(:require [uncomplicate.fluokitten.core :as fluokitten])")
+  (a "(curry f)")
+  (a "(curry f arity)")
+  (a (= ((((fluokitten/curry + 3) 1) 2) 3) 6))
+  (a (= ((fluokitten/curry +) 1 2 3) 6))
+  (m "https://dragan.rocks/articles/18/Fluokitten-080-Fast-function-currying-in-Clojure")
+  (m "https://fluokitten.uncomplicate.org/codox/uncomplicate.fluokitten.core.html#var-curry"))
+
+(qam
+  (q "Why no automatic currying in clojure?")
+  (a "Clojure does not support automatic currying.")
+  (a "Clojure allows functions with a variable number of arguments, so currying makes little sense.")
+  (a "i.e. how to know whether (+ 3) should return 3, or wait for more arguments?")
+  (a "i.e. in Haskell function + expects exactly two arguments. If called with 0 or 1, it will produce a function that waits for the rest.")
+  (a "The closest thing to currying in Clojure is the partial function.")
+  (a false "verify")
   (m "Michael Fogus, Chris Houser: The Joy of Clojure, 2nd, page 139")
-  (m "https://stackoverflow.com/questions/31373507/rich-hickeys-reason-for-not-auto-currying-clojure-functions"))
+  (m "https://stackoverflow.com/questions/31373507/rich-hickeys-reason-for-not-auto-currying-clojure-functions")
+  (m "https://dragan.rocks/articles/18/Fluokitten-080-Fast-function-currying-in-Clojure"))
 
 (qam
   (q "What is the difference between partial application and currying?")
-  (a false "todo")
-  (m ""))
+  (a "A partial function attempts to evaluate whenever it is given another argument.")
+  (a "A curried function returns another curried function until it receives a predetermined number of arguments - only then does it evaluate.")
+  (a false "verify")
+  (m "Michael Fogus, Chris Houser: The Joy of Clojure, 2nd, page 139"))

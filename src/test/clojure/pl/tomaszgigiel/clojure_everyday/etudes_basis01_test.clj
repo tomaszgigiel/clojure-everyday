@@ -25,3 +25,11 @@
   (q "What is the difference between use and require?")
   (a false "todo")
   (m "https://stackoverflow.com/questions/871997/difference-between-use-and-require"))
+
+(qam
+  (q "How to load libs in REPL?")
+  (a "(require '(clojure.string))")
+  (a "(clojure.string/upper-case \"aa\")")
+  (a "(require '[clojure.string :as s])")
+  (a "(s/upper-case \"aa\")")
+  (m "https://clojuredocs.org/clojure.core/require"))
