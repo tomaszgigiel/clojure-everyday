@@ -10,11 +10,17 @@
 
 (qam
   (q "What is at the core of functional programming?")
-  (a "At the core of functional programming is a formal system of computation known as the lambda calculus."))
+  (a "the lambda calculus")
+  (m "Michael Fogus, Chris Houser: The Joy of Clojure, 2nd, page 136"))
 
 (qam
   (q "What is the lambda calculus?")
-  (a false "todo")
+  (a "1. also written as λ-calculus")
+  (a "2. a formal system in mathematical logic")
+  (a "3. for expressing computation")
+  (a "4. based on function abstraction and application")
+  (a "5. using variable binding and substitution")
+  (a "6. is Turing complete")
   (m "https://en.wikipedia.org/wiki/Lambda_calculus"))
 
 (qam
@@ -45,14 +51,14 @@
   (a "3. can be assigned to a variable and stored in a data structure")
   (a "4. can be created and modified at run time")
   (a "5. can be tested for equality and identity (has an identity)")
-  (a "6. can be not bound to an identifier (i.e. an anonymous function)")
+  (a "6. need not be associated with an identifier (i.e. an anonymous function)")
   (m "https://en.wikipedia.org/wiki/First-class_citizen")
   (m "https://pl.wikipedia.org/wiki/Typ_pierwszoklasowy")
   (m "https://en.wikipedia.org/wiki/Anonymous_function"))
 
 (qam
   (q "What is an anonymous function?")
-  (a "other: function literal, lambda abstraction, or lambda expression")
+  (a "also: function literal, lambda abstraction, lambda expression")
   (a "a function definition that is not bound to an identifier")
   (m "https://en.wikipedia.org/wiki/Anonymous_function"))
 
@@ -69,20 +75,36 @@
   (m "https://en.wikipedia.org/wiki/Higher-order_function"))
 
 (qam
-  (q "What are the characteristics of a functional programming language?")
+  (q "What is specific to the functional programming language?")
   (a "pure functions")
   (a "first-class functions")
   (a "higher-order functions")
+  (a "referential transparency (so immutability)")
   (a "function composition")
   (a "typeclasses")
   (a "lambdas")
   (a "closures")
-  (a "immutability")
   (a "recursion")
   (a "manipulation of lists")
   (a "lazy evaluation")
   (a false "verify, organize")
   (m "https://en.wikipedia.org/wiki/Functional_programming"))
+
+(qam
+  (q "What is a lambda?")
+  (a "also anonymous function")
+  (a "a function definition that is not bound to an identifier")
+  (m "https://en.wikipedia.org/wiki/Closure_(computer_programming)"))
+
+(qam
+  (q "What is a closure?")
+  (a "also lexical closure, function closure")
+  (a "a function that has access to some variable outside its own scope")
+  (a "a record storing a function together with an environment")
+  (a "functions containing one or more free variables are called closures")
+  (a false "verify")
+  (m "https://en.wikipedia.org/wiki/Closure_(computer_programming)")
+  (m "https://stackoverflow.com/questions/36636/what-is-a-closure"))
 
 (qam
   (q "What is a first-class function?")
