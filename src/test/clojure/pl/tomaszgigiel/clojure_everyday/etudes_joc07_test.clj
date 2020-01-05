@@ -92,11 +92,28 @@
 
 (qam
   (q "What is a typeclass?")
-  (a "a kind of  Java interfaces, only better")
-  (a "in Scala typeclasses are defined as traits with a type parameter and functions for the type")
-  (a "")
-  (a false "todo")
-  (m ""))
+  (a "1. a type system construct that supports parametric polymorphism")
+  (a "2. a kind of  Java interfaces, only better")
+  (a "3. in Scala typeclasses are defined as traits with a type parameter and functions for the type")
+  (a "4. Clojure is dynamic, so there is no typeclass")
+  (a "5. Clojure supports polymorphism in several ways")
+  (m "https://en.wikipedia.org/wiki/Type_class")
+  (m "https://stackoverflow.com/questions/22040115/what-are-the-reasons-that-protocols-and-multimethods-in-clojure-are-less-powerfu"))
+
+(qam
+  (q "What type of polymorphism does Clojure support?")
+  (a "1. ad-hoc polymorphism: multimethods, protocols, function overloading, function overriding")
+  (a "2. parametric polymorphism: HOF")
+  (a "3. inclusive/subtype polymorphism: type coercion, protocols")
+  (a "4. prototype-based polymorphism: custom dynamic OO system, functions inside maps or records, merge")
+  (a "5. inheritance polymorphism: proxy")
+  (a "6. type-based polymorphism: protocols")
+  (m "https://en.wikipedia.org/wiki/Polymorphism_(computer_science)")
+  (m "https://randomseed.pl/pub/poczytaj-mi-clojure/21-polimorfizm/")
+  (m "https://clojure.org/about/runtime_polymorphism")
+  (m "http://clojure-doc.org/articles/language/polymorphism.html")
+  (m "https://stackoverflow.com/questions/13553100/what-is-polymorphism-a-la-carte-and-how-can-i-benefit-from-it")
+  (m "https://stackoverflow.com/questions/5024211/clojure-adding-functions-to-defrecord-without-defining-a-new-protocol"))
 
 (qam
   (q "What is a lambda?")
