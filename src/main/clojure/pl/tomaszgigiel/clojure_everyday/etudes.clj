@@ -14,6 +14,7 @@
 (defmethod answer java.lang.String [message] (tst/is true message))
 (defmethod answer java.lang.Boolean [test] (tst/is test))
 (defmethod answer :multi [test message] (tst/is test message))
+(defmethod answer :default [x] x)
 
 (defmacro a "answer"
   ([x] `(answer ~x))

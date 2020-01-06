@@ -31,7 +31,7 @@
 
 (qam
   (q "What is a first-class citizen?")
-  (a "A first-class citizen is an entity which supports all the operations generally available to other entities.")
+  (a "an entity which supports all the operations generally available to other entities")
   (m "https://en.wikipedia.org/wiki/First-class_citizen"))
 
 (qam
@@ -65,8 +65,8 @@
 (qam
   (q "What is a higher-order function?")
   (a "a function that does at least one of the following:")
-  (a "takes one or more functions as arguments (i.e. procedural parameters)")
-  (a "returns a function as its result")
+  (a "1. takes one or more functions as arguments (i.e. procedural parameters)")
+  (a "2. returns a function as its result")
   (m "https://en.wikipedia.org/wiki/Higher-order_function"))
 
 (qam
@@ -116,6 +116,19 @@
   (m "https://stackoverflow.com/questions/5024211/clojure-adding-functions-to-defrecord-without-defining-a-new-protocol"))
 
 (qam
+  (q "Create custom dynamic OO system")
+  (a "define a prototype instance to serve as your class")
+  (a "use this to define your methods, plus any default values")
+  (a (def person-class {:get-full-name (fn [this] (str (:first-name this) " " (:last-name this)))}))
+  (a "define an instance by merging member variables into the class")
+  (a (def john (merge person-class  {:first-name "John" :last-name "Smith"})))
+  (a (= ((:get-full-name john) john) "John Smith"))
+  (a "added bonus - inheritance for free!")
+  (a (def mary (merge john {:first-name "Mary"})))
+  (a (= ((:get-full-name mary) mary) "Mary Smith"))
+  (m "https://stackoverflow.com/questions/5024211/clojure-adding-functions-to-defrecord-without-defining-a-new-protocol"))
+
+(qam
   (q "What is a lambda?")
   (a "also anonymous function")
   (a "a function definition that is not bound to an identifier")
@@ -124,12 +137,27 @@
 (qam
   (q "What is a closure?")
   (a "also lexical closure, function closure")
-  (a "a function that has access to some variable outside its own scope")
+  (a "a technique for implementing lexically scoped name binding in a language with first-class functions")
   (a "a record storing a function together with an environment")
-  (a "functions containing one or more free variables are called closures")
-  (a false "verify")
+  (a "a function containing one or more free variables")
+  (a "a function that has access to some variable outside its own scope")
   (m "https://en.wikipedia.org/wiki/Closure_(computer_programming)")
   (m "https://stackoverflow.com/questions/36636/what-is-a-closure"))
+
+(qam
+  (q "Create a closure (function)")
+  (a (defn messenger-builder [greeting] (fn [who] (println greeting who))) "closes over greeting")
+  (a (def hello-er (messenger-builder "Hello")) "greeting provided here, then goes out of scope")
+  (a (= (hello-er "world!") "Hello world!") "greeting value still available because hello-er is a closure")
+  (m "https://clojure.org/guides/learn/functions#_locals_and_closures"))
+
+(qam
+  (q "Create a closure (atom)")
+  (a (def foo (let [counter (atom 0)] (fn [] (do (swap! counter inc) @counter)))) "closes over counter, counter goes out of scope")
+  (a (= (foo) 1) "counter value still available because foo is a closure")
+  (a (= (foo) 2) "foo holds a reference to counter")
+  (a (= (foo) 3) "counter will not be garbage-collected as long as foo is needed")
+  (m "https://stackoverflow.com/questions/14874970/clojure-closure"))
 
 (qam
   (q "What is a first-class function?")
