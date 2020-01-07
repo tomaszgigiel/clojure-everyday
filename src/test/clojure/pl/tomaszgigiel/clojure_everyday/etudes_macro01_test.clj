@@ -23,6 +23,6 @@
   (a (def person-class {:get-full-name (fn [this] (str (:first-name this) " " (:last-name this)))}))
   (a (def john (merge person-class  {:first-name "John" :last-name "Smith"})))
   (a (defmacro call [this method & xs] `(let [this# ~this] ((~method this#) this# ~@xs))))
-  (a (= (call john :get-full-name) "John Smith"))
+  ;(a (= (call john :get-full-name) "John Smith"))
   (a false "todo")
   (m "https://stackoverflow.com/questions/5024211/clojure-adding-functions-to-defrecord-without-defining-a-new-protocol"))

@@ -123,7 +123,7 @@
   (a "define an instance by merging member variables into the class")
   (a (def john (merge person-class  {:first-name "John" :last-name "Smith"})))
   (a (= ((:get-full-name john) john) "John Smith"))
-  (a "added bonus - inheritance for free!")
+  (a "added bonus - prototype-based inheritance for free!")
   (a (def mary (merge john {:first-name "Mary"})))
   (a (= ((:get-full-name mary) mary) "Mary Smith"))
   (m "https://stackoverflow.com/questions/5024211/clojure-adding-functions-to-defrecord-without-defining-a-new-protocol"))
@@ -146,8 +146,8 @@
 
 (qam
   (q "Create a closure (function)")
-  (a (defn messenger-builder [greeting] (fn [who] (println greeting who))) "closes over greeting")
-  (a (def hello-er (messenger-builder "Hello")) "greeting provided here, then goes out of scope")
+  (a (defn messenger-builder [greeting] (fn [who] (str greeting who))) "closes over greeting")
+  (a (def hello-er (messenger-builder "Hello ")) "greeting provided here, then goes out of scope")
   (a (= (hello-er "world!") "Hello world!") "greeting value still available because hello-er is a closure")
   (m "https://clojure.org/guides/learn/functions#_locals_and_closures"))
 
@@ -169,8 +169,10 @@
 (qam
   (q "Create function using composition.")
   (a (= ((comp first rest rest) [1 2 3]) 3) "built from existing parts using the comp (compose) function")
-  (a (= ((def third (comp first rest rest)) [1 2 3]) 3))
-  (a (= (((defn fnth [n] (apply comp (cons first (take (dec n) (repeat rest))))) 3) [1 2 3]) 3) "the function fnth builds new functions on the fly based on its arguments")
+  (a (= (def third (comp first rest rest))))
+  (a (= (third [1 2 3]) 3))
+  (a (defn fnth [n] (apply comp (cons first (take (dec n) (repeat rest))))) "the function fnth builds new functions on the fly based on its arguments")
+  (a (= ((fnth 3 )[1 2 3]) 3))
   (m "Michael Fogus, Chris Houser: The Joy of Clojure, 2nd, page 137"))
 
 (qam
@@ -196,20 +198,33 @@
 
 (qam
   (q "What is a currying?")
-  (a "Currying is the technique of translating the evaluation of a function that takes multiple arguments into evaluating a sequence of functions, each with a single argument.")
-  (a "Currying is the process of taking a function that accepts n arguments and turning it into n functions that each accepts a single argument.")
+  (a "the technique of translating the evaluation of a function that takes multiple arguments into evaluating a sequence of functions, each with a single argument")
+  (a "the process of taking a function that accepts n arguments and turning it into n functions that each accepts a single argument")
   (m "https://en.wikipedia.org/wiki/Currying"))
 
 (qam
   (q "Why use currying?")
-  (a false "todo")
-  (m ""))
+  (q "1. to study functions with multiple arguments in simpler theoretical models which provide only one argument")
+  (q "2. to automatically manage how arguments are passed to functions and exceptions")
+  (q "3. to work with functions that take multiple arguments, and using them in frameworks where functions might take only one argument")
+  (q "4. some programming languages almost always use curried functions to achieve multiple arguments, i.e. all functions in ML and Haskell have exactly one argument")
+  (a "5. allows to effectively get multi-argument functions without actually defining semantics for them or defining semantics for products")
+  (a "6. leads to a simpler language with as much expressiveness as another, more complicated language, and so is desirable")
+  (m "https://softwareengineering.stackexchange.com/questions/185585/what-is-the-advantage-of-currying")
+  (m "https://en.wikipedia.org/wiki/Currying"))
+
+(qam
+  (q "What are the benefits of not having automatic currying?")
+  (a "optional arguments with default values")
+  (a "variadic arguments: you can have a single function foo, rather than foo, foo2, foo3")
+  (a "the compiler can catch the fact that was passed too few arguments to a function")
+  (a "manual currying can be more fully featured compared to automatic")
+  (m "https://news.ycombinator.com/item?id=13322402"))
 
 (qam
   (q "How to implement currying in clojure?")
   (a (= ((defn add [a b c] (+ a b c)) 1 2 3) 6) "the function")
   (a (= ((((defn add-curried [a] (fn [b] (fn [c] (+ a b c)))) 1) 2) 3) 6) "the curried version")
-  (a false "verify")
   (m "https://stackoverflow.com/questions/36314/what-is-currying")
   (m "https://dragan.rocks/articles/18/Fluokitten-080-Fast-function-currying-in-Clojure"))
 
@@ -232,14 +247,12 @@
   (a "i.e. how to know whether (+ 3) should return 3, or wait for more arguments?")
   (a "i.e. in Haskell function + expects exactly two arguments. If called with 0 or 1, it will produce a function that waits for the rest.")
   (a "The closest thing to currying in Clojure is the partial function.")
-  (a false "verify")
   (m "Michael Fogus, Chris Houser: The Joy of Clojure, 2nd, page 139")
   (m "https://stackoverflow.com/questions/31373507/rich-hickeys-reason-for-not-auto-currying-clojure-functions")
   (m "https://dragan.rocks/articles/18/Fluokitten-080-Fast-function-currying-in-Clojure"))
 
 (qam
   (q "What is the difference between partial application and currying?")
-  (a "A partial function attempts to evaluate whenever it is given another argument.")
-  (a "A curried function returns another curried function until it receives a predetermined number of arguments - only then does it evaluate.")
-  (a false "verify")
+  (a "1. a partial function attempts to evaluate whenever it is given another argument")
+  (a "2. a curried function returns another curried function until it receives a predetermined number of arguments - only then does it evaluate")
   (m "Michael Fogus, Chris Houser: The Joy of Clojure, 2nd, page 139"))
