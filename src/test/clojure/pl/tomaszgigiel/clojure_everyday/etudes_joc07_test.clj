@@ -65,9 +65,10 @@
 (qam
   (q "What is a higher-order function?")
   (a "a function that does at least one of the following:")
-  (a "1. takes one or more functions as arguments (i.e. procedural parameters)")
-  (a "2. returns a function as its result")
-  (m "https://en.wikipedia.org/wiki/Higher-order_function"))
+  (a "1. takes one or more functions as arguments")
+  (a "2. returns a function as a result")
+  (m "https://en.wikipedia.org/wiki/Higher-order_function")
+  (m "Michael Fogus, Chris Houser: The Joy of Clojure, 2nd, page 140"))
 
 (qam
   (q "What is a first-order function?")
@@ -189,6 +190,7 @@
 (qam
   (q "Create function using partial function.")
   (a (= ((partial + 5) 100 200) 305) "built from the partial application of another function")
+  (a (def sort-by-some-ratio (partial sort-by #(/ (:something %) (:something-else %)))))
   (m "Michael Fogus, Chris Houser: The Joy of Clojure, 2nd, page 138"))
 
 (qam
@@ -256,3 +258,47 @@
   (a "1. a partial function attempts to evaluate whenever it is given another argument")
   (a "2. a curried function returns another curried function until it receives a predetermined number of arguments - only then does it evaluate")
   (m "Michael Fogus, Chris Houser: The Joy of Clojure, 2nd, page 139"))
+
+(qam
+  (q "Create function using complement.")
+  (a ((complement even?) 1) "takes a function that returns a truthy value and returns the opposite truthy value")
+  (m "Michael Fogus, Chris Houser: The Joy of Clojure, 2nd, page 139"))
+
+(qam
+  (q "Write equivalent to (complement even?) 2) with comp.")
+  (a (= ((complement even?) 1) ((comp not even?) 1) (#(not (even? %)) 1)))
+  (m "Michael Fogus, Chris Houser: The Joy of Clojure, 2nd, page 139"))
+
+(qam
+  (q "Example that a function is data.")
+  (a "clojure.test stores and validates unit tests in the metadata of a var holding a function")
+  (a (defn foo {:test (fn [] (assert (= (foo) "foo")))} [] "foo"))
+  (a (test #'foo))
+  (m "Michael Fogus, Chris Houser: The Joy of Clojure, 2nd, page 139"))
+
+(qam
+  (q "How to assign metadata to a function using the defn macro?")
+  (a (defn foo {:something true :something-else true} [] "foo"))
+  (a (defn ^:something ^:something-else foo [] "foo"))
+  (a (defn ^{:something true, :something-else true} foo [] "foo"))
+  (a (defn foo ([] "foo") {:something true :something-else true}))
+  (m "Michael Fogus, Chris Houser: The Joy of Clojure, 2nd, page 139"))
+
+(qam
+  (q "How to imitate higher-order functions in Java?")
+  (a "1. by subscriber pattern")
+  (a "2. by callback pattern")
+  (m "Michael Fogus, Chris Houser: The Joy of Clojure, 2nd, page 140"))
+
+(qam
+  (q "Example use of functions as argument")
+  (a (= (map second [[:a 3] [:b 2] [:c 1]]) [3 2 1]))
+  (a (= (reduce #(conj %1 (second %2)) [] [[:a 3] [:b 2] [:c 1]]) [3 2 1]))
+  (a (= (filter #(-> % second odd?) [[:a 3] [:b 2] [:c 1]]) [[:a 3] [:c 1]]))
+  (a (= (sort-by second [[:a 3] [:b 2] [:c 1]]) [[:c 1] [:b 2] [:a 3]]))
+  (m "Michael Fogus, Chris Houser: The Joy of Clojure, 2nd, page 141"))
+
+(qam
+  (q "")
+  (a "")
+  (m ""))
