@@ -190,7 +190,8 @@
 (qam
   (q "Create function using partial function.")
   (a (= ((partial + 5) 100 200) 305) "built from the partial application of another function")
-  (a (def sort-by-some-ratio (partial sort-by #(/ (:something %) (:something-else %)))))
+  (a (def sort-by-some-ratio (partial sort-by #(/ (:x %) (:y %)))))
+  (a (= (sort-by-some-ratio [{:x 1 :y 1} {:x 1 :y 2} {:x 1 :y 3}]) [{:x 1 :y 3} {:x 1 :y 2} {:x 1 :y 1}]))
   (m "Michael Fogus, Chris Houser: The Joy of Clojure, 2nd, page 138"))
 
 (qam
@@ -298,6 +299,36 @@
   (a (= (sort-by second [[:a 3] [:b 2] [:c 1]]) [[:c 1] [:b 2] [:a 3]]))
   (m "Michael Fogus, Chris Houser: The Joy of Clojure, 2nd, page 141"))
 
+(qam
+  (q "Sort rows based on selected columns.")
+  (a (defn columns [column-names] (fn [row] (vec (map row column-names)))))
+  (a (= ((columns [:x :z]) {:x 1 :y 2 :z 3}) [1 3]))
+  (a (= (compare [1 3] [2 3]) -1) "vector is a closure function, so it implements the java.util.Comparator interface")
+  (a "sort-by uses compare")
+  (a (= (sort-by (columns [:x :z]) [{:x 2 :y 3 :z 2}{:x 2 :y 2 :z 1}{:x 1 :y 1 :z 3}]) [{:x 1 :y 1 :z 3}{:x 2 :y 2 :z 1}{:x 2 :y 3 :z 2}]))
+  (m "Michael Fogus, Chris Houser: The Joy of Clojure, 2nd, page 143"))
+
+(qam
+  (q "What is a pure function?")
+  (a "1. always returns the same result, given the same arguments")
+  (a "2. doesn't cause any observable side effects")
+  (m "Michael Fogus, Chris Houser: The Joy of Clojure, 2nd, page 144"))
+
+(qam
+  (q "Enumerate the reasons for using pure functions.")
+  (a "1. referential transparency")
+  (a "2. optimization")
+  (a "3. testability")
+  (m "Michael Fogus, Chris Houser: The Joy of Clojure, 2nd, page 144"))
+
+(qam
+  (q "")
+  (a "")
+  (m ""))
+(qam
+  (q "")
+  (a "")
+  (m ""))
 (qam
   (q "")
   (a "")
