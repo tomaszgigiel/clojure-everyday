@@ -1,6 +1,6 @@
 (ns pl.tomaszgigiel.clojure-everyday.faq-joc07-test
   (:require [clojure.test :as tst])
-  ;(:require [uncomplicate.fluokitten.core :as fluokitten])
+  (:require [uncomplicate.fluokitten.core :as fluokitten])
   (:require [pl.tomaszgigiel.clojure-everyday.test-config :as test-config])
   (:require [pl.tomaszgigiel.clojure-everyday.faq :refer [qam q a m]])
   (:require [pl.tomaszgigiel.utils.misc :as misc]))
@@ -237,24 +237,10 @@
   (a "(:require [uncomplicate.fluokitten.core :as fluokitten])")
   (a "(curry f)")
   (a "(curry f arity)")
-  ;(a (= ((((fluokitten/curry + 3) 1) 2) 3) 6))
-  ;(a (= ((fluokitten/curry +) 1 2 3) 6))
-
-  ;(a (do (require [uncomplicate.fluokitten.core :as fluokitten2]) (= ((fluokitten2/curry +) 1 2 3) 6)))
-  ;(a (require '(clojure.java.io)))
-  (a (clojure.java.io/file "filename"))
-
-  ;(a (require '(uncomplicate.fluokitten.core)))
-  ;(a ((((uncomplicate.fluokitten.core/curry + 3) 1) 2) 3))
-
-  ;(ns my-test (:require [uncomplicate.fluokitten.core :as fluokitten])) (= ((fluokitten/curry +) 1 2 3) 6)
-  ;(a (load "/uncomplicate/fluokitten/core"))
-
+  (a (= ((((fluokitten/curry + 3) 1) 2) 3) 6))
+  (a (= ((fluokitten/curry +) 1 2 3) 6))
   (m "https://dragan.rocks/articles/18/Fluokitten-080-Fast-function-currying-in-Clojure")
   (m "https://fluokitten.uncomplicate.org/codox/uncomplicate.fluokitten.core.html#var-curry"))
-
-    (load "/uncomplicate/fluokitten/core")
-    ((((uncomplicate.fluokitten.core/curry + 3) 1) 2) 3)
 
 (qam
   (q "Why no automatic currying in clojure?")

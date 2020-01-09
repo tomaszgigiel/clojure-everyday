@@ -16,6 +16,5 @@
   :uberjar-name "clojure-everyday-uberjar.jar"
   :main pl.tomaszgigiel.clojure-everyday.core
   :aot [pl.tomaszgigiel.clojure-everyday.core]
-  :profiles {;:prod {:resource-paths ["src/test/resources"]}
-             :test {:resource-paths ["src/test/resources"]}}
+  :profiles {:test {:resource-paths ["src/test/resources"]}}
 )

@@ -26,3 +26,10 @@
   ;(a (= (call john :get-full-name) "John Smith"))
   (a false "todo")
   (m "https://stackoverflow.com/questions/5024211/clojure-adding-functions-to-defrecord-without-defining-a-new-protocol"))
+
+(qam
+  (q "Why did the syntaxt error occur?")
+  (a (require '(uncomplicate.fluokitten.core)))
+  ;(a ((((uncomplicate.fluokitten.core/curry + 3) 1) 2) 3))
+  (a false "todo")
+  (m ""))
