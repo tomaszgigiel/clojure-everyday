@@ -1,8 +1,8 @@
-(ns pl.tomaszgigiel.clojure-everyday.etudes-joc07-test
+(ns pl.tomaszgigiel.clojure-everyday.faq-joc07-test
   (:require [clojure.test :as tst])
-  (:require [uncomplicate.fluokitten.core :as fluokitten])
+  ;(:require [uncomplicate.fluokitten.core :as fluokitten])
   (:require [pl.tomaszgigiel.clojure-everyday.test-config :as test-config])
-  (:require [pl.tomaszgigiel.clojure-everyday.etudes :refer [qam q a m]])
+  (:require [pl.tomaszgigiel.clojure-everyday.faq :refer [qam q a m]])
   (:require [pl.tomaszgigiel.utils.misc :as misc]))
 
 (tst/use-fixtures :once test-config/once-fixture)
@@ -51,7 +51,7 @@
   (a "3. can be assigned to a variable and stored in a data structure")
   (a "4. can be created and modified at run time")
   (a "5. can be tested for equality and identity (has an identity)")
-  (a "6. need not be associated with an identifier (i.e. an anonymous function)")
+  (a "6. need not be associated with an identifier (e.g. an anonymous function)")
   (m "https://en.wikipedia.org/wiki/First-class_citizen")
   (m "https://pl.wikipedia.org/wiki/Typ_pierwszoklasowy")
   (m "https://en.wikipedia.org/wiki/Anonymous_function"))
@@ -209,7 +209,7 @@
   (q "1. to study functions with multiple arguments in simpler theoretical models which provide only one argument")
   (q "2. to automatically manage how arguments are passed to functions and exceptions")
   (q "3. to work with functions that take multiple arguments, and using them in frameworks where functions might take only one argument")
-  (q "4. some programming languages almost always use curried functions to achieve multiple arguments, i.e. all functions in ML and Haskell have exactly one argument")
+  (q "4. some programming languages almost always use curried functions to achieve multiple arguments, e.g. all functions in ML and Haskell have exactly one argument")
   (a "5. allows to effectively get multi-argument functions without actually defining semantics for them or defining semantics for products")
   (a "6. leads to a simpler language with as much expressiveness as another, more complicated language, and so is desirable")
   (m "https://softwareengineering.stackexchange.com/questions/185585/what-is-the-advantage-of-currying")
@@ -233,21 +233,35 @@
 (qam
   (q "How to implement automatic currying in clojure?")
   (a "use Fluokitten")
-  (a "i.e. [uncomplicate/fluokitten \"0.9.1\"]")
+  (a "e.g. [uncomplicate/fluokitten \"0.9.1\"]")
   (a "(:require [uncomplicate.fluokitten.core :as fluokitten])")
   (a "(curry f)")
   (a "(curry f arity)")
-  (a (= ((((fluokitten/curry + 3) 1) 2) 3) 6))
-  (a (= ((fluokitten/curry +) 1 2 3) 6))
+  ;(a (= ((((fluokitten/curry + 3) 1) 2) 3) 6))
+  ;(a (= ((fluokitten/curry +) 1 2 3) 6))
+
+  ;(a (do (require [uncomplicate.fluokitten.core :as fluokitten2]) (= ((fluokitten2/curry +) 1 2 3) 6)))
+  ;(a (require '(clojure.java.io)))
+  (a (clojure.java.io/file "filename"))
+
+  ;(a (require '(uncomplicate.fluokitten.core)))
+  ;(a ((((uncomplicate.fluokitten.core/curry + 3) 1) 2) 3))
+
+  ;(ns my-test (:require [uncomplicate.fluokitten.core :as fluokitten])) (= ((fluokitten/curry +) 1 2 3) 6)
+  ;(a (load "/uncomplicate/fluokitten/core"))
+
   (m "https://dragan.rocks/articles/18/Fluokitten-080-Fast-function-currying-in-Clojure")
   (m "https://fluokitten.uncomplicate.org/codox/uncomplicate.fluokitten.core.html#var-curry"))
+
+    (load "/uncomplicate/fluokitten/core")
+    ((((uncomplicate.fluokitten.core/curry + 3) 1) 2) 3)
 
 (qam
   (q "Why no automatic currying in clojure?")
   (a "Clojure does not support automatic currying.")
   (a "Clojure allows functions with a variable number of arguments, so currying makes little sense.")
-  (a "i.e. how to know whether (+ 3) should return 3, or wait for more arguments?")
-  (a "i.e. in Haskell function + expects exactly two arguments. If called with 0 or 1, it will produce a function that waits for the rest.")
+  (a "e.g. how to know whether (+ 3) should return 3, or wait for more arguments?")
+  (a "e.g. in Haskell function + expects exactly two arguments. If called with 0 or 1, it will produce a function that waits for the rest.")
   (a "The closest thing to currying in Clojure is the partial function.")
   (m "Michael Fogus, Chris Houser: The Joy of Clojure, 2nd, page 139")
   (m "https://stackoverflow.com/questions/31373507/rich-hickeys-reason-for-not-auto-currying-clojure-functions")

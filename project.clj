@@ -14,6 +14,8 @@
   :target-path "target/%s"
   :jar-name "clojure-everyday.jar"
   :uberjar-name "clojure-everyday-uberjar.jar"
-  :profiles {:test {:resource-paths ["src/test/resources"]}
-             :dev {:resource-paths ["src/test/resources"]}}
+  :main pl.tomaszgigiel.clojure-everyday.core
+  :aot [pl.tomaszgigiel.clojure-everyday.core]
+  :profiles {;:prod {:resource-paths ["src/test/resources"]}
+             :test {:resource-paths ["src/test/resources"]}}
 )

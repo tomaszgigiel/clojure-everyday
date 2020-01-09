@@ -5,7 +5,7 @@
   (:require [pl.tomaszgigiel.utils.misc :as misc])
   (:gen-class))
 
-(defn clojure-everyday [a] (log/info a))
+(defn clojure-everyday [a])
 
 (defn -main [& args]
   "clojure-everyday: Clojure everyday learning"

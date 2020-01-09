@@ -1,7 +1,7 @@
-(ns pl.tomaszgigiel.clojure-everyday.etudes-macro01-test
+(ns pl.tomaszgigiel.clojure-everyday.faq-macro01-test
   (:require [clojure.test :as tst])
   (:require [pl.tomaszgigiel.clojure-everyday.test-config :as test-config])
-  (:require [pl.tomaszgigiel.clojure-everyday.etudes :refer [qam q a m]])
+  (:require [pl.tomaszgigiel.clojure-everyday.faq :refer [qam q a m]])
   (:require [pl.tomaszgigiel.utils.misc :as misc]))
 
 (tst/use-fixtures :once test-config/once-fixture)

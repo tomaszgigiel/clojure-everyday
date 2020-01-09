@@ -1,4 +1,4 @@
-(ns pl.tomaszgigiel.clojure-everyday.etudes
+(ns pl.tomaszgigiel.clojure-everyday.faq
   (:require [clojure.test :as tst])
   (:require [pl.tomaszgigiel.utils.misc :as misc])
   (:gen-class))
