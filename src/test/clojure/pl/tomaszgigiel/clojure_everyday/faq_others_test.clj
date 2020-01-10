@@ -1,4 +1,4 @@
-(ns pl.tomaszgigiel.clojure-everyday.faq-macro01-test
+(ns pl.tomaszgigiel.clojure-everyday.faq-others-test
   (:require [clojure.test :as tst])
   (:require [pl.tomaszgigiel.clojure-everyday.test-config :as test-config])
   (:require [pl.tomaszgigiel.clojure-everyday.faq :refer [qam q a m]])
@@ -6,6 +6,33 @@
 
 (tst/use-fixtures :once test-config/once-fixture)
 (tst/use-fixtures :each test-config/each-fixture)
+
+(qam
+  (q "What is the difference between a quote and a syntax quote?")
+  (q "What is the difference between \"'\" and \"`\"?")
+  (a false "todo")
+  (m "https://cljs.github.io/api/syntax/quote")
+  (m "https://cljs.github.io/api/syntax/syntax-quote")
+  (m "https://clojuredocs.org/clojure.core/quote")
+  (m "https://8thlight.com/blog/colin-jones/2012/05/22/quoting-without-confusion.html"))
+
+(qam
+  (q "Discuss the weird characters.")
+  (a false "todo")
+  (m "https://clojure.org/guides/weird_characters"))
+
+(qam
+  (q "What is the difference between use and require?")
+  (a false "todo")
+  (m "https://stackoverflow.com/questions/871997/difference-between-use-and-require"))
+
+(qam
+  (q "How to load libs in REPL?")
+  (a "(require '(clojure.string))")
+  (a "(clojure.string/upper-case \"aa\")")
+  (a "(require '[clojure.string :as s])")
+  (a "(s/upper-case \"aa\")")
+  (m "https://clojuredocs.org/clojure.core/require"))
 
 (qam
   (q "Discuss the macro hidden arguments.")
