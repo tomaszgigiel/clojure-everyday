@@ -8,6 +8,19 @@
 (tst/use-fixtures :each test-config/each-fixture)
 
 (qam
+  (q "What is a programming paradigm?")
+  (a "a way to classify programming languages based on their features")
+  (a "an approach to computer programming")
+  (a "a style of building the computer programs")
+  (m "https://en.wikipedia.org/wiki/Programming_paradigm"))
+
+(qam
+  (q "What is a functional programming?")
+  (a "a programming paradigm")
+  (a "constructing programs using only pure functions")
+  (m " Paul Chiusano, Runar Bjarnason: Functional Programming in Scala, 1nd, page 1"))
+
+(qam
   (q "What is at the core of functional programming?")
   (a "the lambda calculus")
   (m "Michael Fogus, Chris Houser: The Joy of Clojure, 2nd, page 136"))
@@ -182,9 +195,10 @@
 
 (qam
   (q "What is a pure function?")
-  (a "1. always returns the same result, given the same arguments")
+  (a "1. idempotent: always returns the same result, given the same arguments")
   (a "2. doesn't cause any observable side effects")
-  (m "Michael Fogus, Chris Houser: The Joy of Clojure, 2nd, page 144"))
+  (m "Michael Fogus, Chris Houser: The Joy of Clojure, 2nd, page 144")
+  (m "https://en.wikipedia.org/wiki/Pure_function"))
 
 (qam
   (q "Enumerate the reasons for using pure functions.")
@@ -196,29 +210,35 @@
 (qam
   (q "What is a referential transparency?")
   (a "also purity")
-  (a "An expression is called referentially transparent if it can be replaced with its corresponding value without changing the program's behavior.")
-  (a "1. a property of part of computer program")
-  (a "2. idempotent")
-  (a "3. no side effects")
+  (a "a property of part of computer program")
+  (a "an expression is called referentially transparent if it can be replaced with its corresponding value without changing the program's behavior")
   (m "Michael Fogus, Chris Houser: The Joy of Clojure, 2nd, page 144")
-  (m "https://en.wikipedia.org/wiki/Referential_transparency"))
+  (m "https://en.wikipedia.org/wiki/Referential_transparency")
+  (m "https://stackoverflow.com/questions/4865616/purity-vs-referential-transparency"))
 
 (qam
   (q "What is a side effect?")
   (a "changing something somewhere")
-  (a "1. an effect ")
+  (a "an effect beside returning value")
   (m "https://en.wikipedia.org/wiki/Side_effect_(computer_science)")
   (m "https://pl.wikipedia.org/wiki/Skutek_uboczny_(informatyka)"))
 
 (qam
   (q "What is a referential opacity?")
-  (a "")
-  (m "")
-  (m "https://en.wikipedia.org/wiki/Side_effect_(computer_science)")
-  (m "https://pl.wikipedia.org/wiki/Skutek_uboczny_(informatyka)"))
+  (a "An expression that is not referentially transparent is called referentially opaque.")
+  (m "https://en.wikipedia.org/wiki/Referential_transparency"))
 
 (qam
-  (q "")
+  (q "What is the difference between purity and referential transparency?")
+  (a "1. idempotent, no side effects")
+  (a "2. an ability to be replaced"))
+
+(qam
+  (q "Can a pure function be not referentially transparent?")
   (a "")
   (m ""))
 
+(qam
+  (q "Can a referentially transparent function be not pure?")
+  (a "")
+  (m ""))
