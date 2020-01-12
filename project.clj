@@ -1,5 +1,5 @@
 (defproject clojure-everyday "1.0.0.0-SNAPSHOT"
-  :description "clojure-everyday: Clojure everyday learning"
+  :description "quizzes: ask for everything, ultimately data for flashcards"
   :url "http://tomaszgigiel.pl"
   :license {:name "Apache License"
             :url "http://www.apache.org/licenses/LICENSE-2.0"}
@@ -12,9 +12,9 @@
   :test-paths ["src/test/clojure"]
   :resource-paths ["src/main/resources"]
   :target-path "target/%s"
-  :jar-name "clojure-everyday.jar"
-  :uberjar-name "clojure-everyday-uberjar.jar"
-  :main pl.tomaszgigiel.clojure-everyday.core
-  :aot [pl.tomaszgigiel.clojure-everyday.core]
+  :jar-name "quizzes.jar"
+  :uberjar-name "quizzes-uberjar.jar"
+  :main pl.tomaszgigiel.quizzes.core
+  :aot [pl.tomaszgigiel.quizzes.core]
   :profiles {:test {:resource-paths ["src/test/resources"]}}
 )

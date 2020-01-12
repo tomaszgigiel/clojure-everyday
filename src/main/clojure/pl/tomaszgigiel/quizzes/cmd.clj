@@ -1,4 +1,4 @@
-(ns pl.tomaszgigiel.clojure-everyday.cmd
+(ns pl.tomaszgigiel.quizzes.cmd
   (:require [clojure.string :as string])
   (:require [clojure.tools.cli :refer [parse-opts]])
   (:require [clojure.tools.logging :as log])
@@ -8,9 +8,9 @@
   [["-h" "--help"]])
 
 (defn usage [options-summary]
-  (->> ["clojure-everyday: Clojure everyday learning"
+  (->> ["quizzes: ask for everything, ultimately data for flashcards"
         ""
-        "Usage: java -jar /path/to/clojure-everyday-uberjar.jar"
+        "Usage: java -jar /path/to/quizzes-uberjar.jar"
         ""
         "Options:"
         options-summary

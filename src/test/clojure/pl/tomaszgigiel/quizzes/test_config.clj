@@ -1,4 +1,4 @@
-(ns pl.tomaszgigiel.clojure-everyday.test-config
+(ns pl.tomaszgigiel.quizzes.test-config
   (:require [clojure.test]))
 
 (defn setup [] ())

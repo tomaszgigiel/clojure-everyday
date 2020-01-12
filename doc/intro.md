@@ -1,1 +1,1 @@
-# Introduction to clojure-everyday
+# Introduction to quizzes

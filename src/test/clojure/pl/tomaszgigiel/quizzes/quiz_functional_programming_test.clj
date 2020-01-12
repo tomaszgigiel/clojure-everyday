@@ -1,7 +1,7 @@
-(ns pl.tomaszgigiel.clojure-everyday.faq-functional-programming-test
+(ns pl.tomaszgigiel.quizzes.quiz-functional-programming-test
   (:require [clojure.test :as tst])
-  (:require [pl.tomaszgigiel.clojure-everyday.test-config :as test-config])
-  (:require [pl.tomaszgigiel.clojure-everyday.faq :refer [qam q a m]])
+  (:require [pl.tomaszgigiel.quizzes.test-config :as test-config])
+  (:require [pl.tomaszgigiel.quizzes.quiz :refer [qam q a m]])
   (:require [pl.tomaszgigiel.utils.misc :as misc]))
 
 (tst/use-fixtures :once test-config/once-fixture)

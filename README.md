@@ -1,2 +1,2 @@
-# clojure-everyday
-clojure-everyday: Clojure everyday learning
+# quizzes
+quizzes: ask for everything, ultimately data for flashcards
