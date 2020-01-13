@@ -1,0 +1,393 @@
+/\
+List basic types in Scala
+(5.1,p113)
+
+scala.Byte       8-bit signed two’s complement integer (-27 to 27 - 1, inclusive)
+scala.Short      16-bit signed two’s complement integer (-215 to 215 - 1, inclusive)
+scala.Int        32-bit signed two’s complement integer (-231 to 231 - 1, inclusive)
+scala.Long       64-bit signed two’s complement integer (-263 to 263 - 1, inclusive)
+scala.Char       16-bit unsigned Unicode character (0 to 216 - 1, inclusive)
+java.lang.String a sequence of Chars
+scala.Float      32-bit IEEE 754 single-precision float
+scala.Double     64-bit IEEE 754 double-precision float
+scala.Boolean    true or false
+
+/\
+Why the Scala compiler can transform value types to Java primitive types in the bytecodes?
+(5.1,p113)
+
+Because of Scala’s basic types have the exact same ranges as the corresponding types in Java.
+
+/\
+What is a literal?
+(5.2,p113)
+
+A literal is a way to write a constant value directly in code.
+
+/\
+How does Scala support octal literals?
+(5.2,p113)
+
+Scala does not support octal literals.
+Integer literals that start with a 0, such as 031, do not compile.
+
+/\
+Example of Int, Long literals.
+(5.2,p114)
+
+val magic = 0xcafebabe
+magic: Int = 889275714
+
+val prog = 0XCAFEBABEL
+prog: Long = 3405691582
+
+/\
+Example of Short, Byte literals.
+(5.2,p115)
+
+val something = 3000
+val little: Short = 300
+val littler: Byte = 30
+
+/\
+Example of Float, Double literals.
+(5.2,p115)
+
+val fooFloat = 1.5e3F
+val fooDouble = 1.5e3D
+val fooAnotherDouble = 1.5e3
+
+/\
+An example of Char literals.
+(5.2,p116)
+
+val a = 'a'
+val b = '\u0062'
+val backslash = '\\'
+
+/\
+An example of using Unicode characters.
+(5.2,p116)
+
+val \u0046\u006F\u006F = 1.0
+Foo: Double = 1.0
+
+/\
+An example of String literals.
+(5.2,p117)
+
+println("""|abc
+           |ABC""".stripMargin)
+
+println("""abc
+          #ABC""".stripMargin('#'))
+
+/\
+An example of Symbol literals.
+(5.2,p118)
+
+val s = 'aSymbol
+
+def updateRecordByName(r: Symbol, value: Any) = {
+  // code goes here
+}
+
+/\
+What is the purpose of Symbol?
+(5.2,p118)
+(https://stackoverflow.com/questions/3554362/purpose-of-scalas-symbol)
+
+- you have a closed set of identifiers that you want to be able to compare quickly,
+- i.e. Map[Symbol, Foo],
+- symbols are interned,
+- having same contents share same heap memory.
+
+/\
+Explein String.intern.
+(API doc)
+
+Returns a canonical representation for the string object.
+A pool of strings, initially empty, is maintained privately by the class String.
+When the intern method is invoked, if the pool already contains a string equal to this String object as determined by the equals(Object) method, then the string from the pool is returned. Otherwise, this String object is added to the pool and a reference to this String object is returned.
+It follows that for any two strings s and t, s.intern() == t.intern() is true if and only if s.equals(t) is true.
+All literal strings and string-valued constant expressions are interned.
+
+/\
+Why (in Java)?
+String s1 = "abc";
+String s2 = "abc";
+String s3 = new String("abc");
+System.out.println(s1 == s2); //true
+System.out.println(s2 == s3); //false
+(https://stackoverflow.com/questions/10578984/what-is-string-interning)
+
+Because the "testString" is interned by the compiler.
+
+/\
+An example of Boolean literals.
+(5.2,p119)
+
+val foo = true
+val boo = false
+
+/\
+List string interpolators.
+(5.3,p119)
+
+val name = "reader"
+println(s"Hello, $name!")
+println(s"The answer is ${6 * 7}.")
+println(raw"No\\\\escape!")
+println(f"$pi is approximately ${math.Pi}%.8f.") // printf-style formatting
+
+/\
+What makes a method an operator?
+(5.4,p122)
+
+What makes a method an operator is how you use it:
+- any method can be an operator,
+- s.indexOf('o'), indexOf is not an operator,
+- s indexOf 'o', indexOf is an operator.
+Scala doesn’t have operators, per se.
+
+/\
+Example of an postfix unary operator.
+(5.4,p122)
+
+12 toLong
+"abc" toUpperCase
+
+/\
+Example of an infix operator.
+(5.4,p122)
+
+s indexOf 'o'
+s indexOf ('o', 5)
+
+/\
+List the identifiers that can be used as prefix operators.
+(5.4,p123)
+
++, -, !, ~
+
+/\
+Declare the method that can be used as a prefix operator.
+(5.4,p123)
+
+class MyString(string:String) {
+  var value = string
+  def unary_- = value.reverse
+  override def toString = value
+}
+
+val myString = new MyString("abcd")
+
+println(myString)     // prints "abcd"
+println(-myString)    // prints "dcba"
+
+/\
+Compile:
+'b' - 'a'
+(5.5,p124)
+
+res0: Int = 1
+
+/\
+Compile:
+1.2 + 2.3
+(5.5,p124)
+
+res0: Double = 3.5
+
+/\
+Compile:
+11 / 4
+(5.5,p124)
+
+res0: Int = 2
+
+/\
+Compile:
+11 / 4
+(5.5,p124)
+
+res0: Int = 2
+
+/\
+Compile:
+11 % 4
+(5.5,p124)
+
+res0: Int = 3
+
+/\
+Compile:
+11.0f / 4.0f
+(5.5,p124)
+
+res0: Float = 2.75
+
+/\
+Compile:
+11.0 % 4.0
+(5.5,p124)
+
+res0: Double = 3.0
+
+/\
+Calculate IEEE 754 remainder.
+(5.5,p125)
+
+math.IEEEremainder(11.0, 4.0)
+res0: Double = -1.0
+
+/\
+Compile:
+def pepper() = { println("pepper"); true }
+def salt() = { println("salt"); false }
+pepper() || salt()
+(5.6,p126)
+
+The && and || operations short-circuit:
+pepper
+res0: Boolean = true
+
+/\
+How to avoid a short circuit with logic operators?
+(5.6,p126)
+
+Use & and |.
+
+/\
+Why does short-circuiting work?
+(5.6,p127)
+
+The operators are just methods with by-value parameters, i.e.:
+def myor (a: => Boolean, b: => Boolean) : Boolean = {
+  println("myor")
+  if (a) true else b
+}
+def pepper() = { println("pepper"); true }
+def salt() = { println("salt"); false }
+myor(pepper(), salt())
+
+/\
+How to perform operations on individual bits of integer types?
+(5.7,p127)
+
+1 & 2 // res0: Int = 0
+1 | 2 // res1: Int = 3
+1 ^ 3 // res2: Int = 2 // xor
+~1 // res3: Int = -2 // invert every bits
+-1 >> 31 // res4: Int = 1 // shift with leftmost bit; -1 = 11..1; the number is negative, so the leftmost bit is 1; identical
+-1 >>> 31 // res5: Int = 1 // shift with zeroes
+1 << 2 // res6: Int = 4 // shift with zeroes
+
+/\
+How to compare?
+(5.8,p129)
+
+1 == 2 // res0: Boolean = false
+List(1, 2, 3) == List(1, 2, 3) // res0: Boolean = true
+List(1, 2, 3) == List(4, 5, 6) // res0: Boolean = false
+1 == 1.0 // res0: Boolean = true
+List(1, 2, 3) == "hello" // res0: Boolean = true
+List(1, 2, 3) == null // res0: Boolean = false
+null == List(1, 2, 3) // res0: Boolean = false
+("he" + "llo") == "hello" // res0: Boolean = true; other than in Java
+
+/\
+Operator precedence.
+(5.9,p131)
+
+The precedence given to the first character of a method:
+ 1. (all other special characters)
+ 2. * / %
+ 3. + -
+ 4. :
+ 5. = !
+ 6. < >
+ 7. &
+ 8. ^
+ 9. |
+10. (all letters)
+11. (all assignment operators, ends with =, i.e. +=)
+
+/\
+What is "associativity"?
+(5.9,p132)
+
+The "associativity" is a property that determines how operators of the same precedence are grouped in the absence of parentheses.
+(³¹cznoœæ dzia³ania)
+
+/\
+Discuss a associativity in Scala.
+(5.9,p132)
+
+- associativity of an operator is determined by its last character,
+- any method that ends in a ':' character is invoked on its right operand, passing in the left operand,
+- otherwise method is invoked on their left operand, passing in the right operand,
+- a ::: b == { val x = a; b.:::(x) }
+- a ::: b ::: c == a ::: (b ::: c)
+
+/\
+Add parentheses (without changing the meaning):
+bills !*&^%~ code!
+(5.9,p133)
+
+(bills.!*&^%~(code)).!()
+
+/\
+What is "a rich wrapper" for basic type?
+(5.10,p133)
+
+- the realization The Rich Wrapper Pattern (or Pimp My Library Pattern),
+- in a situation illegal assignment, the conversion is automatically inserted.
+import scala.language.implicitConversions
+implicit def array2string[T](xs: Array[T]) = s"""Produced by MyRichWrapper: [${xs.mkString(", ")}]"""
+val text: String = Array(1, 2, 3, 4)
+
+/\
+Complete:
+Array(1, 2, 3, 4) append Array(5)
+(https://www.artima.com/weblogs/viewpost.jsp?thread=179766)
+
+Scala's arrays are directly mapped to Java's arrays, and there is no append method in either type.
+import scala.reflect.ClassTag
+class RichArray[T: ClassTag](val value: Array[T]) {
+  def append(other: Array[T]): Array[T] = {
+    (value ++ other).toArray
+  }
+}
+import scala.language.implicitConversions
+implicit def enrichArray[T: ClassTag](xs: Array[T]) = new RichArray[T](xs)
+Array(1, 2, 3, 4) append Array(5)
+
+/\
+Correct:
+import scala.reflect.ClassTag
+class RichArray[T: ClassTag](val value: Array[T]) {
+  def append[T: ClassTag](other: Array[T]): Array[T] = {
+    (value ++ other).toArray
+  }
+}
+import scala.language.implicitConversions
+implicit def enrichArray[T: ClassTag](xs: Array[T]) = new RichArray[T](xs)
+Array(1, 2, 3, 4) append Array(5)
+(https://www.artima.com/weblogs/viewpost.jsp?thread=179766)
+
+Delete second [T: ClassTag].
+
+/\
+List Rich wrapper classes.
+(5.10,p134)
+
+Byte    : scala.runtime.RichByte
+Short   : scala.runtime.RichShort
+Int     : scala.runtime.RichInt
+Long    : scala.runtime.RichLong
+Char    : scala.runtime.RichChar
+Float   : scala.runtime.RichFloat
+Double  : scala.runtime.RichDouble
+Boolean : scala.runtime.RichBoolean
+String  : scala.collection.immutable.StringOps

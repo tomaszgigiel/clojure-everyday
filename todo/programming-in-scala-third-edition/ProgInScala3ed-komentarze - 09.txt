@@ -1,0 +1,201 @@
+/\
+How to create control abstractions?
+(ch9.1,p203)
+
+To create new control abstractions apply function values.
+
+/\
+What is Higher-order function?
+(ch9,p203)
+(https://en.wikipedia.org/wiki/Higher-order_function)
+
+A higher-order function (also functional, functional form, functor) is a function that does at least one of the following:
+- takes one or more functions as arguments,
+- returns a function as its result.
+
+/\
+Implement Repeat-Until Loop.
+(http://stackoverflow.com/questions/3036058/how-does-one-make-scala-control-abstraction-in-repeat-until)
+
+import scala.language.reflectiveCalls
+def repeat(body: => Unit) = new {
+  def until(condition: => Boolean) = { 
+    do {
+      body
+    } while (!condition)
+  }   
+}
+
+or
+import scala.language.reflectiveCalls
+def repeat(body: => Unit) = new {def until(condition: => Boolean) {body; while (!condition) body}}
+
+or
+import scala.language.reflectiveCalls
+def repeat(body: => Unit) = new {@scala.annotation.tailrec def until(condition: => Boolean) : Unit = {body; if (!condition) until(condition)}}
+
+var i = 0
+repeat { println(i); i += 1 } until(i == 10)
+
+/\
+What does this warning mean: "reflective access of structural type member method orElse should be enabled"?
+(http://stackoverflow.com/questions/26787871/warning-about-reflective-access-of-structural-type-member-in-scala)
+(http://blog.zabiello.com/2010/01/23/scala-duck-typing)
+
+The new { ... } objects are structurally typed ("duck typing"), which require reflection to implement.
+
+class Duck { def quack = println("quack quack") }
+class Canary { def quack = println("fiu fiu") }
+class Cat { def meow = println("meow meow") }
+
+def duck_quack (d : {def quack}) { d.quack }
+ 
+duck_quack (new Duck) 
+duck_quack (new Canary)
+duck_quack (new Cat) // error: type mismatch;
+
+/\
+Reduce code duplication
+(ch9.1;p204)
+
+object FileMatcher {
+  private def filesHere = (new java.io.File(".")).listFiles
+  def filesEnding(query: String) = for (file <- filesHere; if file.getName.endsWith(query)) yield file
+  def filesContaining(query: String) = for (file <- filesHere; if file.getName.contains(query)) yield file
+  def filesRegex(query: String) = for (file <- filesHere; if file.getName.matches(query)) yield file
+}
+
+object FileMatcher {
+  private def filesHere = (new java.io.File(".")).listFiles
+  private def filesMatching(matcher: String => Boolean) = for (file <- filesHere; if matcher(file.getName)) yield file
+  def filesEnding(query: String) = filesMatching(_.endsWith(query))
+  def filesContaining(query: String) = filesMatching(_.contains(query))
+  def filesRegex(query: String) = filesMatching(_.matches(query))
+}
+The function literal "_.endsWith(query)" contains one bound variable "_", and one free variable "query".
+
+/\
+Simplify
+(ch9.2;p208)
+def containsOdd(nums: List[Int]): Boolean = {
+  var exists = false
+  for (num <- nums) {
+    if (num % 2 == 1) {
+      exists = true
+    }
+  }
+  exists
+}
+
+def containsOdd(nums: List[Int]) = nums.exists(_ % 2 == 1)
+
+/\
+What is currying?
+
+The functional programming technique.
+Instead of one list of parameters, function has lists of one parameter each.
+
+/\
+(ch9.3;p210)
+Show spirit
+def curriedSum(x: Int)(y: Int) = x + y
+curriedSum(1)(2)
+
+Two traditional function invocations back to back:
+def first(x: Int) = (y: Int) => x + y
+val second = first(1)
+second(2)
+
+/\
+(ch9.3;p211)
+Define onePlus based on:
+def curriedSum(x: Int)(y: Int) = x + y
+
+val onePlus = curriedSum(1)_
+onePlus(2)
+The underscore _ is a placeholder for the second parameter list.
+
+/\
+(ch9.4;p212)
+Show "loan pattern"
+
+def withPrintWriter(file: File, operation: PrintWriter => Unit) = {
+  val writer = new PrintWriter(file)
+  try {
+    operation(writer)
+  } finally {
+    writer.close()
+  }
+}
+
+withPrintWriter(
+  new File("date.txt"),
+  writer => writer.println(new java.util.Date)
+)
+
+Control-abstraction function opens a resource and “loans” it to a function.
+The resource is closed in a finally block.
+
+/\
+(ch9.5;p213)
+When "curly braces" and "parentheses" are interchangeable?
+
+To surround one argument:
+ok: println{"ok"}
+error: "ok".substring{1, 2}
+
+/\
+(ch9.5;p214)
+What is the purpose of ability to substitute curly braces for parentheses for passing in one argument?
+
+To enable client programmers to write function literals between curly braces.
+A method call feel more like a control abstraction.
+
+def withPrintWriter(file: File)(operation: PrintWriter => Unit) = {
+  val writer = new PrintWriter(file)
+  try {
+    operation(writer)
+  } finally {
+    writer.close()
+  }
+}
+
+val file = new File("date.txt")
+withPrintWriter(file) { writer => writer.println(new java.util.Date) }
+
+/\
+Write functions:
+(ch9.5;p215)
+myAssert (() => 5 > 3)
+byNameAssert (5 > 3)
+
+
+var assertionsEnabled = true
+def myAssert(predicate: () => Boolean) = 
+  if (assertionsEnabled && !predicate())
+    throw new AssertionError
+
+def byNameAssert(predicate: => Boolean) =
+  if (assertionsEnabled && !predicate)
+    throw new AssertionError
+
+/\
+What is by-name parameters?
+(ch9.5;p215)
+
+Programming technique to give the parameter a type starting with "=>" instead of "() =>".
+myAssert (() => 5 > 3)
+vs.
+byNameAssert (5 > 3)
+
+var assertionsEnabled = true
+def myAssert(predicate: () => Boolean) = 
+  if (assertionsEnabled && !predicate())
+    throw new AssertionError
+vs.
+def byNameAssert(predicate: => Boolean) =
+  if (assertionsEnabled && !predicate)
+    throw new AssertionError
+
+A by-name type, in which the empty parameter list, (), is left out, is only allowed for parameters.
+There is no such thing as a by-name variable or a by-name field.

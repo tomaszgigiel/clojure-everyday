@@ -1,0 +1,503 @@
+/\
+List kinds of abstract member.
+(20.1;p443)
+
+Kinds of abstract member:
+type (T), method (transform), val (initial), var (current).
+
+/\
+Example of all kinds of abstract member.
+(20.1;p443)
+
+trait Abstract {
+  type T
+  def transform(x: T): T
+  val initial: T
+  var current: T
+}
+
+class Concrete extends Abstract {
+  type T = String
+  def transform(x: String) = x + x
+  val initial = "hi"
+  var current = initial
+}
+
+/\
+Difference abstract "val v: String" vs. "def m: String".
+(20.3;p445)
+
+abstract class Fruit {
+  val v: String // ‘v' for value
+  def m: String // ‘m' for method
+}
+abstract class Apple extends Fruit {
+  val v: String
+  val m: String // OK to override a ‘def' with a ‘val'
+}
+abstract class BadApple extends Fruit {
+  def v: String // ERROR: cannot override a ‘val' with a ‘def'
+  def m: String
+}
+
+/\
+Is a "def" implementation for an abstract "val" legal?
+(20.3;p445)
+
+Although client code would refer to both the val and the method in exactly the same way (i.e., obj.initial), no.
+Becasue:
+- "val" will yield the same value every time it is referenced,
+- "def" not.
+
+/\
+What is the meaning of abstract vars?
+(20.4;p446)
+
+trait AbstractTime {
+  var hour: Int
+}
+
+->
+
+trait AbstractTime {
+  def hour: Int // getter for ‘hour'
+  def hour_=(x: Int) // setter for ‘hour'
+}
+
+/\
+How to pass parameters to traits (analogous to superclass parameters)?
+(20.5;p447)
+
+Via abstract vals that are implemented in subclasses.
+
+trait RationalTrait {
+  val numerArg: Int
+  val denomArg: Int
+}
+
+// instance of an anonymous class that mixes in the trait and is defined by the body in curly braces
+new RationalTrait {
+  val numerArg = expr1
+  val denomArg = expr2
+}
+
+almost:
+new Rational(expr1, expr2)
+
+/\
+trait SampleTrait {val sample: Int; ???}
+new SampleTrait {val sample = expr1; ???}
+vs.
+new SampleClass(expr1)
+(20.5;p447)
+
+val x = 2
+new SampleClass(1 * x)
+
+trait SampleTrait {
+  val sample: Int
+  require(sample != 0)
+}
+
+// the anonymous class (defined by the body in curly braces) is initialized after the RationalTrait
+// selection of either value would yield the default value for type Int, 0
+new SampleTrait {
+  val sample = 1 * x
+}
+
+->
+java.lang.IllegalArgumentException: requirement failed
+
+/\
+The initialization order:
+class parameter argument
+class constructor
+class parameter argument (parameter is by-name)
+(20.5;p449)
+
+class parameter argument
+class constructor
+class parameter argument (parameter is by-name)
+
+/\
+The initialization order:
+superclass
+val definition in a subclass
+(20.5;p449)
+
+superclass
+val definition in a subclass
+
+/\
+Pre-initialized fields.
+(20.5;p449)
+
+// initialize a field of a subclass before the superclass is called
+new {
+  val numerArg = 1 * x
+  val denomArg = 2 * x
+} with RationalTrait
+
+vs.
+
+new with RationalTrait {
+  val numerArg = 1 * x
+  val denomArg = 2 * x
+}
+
+/\
+Pre-initialized fields in an object definition.
+(20.5;p450)
+
+object twoThirds extends {
+  val numerArg = 2
+  val denomArg = 3
+} with RationalTrait
+
+/\
+Pre-initialized fields in a class definition.
+(20.5;p450)
+
+class RationalClass(n: Int, d: Int) extends {
+  val numerArg = n
+  val denomArg = d
+} with RationalTrait {
+  def + (that: RationalClass) = new RationalClass(
+  numer * that.denom + that.numer * denom,
+  denom * that.denom
+  )
+}
+
+/\
+Pre-initialized fields - disadventages.
+(20.5;p450)
+
+new {
+  val numerArg = 1
+  val denomArg = this.numerArg * 2
+} with RationalTrait
+
+<console>:11: error: value numerArg is not a member of object $iw
+val denomArg = this.numerArg * 2
+
+/\
+object DemoVal { val x = { println("initializing x"); "done" } }
+object DemoLazy { lazy val x = { println("initializing x"); "done" } }
+object DemoDef { def x = { println("initializing x"); "done" } }
+(20.5;p451)
+
+"val x" evaluated once when initializing object
+a "lazy val x" is evaluated once, the first time x is used,
+"def x" evaluated when used
+
+/\
+Example lazy.
+(20.5;p453)
+
+trait LazyRationalTrait {
+  val numerArg: Int
+  val denomArg: Int
+  lazy val numer = numerArg / g
+  lazy val denom = denomArg / g
+  override def toString = numer + "/" + denom
+  private lazy val g = {
+    require(denomArg != 0)
+    gcd(numerArg, denomArg)
+  }
+  private def gcd(a: Int, b: Int): Int = if (b == 0) a else gcd(b, a % b)
+}
+
+val x = 2
+new LazyRationalTrait {
+  val numerArg = 1 * x
+  val denomArg = 2 * x
+}
+
+/\
+An important property of lazy vals (the textual order...).
+(20.5;p454)
+
+The textual order of lazy vals definitions does not matter because values get initialized on demand.
+
+/\
+Why?
+class Food
+abstract class Animal {
+  def eat(food: Food)
+}
+class Grass extends Food
+class Cow extends Animal {
+  override def eat(food: Grass) = {} // This won't compile,
+} // but if it did,...
+(20.6;p456)
+
+Because:
+class Fish extends Food
+val bessy: Animal = new Cow
+bessy eat (new Fish) // ...you could feed fish to cows.
+
+/\
+What is "a path-dependent type"?
+(20.7;p458)
+
+the type dependent on the path:
+
+class Food
+abstract class Animal {
+  type SuitableFood <: Food
+  def eat(food: SuitableFood)
+}
+
+class Grass extends Food
+class Cow extends Animal {
+  type SuitableFood = Grass
+  override def eat(food: Grass) = {}
+}
+
+val bessy: Animal = new Cow
+
+"bessy.SuitableFood" is called "a path-dependent type".
+
+/\
+What is the equivalent of the java inner class?
+(20.7;p459)
+
+a path-dependent type
+
+/\
+How to instantiate an inner class?
+(20.7;p459)
+
+1. Instantiate the inner class inside the body of the outer class.
+2. 
+class Outer {
+  class Inner
+}
+val outer1 = new Outer
+val inner1 = new outer1.Inner
+
+/\
+Explain relations between path-dependent types.
+
+class Outer {
+  class Inner
+}
+val o1 = new Outer
+val o2 = new Outer
+
+new o1.Inner
+new o2.Inner
+(20.7;p459)
+
+- path-dependent types,
+- different types,
+- subtypes of Outer#Inner.
+
+/\
+Why not?
+new Outer#Inner
+(20.7;p459)
+
+You can’t instantiate an inner class without specifying an outer class instance.
+
+/\
+What is "a nominal subtype"?
+(20.8;p460)
+
+Nominal subtyping means that one type is a subtype of another if and only if 
+it is explicitly declared to be so in its definition.
+
+/\
+What is "a structural subtype"?
+(20.8;p460)
+
+Structural subtyping means that one type is a subtype of another because has compatible members.
+
+/\
+How to get structural subtyping in Scala?
+(20.8;p460)
+
+To get structural subtyping in Scala, use Scala’s refinement types.
+
+/\
+What is "a refinement type"?
+(20.8;p460)
+
+Refinement type is a type formed by supplying a base type a number of members inside curly braces.
+The members in the curly braces refine the types that are present in the base type.
+For example, the type of “animal that eats grass” is Animal { type SuitableFood = Grass }.
+
+/\
+Disadventages "structural subtyping" vs. "nominal subtyping".
+(20.8;p460)
+
+- an explicit listing of member types vs. a name as a single short identifier,
+- structural subtyping is often more flexible than you want
+(a widget can draw(), and a Western cowboy can draw()).
+
+/\
+Adventages "structural subtyping" vs. "nominal subtyping".
+(20.8;p460)
+
+Animal { type SuitableFood = Grass }
+
+class Pasture {
+  var animals: List[Animal { type SuitableFood = Grass }] = Nil
+  // ...
+}
+
+vs.
+define a trait AnimalThatEatsGrass 
+and mix it into every class where it applies
+
+/\
+How to create an enumeration?
+(20.9;p460)
+
+object Color extends Enumeration {
+  val Red, Green, Blue = Value
+}
+
+/\
+Main features of an enumeration.
+(20.9;p460; http://pedrorijo.com/blog/scala-enums/)
+
+- serialization and deserialization (Color.Red.toString, Color.withName("Red")),
+- human-readable value:
+
+object Color extends Enumeration {
+  val Red = Value("red")
+  val Green = Value("green")
+  val Blue = Value("blue")
+}
+
+- listing all possible values (Color.values),
+- ordering (Color.values.toList.sorted),
+- numbering values of an enumeration from 0 (Color.Red.id, Color(0)),
+- the same type after erasure:
+
+  def test(enum: Weekday.Value) = { println(s"enum: $enum") }
+  def test(enum: Color.Value) = { println(s"enum: $enum") }
+  -> error: double definition
+
+- no exhaustive matching check during compile,
+
+  def nonExhaustive(weekday: Weekday.Value) {
+    weekday match {
+      case Monday => println("I hate Mondays")
+      case Sunday => println("The weekend is already over? :( ")
+    }
+  }
+
+- no inter-operate with Java’s enum.
+
+/\
+Alternatives to scala.Enumeration.
+(http://pedrorijo.com/blog/scala-enums/)
+
+- Java’s enum (i.e. java source files),
+- sealed case objects:
+
+object WeekDay {
+  sealed trait EnumVal
+  case object Mon extends EnumVal
+  case object Tue extends EnumVal
+  case object Wed extends EnumVal
+  case object Thu extends EnumVal
+  case object Fri extends EnumVal
+  val daysOfWeek = Seq(Mon, Tue, Wed, Thu, Fri)
+}
+
+or:
+https://underscore.io/blog/posts/2014/09/03/enumerations.html
+
+object SolarSystemPlanets {
+
+  sealed abstract class Planet(
+    val orderFromSun : Int,
+    val name         : String,
+    val mass         : Kilogram,
+    val radius       : Meter) extends Ordered[Planet] {
+
+      def compare(that: Planet) = this.orderFromSun - that.orderFromSun
+
+      lazy val surfaceGravity = G * mass / (radius * radius)
+
+      def surfaceWeight(otherMass: Kilogram) = otherMass * surfaceGravity
+
+      override def toString = name
+  }
+
+  case object MERCURY extends Planet(1, "Mercury", 3.303e+23, 2.4397e6)
+  case object VENUS   extends Planet(2, "Venus",   4.869e+24, 6.0518e6)
+  case object EARTH   extends Planet(3, "Earth",   5.976e+24, 6.3781e6)
+  case object MARS    extends Planet(4, "Mars",    6.421e+23, 3.3972e6)
+  case object JUPITER extends Planet(5, "Jupiter", 1.9e+27,   7.1492e7)
+  case object SATURN  extends Planet(6, "Saturn",  5.688e+26, 6.0268e7)
+  case object URANUS  extends Planet(7, "Uranus",  8.686e+25, 2.5559e7)
+  case object NEPTUNE extends Planet(8, "Neptune", 1.024e+26, 2.4746e7)
+
+  import EnumerationMacros._
+  val planets: Set[Planet] = sealedInstancesOf[Planet]
+
+  type Kilogram = Double
+  type Meter   = Double
+  private val G = 6.67300E-11 // universal gravitational constant  (m3 kg-1 s-2)
+}
+
+import SolarSystemPlanets._
+println(planets)
+EARTH < MARS
+planets.filter(_.radius > 7.0e6)
+
+- using library, i.e. itemized:
+
+import io.rbricks.itemized.annotation.enum
+@enum trait Weekday {
+  object Monday
+  object Tuesday
+  object Wednesday
+  object Thursday
+  object Friday
+  object Saturday
+  object Sunday
+}
+
+/\
+How to work around restriction of creating an instance of an abstract type?
+How to substitute "virtual classes"?
+(20.10;p466)
+
+Use a factory method.
+
+/\
+Example CurrencyZone.
+(20.10;p472)
+
+object Converter {
+  var exchangeRate = Map(
+  "USD" -> Map("USD" -> 1.0, "EUR" -> 0.7596, "JPY" -> 1.211 , "CHF" -> 1.223),
+  "EUR" -> Map("USD" -> 1.316, "EUR" -> 1.0, "JPY" -> 1.594 , "CHF" -> 1.623),
+  "JPY" -> Map("USD" -> 0.8257, "EUR" -> 0.6272, "JPY" -> 1.0 , "CHF" -> 1.018),
+  "CHF" -> Map("USD" -> 0.8108, "EUR" -> 0.6160, "JPY" -> 0.982 , "CHF" -> 1.0 ))
+}
+
+abstract class CurrencyZone {
+  type Currency <: AbstractCurrency
+  def make(x: Long): Currency
+  abstract class AbstractCurrency {
+    val amount: Long
+    def designation: String
+    def + (that: Currency): Currency = make(this.amount + that.amount)
+    def * (x: Double): Currency = make((this.amount * x).toLong)
+    def (that: Currency): Currency = make(this.amount that.amount)
+    def / (that: Double) = make((this.amount / that).toLong)
+    def / (that: Currency) = this.amount.toDouble / that.amount
+    def from(other: CurrencyZone#AbstractCurrency): Currency = make(math.round(other.amount.toDouble * Converter.exchangeRate(other.designation)(this.designation)))
+    private def decimals(n: Long): Int = if (n == 1) 0 else 1 + decimals(n / 10)
+    override def toString = ((amount.toDouble / CurrencyUnit.amount.toDouble) formatted ("%." + decimals(CurrencyUnit.amount) + "f") + " " + designation)
+  }
+  val CurrencyUnit: Currency
+}
+
+US.Dollar * 100 + US.Dollar + (Japan.Yen from US.Dollar * 100)

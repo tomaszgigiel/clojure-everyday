@@ -1,0 +1,181 @@
+/\
+Explain equality in Java.
+(30.1;p674)
+
+==
+natural equality for value types,
+object identity for reference types.
+
+equals
+(user-defined) canonical equality for reference types.
+
+/\
+Explain equality in Scala.
+(30.1;p675)
+
+final def == (that: Any): Boolean =
+  if (null eq this) {null eq that} else {this equals that}
+
+/\
+List pitfalls that can cause inconsistent behavior when overriding equals.
+(30.2;p675)
+
+1. Defining equals with the wrong signature.
+2. Changing equals without also changing hashCode.
+3. Defining equals in terms of mutable fields.
+4. Failing to define equals as an equivalence relation.
+
+/\
+Explain pitfall "Defining equals with the wrong signature".
+(30.2;p676)
+
+def equals(other: Point): Boolean // Don't do this!
+Becasue:
+Scala and in Java is resolved by the static type of the argument, not the run-time type
+OK:
+def equals(other: Any): Boolean
+
+def ==(other: Point): Boolean = // Don't do this!
+OK:
+def equals(other: Any): Boolean
+
+/\
+Explain pitfall "Changing equals without also changing hashCode".
+(30.2;p678)
+
+If two objects are equal according to the equals method,
+then calling the hashCode method on each of the two objects must produce the same integer result.
+
+val p1, p2 = new Point(1, 2)
+collection.mutable.HashSet(p1) contains p2 // usually false
+
+Because hash bucket no longer correspond to the value of its hash code.
+
+/\
+Explain pitfall "Defining equals in terms of mutable fields".
+(30.2;p680)
+
+val p = new Point(1, 2)
+val coll = collection.mutable.HashSet(p)
+coll contains p
+p.x += 1
+coll contains p // false!
+coll.iterator contains p // true
+
+Because original hash bucket no longer correspond to the new value of its hash code.
+
+/\
+Characterize equivalence relation.
+(30.2;p681)
+
+reflexive: x.equals(x)
+symmetric: x.equals(y) -> y.equals(x)
+transitive: x.equals(y) && y.equals(z) -> x.equals(z)
+consistent: multiple invocations consistently return true (or false)
+for any non-null value x, x.equals(null) should return false
+
+/\
+Explain pitfall "Defining equals in terms of mutable fields".
+(30.2;p681)
+
+val p = new Point(1, 2)
+val cp = new Point(1, 2, Color.Red)
+p equals cp // true
+cp equals p // false
+
+/\
+Why use "canEqual" (equality in Scala)?
+(30.2;p681)
+
+class Point(val x: Int, val y: Int) {
+  override def hashCode = (x, y).##
+  override def equals(other: Any) = other match {
+    case that: Point => (that canEqual this) && (this.x == that.x) && (this.y == that.y)
+    case _ => false
+  }
+  def canEqual(other: Any) = other.isInstanceOf[Point]
+}
+
+val pAnon = new Point(1, 1) { override val y = 2 }
+
+/\
+"(x, y).##"?
+(30.2;p681)
+
+The ## method is a shorthand for computing hash codes that works for primitive values, reference types, and null.
+Takes hashCode values of all fields and combine them.
+
+/\
+Example "equality in Scala".
+(30.2;p686)
+
+class Point(val x: Int, val y: Int) {
+  override def hashCode = (x, y).##
+  override def equals(other: Any) = other match {
+    case that: Point => (that canEqual this) && (this.x == that.x) && (this.y == that.y)
+    case _ => false
+  }
+  def canEqual(other: Any) = other.isInstanceOf[Point]
+}
+
+class ColoredPoint(x: Int, y: Int, val color: Color.Value) extends Point(x, y) {
+  override def hashCode = (super.hashCode, color).##
+  override def equals(other: Any) = other match {
+    case that: ColoredPoint => (that canEqual this) && super.equals(that) && this.color == that.color
+    case _ => false
+  }
+  override def canEqual(other: Any) = other.isInstanceOf[ColoredPoint]
+}
+
+/\
+Explain:
+class Branch[T](val elem: T, val left: Tree[T], val right: Tree[T]) extends Tree[T] {
+  override def equals(other: Any) = other match {
+    case that: Branch[T] => this.elem == that.elem && this.left == that.left && this.right == that.right
+    case _ => false
+  }
+}
+fsc -unchecked Tree.scala
+(30.3;p690)
+
+Tree.scala:14: warning: non variable type-argument T in type
+pattern is unchecked since it is eliminated by erasure
+case that: Branch[T] => this.elem == that.elem &&
+
+use:
+case that: Branch[t] => this.elem == that.elem && this.left == that.left && this.right == that.right
+or:
+case that: Branch[_] => this.elem == that.elem && this.left == that.left && this.right == that.right
+
+/\
+Implement Tree[T] ("equality in Scala").
+(30.4;p693)
+
+trait Tree[+T] {
+  def elem: T
+  def left: Tree[T]
+  def right: Tree[T]
+}
+object EmptyTree extends Tree[Nothing] {
+  def elem = throw new NoSuchElementException("EmptyTree.elem")
+  def left = throw new NoSuchElementException("EmptyTree.left")
+  def right = throw new NoSuchElementException("EmptyTree.right")
+}
+
+class Branch[T]( val elem: T, val left: Tree[T], val right: Tree[T]) extends Tree[T] {
+  override def equals(other: Any) = other match {
+    case that: Branch[_] => (that canEqual this) && this.elem == that.elem && this.left == that.left && this.right == that.right
+    case _ => false
+  }
+  def canEqual(other: Any) = other.isInstanceOf[Branch[_]]
+  override def hashCode: Int = (elem, left, right).##
+}
+
+/\
+Whato to do if hash code calculation is harming the performance?
+(30.4;p697)
+
+If the object is immutable:
+override def hashCode = (super.hashCode, color).##
+->
+override val hashCode = (super.hashCode, color).##

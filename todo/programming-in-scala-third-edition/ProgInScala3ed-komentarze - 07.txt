@@ -1,0 +1,291 @@
+/\
+List Scala control structures.
+(7;p155)
+
+if, while, for, try, match, function calls
+
+/\
+Example "if" expression.
+(7.1;p156)
+
+val filename : String = if (!args.isEmpty) args(0) else "default.txt"
+
+/\
+Example "while" loop.
+(7.2;p157)
+
+// "loops", not expressions, because they do not result in an interesting value (Unit)
+var a = 1
+val foo : Unit = while (a < 10) a += 1
+
+/\
+Example "do-while" loop.
+(7.2;p158)
+
+// "loops", not expressions, because they do not result in an interesting value (Unit)
+var line = ""
+do {
+  line = readLine()
+  println("Read: " + line)
+} while (line != "")
+
+/\
+Discuss Unit.
+(7.2;p158)
+
+- abstract final class Unit extends AnyVal,
+- only one value: (),
+- assignment always results in the unit value,
+- to define procedures: def greet() = { println("hi") }
+- () == println("ok") // true
+
+/\
+GCD with "loop" and not.
+(7.2;p159)
+
+
+def gcdLoop(x: Long, y: Long): Long = {
+  var a = x
+  var b = y
+  while (a != 0) {
+    val temp = a
+    a = b % a
+    b = temp
+  }
+  b
+}
+
+def gcd(x: Long, y: Long): Long = if (y == 0) x else gcd(y, x % y)
+
+/\
+Example "for" expression.
+(7.3;p160)
+
+for (i <- 1 to 4) println("Iteration " + i)
+
+/\
+Improve:
+val filesHere = (new java.io.File(".")).listFiles
+for (file <- filesHere) if (file.getName.endsWith(".scala")) println(file)
+(7.3;p162)
+
+
+for (file <- filesHere if file.getName.endsWith(".scala")) println(file)
+
+/\
+Example of using multiple filters in a for expression.
+(7.3;p162)
+
+for (
+  file <- filesHere
+  if file.isFile
+  if file.getName.endsWith(".scala")
+) println(file)
+
+/\
+Example of using multiple generators in a "for" expression.
+(7.3;p163)
+
+val filesHere = (new java.io.File(".")).listFiles
+def fileLines(file: java.io.File) = scala.io.Source.fromFile(file).getLines().toList
+
+def grep(pattern: String) =
+  for (
+    file <- filesHere
+    if file.getName.endsWith(".scala");
+    line <- fileLines(file)
+    if line.trim.matches(pattern)
+  ) println(file + ": " + line.trim)
+
+grep(".*gcd.*")
+
+/\
+Example of mid-stream assignment in a "for" expression.
+(7.3;p164)
+
+val filesHere = (new java.io.File(".")).listFiles
+def fileLines(file: java.io.File) = scala.io.Source.fromFile(file).getLines().toList
+
+def grep(pattern: String) =
+  for (
+    file <- filesHere
+    if file.getName.endsWith(".scala");
+    line <- fileLines(file)
+    trimmed = line.trim
+    if trimmed.matches(pattern)
+  ) println(file + ": " + trimmed)
+
+grep(".*gcd.*")
+
+/\
+Example of "yield" in a "for" expression.
+(7.3;p165)
+
+val forLineLengths =
+  for {
+    file <- filesHere
+    if file.getName.endsWith(".scala")
+    line <- fileLines(file)
+    trimmed = line.trim
+    if trimmed.matches(".*for.*")
+  } yield trimmed.length
+
+/\
+Throw an exception.
+(7.4;p166)
+
+throw new IllegalArgumentException
+
+/\
+What is exception throw type?
+(7.4;p166)
+
+Nothing
+
+/\
+What is expression type?
+val n = 3
+val half = if (n % 2 == 0) n / 2 else throw new RuntimeException("n must be even")
+(7.4;p166)
+
+Int, the type of that branch which does compute something
+
+/\
+Example try-catch-finally clause.
+(7.4;p167)
+
+try {
+  // do something
+} catch {
+  case ex: FileNotFoundException => // Handle missing file
+  case ex: IOException => // Handle other I/O error
+  case unknown => println("Got this unknown exception: " + unknown)
+} finally {
+  // do something, i.e. close
+}
+
+/\
+Compare Scala and Java checked exceptions handling.
+(7.4;p167)
+
+Scala does not require:
+- catching checked exceptions,
+- declaring checked exceptions in a throws clause,
+- declaring a throws clause (with the @throws annotation).
+
+
+/\
+Compile:
+def f(): Int = try return 1 finally return 2
+f()
+(7.4;p168)
+
+2
+
+/\
+Compile:
+def f(): Int = try 1 finally 2
+f()
+(7.4;p169)
+
+1
+
+/\
+Example of match expression.
+(7.5;p170)
+
+def getClassAsString(x: Any):String = x match {
+  case s: String => s + " is a String"
+  case i: Int => "Int"
+  case f: Float => "Float"
+  case l: List[_] => "List"
+  case p: Person => "Person"
+  case _ => "Unknown"
+}
+
+/\
+Rewrite in Scala with "loop":
+int i = 0;
+boolean foundIt = false;
+while (i < args.length) {
+  if (args[i].startsWith("")) {
+    i = i + 1;
+    continue;
+  }
+  if (args[i].endsWith(".scala")) {
+    foundIt = true;
+    break;
+  }
+  i = i + 1;
+}
+(7.6;p171)
+
+var i = 0
+var foundIt = false
+while (i < args.length && !foundIt) {
+  if (!args(i).startsWith("")) {
+    if (args(i).endsWith(".scala"))
+      foundIt = true
+  }
+  i = i + 1
+}
+
+/\
+Rewrite in Scala with recursive function:
+int i = 0;
+boolean foundIt = false;
+while (i < args.length) {
+  if (args[i].startsWith("")) {
+    i = i + 1;
+    continue;
+  }
+  if (args[i].endsWith(".scala")) {
+    foundIt = true;
+    break;
+  }
+  i = i + 1;
+}
+(7.6;p172)
+
+def searchFrom(i: Int): Int =
+  if (i >= args.length) 1
+  else if (args(i).startsWith("")) searchFrom(i + 1)
+  else if (args(i).endsWith(".scala")) i
+  else searchFrom(i + 1)
+
+val i = searchFrom(0)
+
+/\
+Rewrite in Scala with "break":
+int i = 0;
+boolean foundIt = false;
+while (i < args.length) {
+  if (args[i].startsWith("")) {
+    i = i + 1;
+    continue;
+  }
+  if (args[i].endsWith(".scala")) {
+    foundIt = true;
+    break;
+  }
+  i = i + 1;
+}
+(7.6;p173)
+
+import scala.util.control.Breaks._
+import java.io._
+val in = new BufferedReader(new InputStreamReader(System.in))
+breakable {
+  while (true) {
+    println("? ")
+    if (in.readLine() == "") break
+  }
+}
+
+/\
+Discuss Scala vs. Java Variable scope.
+(7.7;p176)
+
+Java will not let create a variable in an inner scope that has the same name as a variable in an outer scope
+vs.
+In a Scala program, an inner variable is said to shadow a like-named outer variable.

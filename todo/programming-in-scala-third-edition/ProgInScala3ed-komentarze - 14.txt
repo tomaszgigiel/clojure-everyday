@@ -1,0 +1,327 @@
+/\
+How to use "assert"?
+(14.1;p294)
+
+def foo(a: Integer, b: Integer) : Integer = {
+  assert(a > b)
+  a + b
+}
+
+/\
+How to use "ensuring"?
+(14.1;p295)
+
+def foo(a: Integer, b: Integer) : Integer = {
+  assert(a > b)
+  a + b
+} ensuring (_ == a)
+foo(2, 0)
+foo(2, 1)
+
+def foo(a: Integer, b: Integer) : Integer = {
+  assert(a > b)
+  if(a > 10) {
+    a
+  } ensuring (_ == a) else {
+    a + b
+  } ensuring (_ == a)
+} 
+foo(2, 0)
+foo(2, 1)
+foo(100, 1)
+
+/\
+How to enable or disable assertions?
+(14.1;p295)
+
+scala –ea:package1 –da:Class1 AssertionDemo
+scalac –Xdisable-assertions
+
+/\
+List testing tools for Scala.
+(14.2;p296)
+
+- JUnit, TestNG
+- ScalaTest, specs2, ScalaCheck
+
+/\
+Which is the most flexible Scala test framework?
+(14.2;p296)
+
+ScalaTest is the most flexible Scala test framework.
+
+/\
+Show example test in ScalaTest.
+(14.2;p296)
+
+import org.scalatest.FunSuite
+
+class MyTestSuite extends FunSuite {
+  test("result should have something") {
+    assert(2 == 2)
+  }
+}
+
+/\
+What is the central concept in ScalaTest?
+(14.2;p296)
+
+The central concept in ScalaTest is the suite, a collection of tests.
+
+/\
+Run a Suite directly (ScalaTest).
+(14.2;p297)
+(http://www.scalatest.org/user_guide/using_the_runner)
+
+via ScalaTest's Runner application:
+> scala -cp scalatest-app_2.11.7-3.0.1.jar org.scalatest.run MyTestSuite
+
+from the Scala interpreter:
+> scala -cp scalatest_2.11.7-3.0.1.jar
+scala> import org.scalatest._
+scala> (new MyTestSuite).execute()
+
+/\
+How to provide descriptive error messages when assertions fail (ScalaTest)?
+(14.3;p297)
+
+Use "DiagrammedAssertions":
+scala> val x = 1
+scala> import org.scalatest.DiagrammedAssertions._
+scala> assert(List(1, 2, 3).contains(x) && x > 1)
+
+org.scalatest.exceptions.TestFailedException:
+
+assert(List(1, 2, 3).contains(x) && x > 1)
+       |    |  |  |  |        |  |  | | |
+       |    1  2  3  true     1  |  1 | 1
+       List(1, 2, 3)             |    false
+                                 false
+/\
+How to differentiate between the actual and expected result in error messages (ScalaTest)?
+(14.3;p298)
+
+Use "assertResult":
+assertResult(2) {
+  a.width
+}
+
+/\
+How to check that a method throws an expected exception (ScalaTest)?
+(14.3;p298)
+
+- use "assertThrows":
+assertThrows[ArithmeticException]] {
+  1/0
+}
+
+- to inspect the expected exception further:
+val caught = intercept[ArithmeticException] {
+  1/0
+}
+assert(caught.getMessage == "/ by zero")
+
+/\
+Show example test in BDD testing style (ScalaTest).
+(14.4;p299)
+
+import org.scalatest.FlatSpec
+import org.scalatest.Matchers
+import element.*
+
+class ElementSpec extends FlatSpec with Matchers {
+  "A UniformElement" should "have a width equal to the passed value" in {
+    val element = Element('x', 2, 3)
+    element.width should be (2)
+  }
+
+  it should "throw an IAE if passed a negative width" in {
+    an [IllegalArgumentException] should be thrownBy {
+      elem('x', -2, 3)
+    }
+  }
+}
+
+/\
+Show example output in BDD testing style (ScalaTest).
+(14.4;p300)
+
+scala> (new ElementSpec).execute()
+A UniformElement
+- should have a width equal to the passed value
+- should throw an IAE if passed a negative width
+
+/\
+Show example custom matcher (ScalaTest).
+(14.4;p300)
+http://www.scalatest.org/user_guide/using_matchers#usingCustomMatchers
+
+import org.scalatest._
+import matchers._
+
+trait CustomMatchers {
+  class FileEndsWithExtensionMatcher(expectedExtension: String) extends Matcher[java.io.File] {
+    def apply(left: java.io.File) = {
+      val name = left.getName
+      MatchResult(
+        name.endsWith(expectedExtension),
+        s"""File $name did not end with extension "$expectedExtension"""",
+        s"""File $name ended with extension "$expectedExtension""""
+      )
+    }
+  }
+  def endWithExtension(expectedExtension: String) = new FileEndsWithExtensionMatcher(expectedExtension)
+}
+
+// Make them easy to import with:
+// import CustomMatchers._
+object CustomMatchers extends CustomMatchers
+
+file should endWithExtension ("txt")
+file should not endWithExtension "txt"
+file should (exist and endWithExtension ("txt"))
+
+vs.
+
+file.getName should endWith (".txt")
+
+/\
+Show example test in BDD testing style (specs2).
+(14.4;p301)
+
+import org.specs2._
+import Element.elem
+
+object ElementSpecification extends Specification {
+  "A UniformElement" should {
+    "have a width equal to the passed value" in {
+      val ele = elem('x', 2, 3)
+      ele.width must be_==(2)
+    }
+    "throw an IAE if passed a negative width" in {
+      elem('x', 2, 3) must throwA[IllegalArgumentException]
+    }
+  }
+}
+
+/\
+How to use specs2?
+(14.4;p301)
+
+- standalone,
+- integrated with ScalaTest,
+- integrated with JUnit.
+
+/\
+How one of the big ideas of BDD that tests can be used to facilitate communication between:
+- the people who decide what a software system should do,
+- the people who implement the software,
+- and the people who determine whether the software is finished and working
+is expressed in ScalaTest?
+(14.4;p301)
+(http://www.scalatest.org/getting_started_with_feature_spec)
+
+import org.scalatest.FeatureSpec
+import org.scalatest.GivenWhenThen
+ 
+class ExampleSpec extends FeatureSpec with GivenWhenThen {
+ 
+  feature("The user can pop an element off the top of the stack") {
+ 
+    info("As a programmer")
+    info("I want to be able to pop items off the stack")
+    info("So that I can get them in last-in-first-out order")
+ 
+    scenario("pop is invoked on a non-empty stack") {
+ 
+      given("a non-empty stack")
+      when("when pop is invoked on the stack")
+      then("the most recently pushed element should be returned")
+      and("the stack should have one less item than before")
+      pending
+    }
+ 
+    scenario("pop is invoked on an empty stack") {
+ 
+      given("an empty stack")
+      when("when pop is invoked on the stack")
+      then("NoSuchElementException should be thrown")
+      and("the stack should still be empty")
+      pending
+    }
+  }
+}
+
+->
+
+import org.scalatest.FeatureSpec
+import org.scalatest.GivenWhenThen
+import org.scalatest.BeforeAndAfter
+import scala.collection.mutable.Stack
+ 
+class ExampleSpec extends FeatureSpec with GivenWhenThen with BeforeAndAfter {
+ 
+  var stack: Stack[Int] = _
+
+  before {
+    stack = new Stack[Int]
+  }
+
+  feature("The user can pop an element off the top of the stack") {
+ 
+    info("As a programmer")
+    info("I want to be able to pop items off the stack")
+    info("So that I can get them in last-in-first-out order")
+
+    scenario("pop is invoked on a non-empty stack") {
+ 
+      given("a non-empty stack")
+      stack.push(1)
+      stack.push(2)
+      val oldSize = stack.size
+ 
+      when("when pop is invoked on the stack")
+      val result = stack.pop()
+ 
+      then("the most recently pushed element should be returned")
+      assert(result === 2)
+ 
+      and("the stack should have one less item than before")
+      assert(stack.size === oldSize - 1)
+    }
+ 
+    scenario("pop is invoked on an empty stack") {
+ 
+      given("an empty stack")
+      when("when pop is invoked on the stack")
+      then("NoSuchElementException should be thrown")
+      intercept[NoSuchElementException] {
+        stack.pop()
+      }
+ 
+      and("the stack should still be empty")
+      assert(stack.isEmpty)
+    }
+  }
+}
+
+/\
+Show example of property-based testing (ScalaCheck).
+(14.4;p300)
+
+import org.scalatest.WordSpec
+import org.scalatest.prop.PropertyChecks
+import org.scalatest.MustMatchers._
+import Element.elem
+
+class ElementSpec extends WordSpec with PropertyChecks {
+  "elem result" must {
+    "have passed width" in {
+      forAll { (w: Int) =>
+        whenever (w > 0) {
+          elem('x', w, 3).width must equal (w)
+        }
+      }
+    }
+  }
+}

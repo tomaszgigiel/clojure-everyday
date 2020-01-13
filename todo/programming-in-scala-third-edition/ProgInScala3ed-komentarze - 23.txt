@@ -1,0 +1,262 @@
+/\
+Use a for expression:
+
+val lara = Person("Lara", false)
+val bob = Person("Bob", true)
+val julie = Person("Julie", false, lara, bob)
+val persons = List(lara, bob, julie)
+
+persons withFilter (p => !p.isMale) flatMap (p => (p.children map (c => (p.name, c.name))))
+res1: List[(String, String)] = List((Julie,Lara), (Julie,Bob))
+(23;p512)
+
+for (p <- persons; if !p.isMale; c <- p.children)
+  yield (p.name, c.name)
+
+/\
+Explain: filter vs. withFilter
+(23;p513)
+
+"c filter p" - creates a new collection,
+"c withFilter p" - only restricts the domain of subsequent map, flatMap, foreach, and withFilter operations.
+
+/\
+How does the compiler translate for expressions that yield a result?
+(23;p513)
+
+All for expressions that yield a result are translated by the compiler into combinations of 
+invocations of the higher-order methods map, flatMap, and withFilter.
+
+/\
+How does the compiler translate for loops without yield?
+(23;p513)
+
+All for loops without yield are translated into a smaller set of higher-order functions:
+just withFilter and foreach.
+
+/\
+What is a form a for expression?
+(23.1;p514)
+
+for ( seq ) yield expr
+
+seq is a sequence of generators, definitions, and filters, with semicolons between successive elements
+
+/\
+Example a for expression.
+(23.1;p514)
+
+
+for (p <- persons; n = p.name; if (n startsWith "To"))
+  yield n
+
+or:
+
+for {
+  p <- persons // a generator
+  n = p.name // a definition
+  if (n startsWith "To") // a filter
+} yield n
+
+/\
+Execute:
+for ((a: Int) <- List(1, 2, "abc")) {
+  println(a)
+}
+(23.1;p514)
+
+error: type mismatch
+
+/\
+Execute:
+for ((a, b) <- List(1, 2, "abc", ("key", "value"))) {
+  println(a)
+}
+(23.1;p514)
+
+"key"
+
+/\
+Execute:
+scala> for (x <- List(1, 2); y <- List("one", "two"))
+  yield (x, y)
+(23.1;p515)
+  
+List[(Int, String)] = List((1, one), (1, two), (2, one), (2, two))
+
+/\
+Implement "the n-queens problem".
+(23.2;p516)
+
+def queens(n: Int): List[List[(Int, Int)]] = {
+  def placeQueens(k: Int): List[List[(Int, Int)]] =
+    if (k == 0)
+      List(List())
+    else
+      for {
+        queens <- placeQueens(k - 1)
+        column <- 1 to n
+        queen = (k, column)
+        if isSafe(queen, queens)
+      } yield queen :: queens
+    placeQueens(n)
+}
+
+def isSafe(queen: (Int, Int), queens: List[(Int, Int)]) = queens forall (q => !inCheck(queen, q))
+
+def inCheck(q1: (Int, Int), q2: (Int, Int)) =
+  q1._1 == q2._1 || // same row
+  q1._2 == q2._2 || // same column
+  (q1._1 q2._1).abs == (q1._2 q2._2).abs // on diagonal
+
+/\
+Find the titles of all books whose author’s last name is “Gosling”.
+case class Book(title: String, authors: String*)
+val books: List[Book] = ???
+(23.3;p518)
+
+for (b <- books; a <- b.authors; if a startsWith "Gosling")
+  yield b.title
+
+/\
+Find the names of all authors who have written at least two books.
+case class Book(title: String, authors: String*)
+val books: List[Book] = ???
+(23.3;p518)
+
+for (b1 <- books; b2 <- books if b1 != b2; a1 <- b1.authors; a2 <- b2.authors if a1 == a2)
+  yield a1
+
+/\
+Remove duplicates:
+List(1, 2, 2, 3, 4, 5)
+(23.3;p519)
+
+def removeDuplicates[A](xs: List[A]): List[A] = {
+  if (xs.isEmpty) xs
+  else
+    xs.head :: removeDuplicates(xs.tail filter (x => x != xs.head))
+}
+
+/\
+Translate:
+for (x <- expr1) yield expr2
+(23.4;p520)
+
+expr1.map(x => expr2)
+
+/\
+Translate:
+for (x <- expr1 if expr2) yield expr3
+(23.4;p520)
+
+for (x <- expr1 withFilter (x => expr2)) yield expr3
+->
+expr1 withFilter (x => expr2) map (x => expr3)
+
+/\
+Translate:
+for (x <- expr1 if expr2; seq) yield expr3
+(23.4;p521)
+
+for (x <- expr1 withFilter expr2; seq) yield expr3
+Then translation continues with the second expression.
+
+/\
+Translate:
+for (x <- expr1; y <expr2; seq) yield expr3
+(23.4;p521)
+
+expr1.flatMap(x => for (y <- expr2; seq) yield expr3)
+Then translation continues.
+
+/\
+Translate:
+for ((x1, ..., xn) <- expr1) yield expr2
+(23.4;p522)
+
+expr1.map { case (x1, ..., xn) => expr2 }
+
+/\
+Translate:
+for (pat <- expr1) yield expr2
+translates to:
+(23.4;p522)
+
+expr1 withFilter {
+  case pat => true
+  case _ => false
+} map {
+  case pat => expr2
+}
+// never throw a MatchError
+
+/\
+Translate:
+for (x <- expr1; y = expr2; seq) yield expr3
+(23.4;p523)
+
+for ((x, y) <- for (x <- expr1) yield (x, expr2); seq)
+  yield expr3
+
+/\
+Improve:
+for (x <-1 to 1000; y = expensiveComputationNotInvolvingX)
+  yield x * y
+(23.4;p523)
+
+val y = expensiveComputationNotInvolvingX
+for (x <- 1 to 1000) yield x * y
+
+avoid re-evaluating expensiveComputationNotInvolvingX:
+
+for ((x, y) <- for (x <- 1 to 1000) yield (x, expensiveComputationNotInvolvingX))
+  yield x * y
+
+/\
+Translate:
+for (x <- expr1) body
+(23.4;p523)
+
+expr1 foreach (x => body)
+
+/\
+Translate:
+for (x <- expr1; if expr2; y <- expr3) body
+(23.4;p524)
+
+expr1 withFilter (x => expr2) foreach (x => expr3 foreach (y => body))
+
+/\
+Translate:
+var sum = 0
+for (xs <xss; x <- xs) sum += x
+(23.4;p524)
+
+var sum = 0
+xss foreach (xs => xs foreach (x => sum += x))
+
+/\
+Implement map, flatMap, filter using for expressions.
+(23.5;p525)
+
+object Demo {
+  def map[A, B](xs: List[A], f: A => B): List[B] = for (x <- xs) yield f(x)
+  def flatMap[A, B](xs: List[A], f: A => List[B]): List[B] = for (x <- xs; y <- f( x)) yield y
+  def filter[A](xs: List[A], p: A => Boolean): List[A] =for (x <- xs if p(x)) yield x
+}
+
+/\
+Where is it possible to apply the "for expressions" and "for loops"?
+(23.6;p525)
+
+All types that support the four methods:
+map, flatMap, withFilter, foreach ("for loops").
+Or a subset of these methods, to support a subset notations.
+
+abstract class C[A] {
+  def map[B](f: A => B): C[B]
+  def flatMap[B](f: A => C[B]): C[B]
+  def withFilter(p: A => Boolean): C[A]
+  def foreach(b: A => Unit): Unit
+}

@@ -1,0 +1,303 @@
+/\
+Show example of case classes.
+(15.1;p307)
+
+abstract class Expr
+case class Var(name: String) extends Expr
+case class Number(num: Double) extends Expr
+case class UnOp(operator: String, arg: Expr) extends Expr
+case class BinOp(operator: String, left: Expr, right: Expr) extends Expr
+
+/\
+What syntactic conveniences to case class are added by the Scala compiler?
+(15.1;p307)
+
+- a factory method with the name of the class,
+- all arguments in the parameter list of a case class implicitly get a val prefix, so they are maintained as fields,
+- implementations of methods toString, hashCode, and equals,
+- a copy method for making modified copies:
+
+scala> val op = BinOp("+", Number(1), v)
+op: BinOp = BinOp(+,Number(1.0),Var(x))
+
+scala> val op2 = op.copy(operator = "+")
+op2: BinOp = BinOp(+,Number(1.0),Var(x))
+
+- support for pattern matching.
+
+/\
+Show example of pattern matching.
+(15.1;p309)
+
+def simplify(expr: Expr): Expr = expr match {
+  case UnOp("",UnOp("", e))     => e // Double negation
+  case BinOp("+", e, Number(0)) => e // Adding zero
+  case BinOp("*", e, Number(1)) => e // Multiplying by one
+  case _ => expr
+}
+
+/\
+What is the difference between match and switch?
+(15.1;p310)
+
+- match is an expression,
+- match never “fall through” into the next case,
+- if none of the patterns match, an exception named MatchError is thrown.
+
+/\
+List kinds of patterns.
+(15.2;p311)
+
+- wildcard patterns "case _" (or lower-case letter),
+- constant patterns "case Pi",
+- variable patterns "case pi",
+- constructor patterns "case BinOp("+", e, Number(0))",
+- sequence patterns "case List(0, _, _)",
+- tuple patterns "case (a, b, c)",
+- typed patterns "case s: String",
+- variable-binding patterns "case UnOp("absolute", e @ UnOp("absolute", _)) => e".
+
+/\
+constant pattern vs. variable pattern
+(15.2;p314)
+
+A simple name starting with a lowercase letter is taken to be a pattern variable.
+All other references are taken to be constants.
+But:
+- this.pi,
+- obj.pi,
+- `pi` (back-tick)
+are constant pattern.
+
+/\
+Show a sequence pattern with an arbitrary length.
+(15.2;p316)
+
+expr match {
+  case List(0, _*) => println("found it")
+  case _ =>
+}
+
+/\
+Show a typed pattern with a Map.
+(15.2;p317)
+
+def generalSize(x: Any) = x match {
+  case s: String => s.length
+  case m: Map[_, _] => m.size
+  case _ => 1
+}
+
+/\
+How to test whether an expression has type String?
+(15.2;p317)
+
+expr.isInstanceOf[String]
+
+/\
+How to cast expression to type String?
+(15.2;p317)
+
+expr.asInstanceOf[String]
+
+/\
+What is "a type pattern"?
+(15.2;p318)
+
+In the typed pattern, m: Map[_, _], the “Map[_, _]” portion is called a type pattern.
+
+/\
+What is "type erasure"?
+(15.2;p318)
+
+Scala uses the erasure model of generics, just like Java does.
+This means that no information about type arguments is maintained at runtime.
+Type parameters are not preserved at run time.
+Element types of parameterized types are eliminated by the compiler’s erasure phase; they are not available to be inspected at run-time.
+
+scala> def isIntIntMap(x: Any) = x match {
+  case m: Map[Int, Int] => true
+  case _ => false
+}
+
+<console>:9: warning: nonvariable type argument Int in type
+pattern scala.collection.immutable.Map[Int,Int] (the
+underlying of Map[Int,Int]) is unchecked since it is
+eliminated by erasure
+  case m: Map[Int, Int] => true
+
+scala> isIntIntMap(Map(1 -> 1))
+res19: Boolean = true
+scala> isIntIntMap(Map("abc" -> "abc"))
+res20: Boolean = true
+
+The only exception to the erasure rule is arrays,
+because they are handled specially in Java as well as in Scala:
+
+scala> def isStringArray(x: Any) = x match {
+  case a: Array[String] => true
+  case _ => false
+}
+isStringArray: (x: Any)String
+
+scala> val as = Array("abc")
+as: Array[String] = Array(abc)
+scala> isStringArray(as)
+res21: Boolean = true
+
+scala> val ai = Array(1, 2, 3)
+ai: Array[Int] = Array(1, 2, 3)
+scala> isStringArray(ai)
+res22: Boolean = false
+
+/\
+What if syntactic pattern matching is not precise enough?
+(15.3;p321)
+
+Use a pattern guard, i.e. "if x == y":
+def simplifyAdd(e: Expr) = e match {
+  case BinOp("+", x, y) if x == y => BinOp("*", x, Number(2))
+  case _ => e
+}
+
+/\
+What is a "sealed" class?
+(15.5;p323)
+
+A sealed class cannot have any new subclasses added except the ones in the same file.
+If you match against case classes that inherit from a sealed class, 
+the compiler will flag missing combinations of patterns with a warning message:
+
+def describe(e: Expr): String = e match {
+  case Number(_) => "a number"
+  case Var(_) => "a variable"
+}
+
+warning: match is not exhaustive!
+missing combination UnOp
+missing combination BinOp
+
+/\
+How to make the warning "match is not exhaustive" go away?
+(15.5;p324)
+
+def describe(e: Expr): String = e match {
+  case Number(_) => "a number"
+  case Var(_) => "a variable"
+  case _ => throw new RuntimeException // Should not happen
+}
+
+def describe(e: Expr): String = (e: @unchecked) match {
+  case Number(_) => "a number"
+  case Var(_) => "a variable"
+}
+
+/\
+What is the "Option" type?
+(15.6;p325)
+
+A standard type for optional values:
+- Some(x), where x is the actual value,
+- None object, which represents a missing value.
+
+/\
+Map("France" -> "Paris", "Japan" ->"Tokyo") get "France"?
+(15.6;p325)
+
+res1: Option[String] = Some(Paris)
+
+/\
+Map("France" -> "Paris", "Japan" ->"Tokyo") get "Europe"?
+(15.6;p325)
+
+res1: Option[String] = None
+
+/\
+How to take optional values apart is through a pattern match?
+(15.6;p326)
+
+def show(x: Option[String]) = x match {
+  case Some(s) => s
+  case None => "?"
+}
+
+show(capitals get "France")
+res1: String = Paris
+
+show(capitals get "Europe")
+res1: String = ?
+
+/\
+Show using patterns in variable definitions.
+(15.7;p327)
+
+scala> val (number, string) = myTuple
+number: Int = 123
+string: String = abc
+
+scala> val BinOp(op, left, right) = exp
+op: String = *
+left: Expr = Number(5.0)
+right: Expr = Number(1.0)
+
+/\
+How to provide multiple entry points in function?
+(15.7;p328)
+(http://doc.akka.io/docs/akka/current/scala/actors.html)
+
+- each case is an entry point to the function.
+- the parameters are specified with the pattern:
+
+val manyEntryPoint: Any => Int = {
+  case x: Int    => x + 1
+  case s: String => 0
+  case _         => -1
+}
+
+manyEntryPoint(2)
+manyEntryPoint("foo")
+manyEntryPoint(Nil)
+
+Akka example:
+import akka.actor.Actor
+import akka.actor.Props
+import akka.event.Logging
+ 
+class MyActor extends Actor {
+  val log = Logging(context.system, this)
+
+  def receive = {
+    case "test" => log.info("received test")
+    case _      => log.info("received unknown message")
+  }
+}
+
+/\
+Show using case sequences as partial functions.
+(15.7;p328)
+
+A sequence of cases gives you a partial function:
+
+val second: PartialFunction[List[Int],Int] = {
+  case x :: y :: _ => y
+}
+
+or better:
+
+scala> second.isDefinedAt(List(5,6,7))
+res30: Boolean = true
+
+scala> second.isDefinedAt(List())
+res31: Boolean = false
+
+/\
+Show using patterns in for expressions.
+(15.7;p331)
+
+for ((country, city) <- capitals) {
+  println("The capital of " + country + " is " + city)
+}
+
+for (Some(fruit) <- fruits) {
+  println(fruit)
+}

@@ -1,0 +1,172 @@
+/\
+What is implicit definition?
+(21.2;p477)
+
+Implicit definitions are those that the compiler is allowed to insert into a program in order to fix any of its type errors.
+
+/\
+Example implicit conversions.
+(21.1;p476)
+
+implicit def function2ActionListener(f: ActionEvent => Unit) =
+  new ActionListener {
+    def actionPerformed(event: ActionEvent) = f(event)
+  }
+
+button.addActionListener( (_: ActionEvent) => println("pressed!") )
+
+/\
+Rules for implicits.
+(21.2;p477)
+
+
+Marking rule: Only definitions marked implicit are available.
+Scope rule: An inserted implicit conversion must be in scope as a single identifier, or be associated with the source or target type of the conversion.
+One-at-a-time rule: Only one implicit is inserted.
+Explicits-first rule: Whenever code type checks as it is written, no implicits are attempted.
+
+/\
+Exception for "Scope rule for implicits".
+(21.2;p478)
+
+The compiler will also look for implicit definitions in the companion object of the source
+or expected target types of the conversion.
+
+/\
+How do many libraries import implicit conversions?
+(21.2;p478)
+
+import Preamble._
+
+/\
+Where implicits are tried?
+(21.2;p480)
+
+- conversions to an expected type,
+- conversions of the receiver of a selection,
+- implicit parameters.
+
+/\
+Example of implicits and interoperating with new types.
+(21.4;p482)
+
+class Rational(n: Int, d: Int) {
+  ...
+  def + (that: Rational): Rational = ...
+  def + (that: Int): Rational = ...
+}
+
+new Rational(1, 2) + 1
+implicit def intToRational(x: Int) = new Rational(x, 1)
+1 + new Rational(1, 2) // implicits needed
+
+/\
+Example of implicits and DSL.
+(21.4;p484)
+
+
+package scala
+object Predef {
+  class ArrowAssoc[A](x: A) {
+    def -> [B](y: B): Tuple2[A, B] = Tuple2(x, y)
+  }
+  implicit def any2ArrowAssoc[A](x: A): ArrowAssoc[A] = new ArrowAssoc(x)
+  ...
+}
+
+Map(1 -> "one", 2 -> "two", 3 -> "three")
+
+/\
+Example of implicits rich wrapper class.
+(21.4;p484)
+
+case class Rectangle(width: Int, height: Int)
+implicit class RectangleMaker(width: Int) { def x(height: Int) = Rectangle(width, height) }
+// Automatically generated
+implicit def RectangleMaker(width: Int) = new RectangleMaker(width)
+
+val myRectangle = 3 x 4
+
+/\
+Example of implicits parameters.
+(21.5;p484)
+
+def maxListImpParm[T](elements: List[T])(implicit ordering: Ordering[T]): T =
+  elements match {
+    case List() => throw new IllegalArgumentException("empty list!")
+    case List(x) => x
+    case x :: rest =>
+      val maxRest = maxListImpParm(rest)(ordering)
+      if (ordering.gt(x, maxRest)) x else maxRest
+}
+
+maxListImpParm(List(1,5,10,3))
+
+implicit object IntOrdering extends Ordering[Int] {
+  def compare(a:Int, b:Int) = a compare b
+}
+maxListImpParm(List(1,5,10,3))(IntOrdering)
+
+case class Person(name:String, age:Int)
+implicit object AgeOrdering extends Ordering[Person] {
+  def compare(a:Person, b:Person) = a.age compare b.age
+}
+maxListImpParm(List(Person("bob", 30), Person("ann", 32), Person("carl", 19)))
+
+/\
+What is 'implicitly"?
+(21.5;p484, https://stackoverflow.com/questions/3855595/what-is-the-scala-identifier-implicitly)
+
+def implicitly[T](implicit t: T): T = t
+It is commonly used to check if an implicit value of type T is available and return it if so is the case.
+
+implicit val a = "test" 
+val b = implicitly[String] // ok
+val c = implicitly[Int] // error
+
+
+/\
+Example of implicitly and context bounds.
+(21.6;p492)
+
+def maxList[T : Ordering](elements: List[T]): T =
+elements match {
+  case List() => throw new IllegalArgumentException("empty list!")
+  case List(x) => x
+  case x :: rest =>
+    val maxRest = maxList(rest)
+    if (implicitly[Ordering[T]].gt(x, maxRest)) x else maxRest
+}
+maxList(List(1,5,10,3))
+
+"[T : Ordering]" - there is some form of ordering associated with T.
+
+/\
+When when multiple conversions apply?
+(21.7;p495)
+
+The compiler will choose the more specific conversions:
+- The argument type of the former is a subtype of the latter’s.
+- Both conversions are methods, and the enclosing class of the former extends the enclosing class of the latter.
+
+/\
+Explain:
+val cba = "abc".reverse
+in Scala 2.7 and Scala 2.8+.
+(21.7;p496)
+
+Scala 2.7: false, WrappedString("abc").reverse returning a collection
+
+Scala 2.8: true, StringOps("abc").reverse returning a String
+
+Because:
+- LowPriorityImplicits has conversions from String to scala.collection.immutable.WrappedString
+- Predef has conversions from String to scala.collection.immutable.StringOps
+- LowPriorityImplicits <- Predef (more specific conversion)
+
+
+/\
+How to see what implicit conversions the compiler is inserting?
+(21.8;p497)
+
+scalac Xprint:typer sourcefilename.scala

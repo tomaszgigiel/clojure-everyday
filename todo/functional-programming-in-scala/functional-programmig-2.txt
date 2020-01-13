@@ -1,0 +1,8 @@
+.
+What is "headOption"?
+(7.1, p97)
+
+scala.collection.Seq
+def headOption: Option[A]
+Optionally selects the first element.
+

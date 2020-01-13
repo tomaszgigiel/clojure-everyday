@@ -1,0 +1,188 @@
+/\
+Define class A
+(4.1,p99)
+
+class A
+
+/\
+Create object A.
+(4.1,p99)
+
+new A
+
+/\
+What is "instance variable"?
+(4.1,p101)
+
+Field.
+
+/\
+Compress:
+class ChecksumAccumulator {
+  private var sum = 0;
+  def add(b: Byte): Unit = { sum += b; }
+  def checksum(): Int = { return ~(sum & 0xFF) + 1; }
+}
+(4.1,p102)
+
+class ChecksumAccumulator {
+  private var sum = 0
+  def add(b: Byte) = sum += b
+  def checksum() = ~(sum & 0xFF) + 1
+}
+
+/\
+What is "procedure"?
+(4.1,p102)
+
+Function:
+- executed only for its side effects,
+- with a result type of Unit.
+
+/\
+Execute:
+val a = 1
+val b = 1
+val c = a
++ b
+(4.2,p104)
+
+c == 1
+vs.
+val c = (a
++ b)
+vs.
+val c = a +
+b
+
+/\
+What is "a singleton object"?
+(4.3,p105)
+
+The singleton object is object having one and only one instance.
+
+/\
+What is "a companion object"?
+(4.3,p105)
+
+The companion object is an object that shares the same name with a class. Is defined in the same source file.
+
+/\
+What is "a companion class"?
+(4.3,p105)
+
+The companion class is a class that shares the same name with a singleton object. Is defined in the same source file.
+
+/\
+What is "a synthetic class"?
+(4.3,p107)
+
+The synthetic class is a class generated automatically by the compiler rather than being written by hand by the programmer.
+
+/\
+How is implemented "a singleton object"?
+(4.3,p107)
+
+Each singleton object is implemented as an instance of a synthetic class referenced from a static variable.
+So they have the same initialization semantics as Java statics.
+The name of the synthetic class is the object name plus a dollar sign, i.e. MySingletonObject$
+
+/\
+Can a singleton object extend a superclass?
+(4.3,p107)
+
+Yes, the singleton object can extend a superclass.
+
+/\
+Can a singleton object mix in traits?
+(4.3,p107)
+
+Yes, The singleton object can mix in traits.
+
+/\
+When a singleton object is initialized?
+(4.3,p107)
+
+The singleton object is initialized the first time some code accesses it.
+
+/\
+What is "a standalone object"?
+(4.3,p107)
+
+The standalone object is a singleton object that has no companion class.
+
+/\
+Sample scala application with main.
+(4.4,p108)
+
+object Foo {
+  def main(args: Array[String]) : Unit = {
+    println("Hello, world with args: " + args.mkString)
+  }
+}
+
+/\
+Complete:
+object Foo { def foo = "ok" }
+object FooApp extends App { foo }
+(4.4,p108)
+
+object Foo { def foo = "ok" }
+import Foo.foo
+object FooApp extends App { foo }
+
+/\
+Explain:
+println("ok")
+(4.4,p108)
+
+Scala implicitly imports:
+- java.lang
+- scala
+- Predef
+So:
+println -> Predef.println
+
+/\
+Compile files Foo.scala, Boo.scala
+(4.4,p109)
+
+scalac Foo.scala Boo.scala
+
+/\
+What causes the compiler delay?
+(4.4,p109)
+
+- initial work,
+- scanning the contents of jar files.
+
+/\
+How to avoid a delay before the compiler starts up?
+(4.4,p109)
+
+Use fsc, i.e.:
+- at the beginning of the working day: fsc Foo.scala Boo.scala
+- at the end of the working day: fsc -shutdown
+
+/\
+What is fsc?
+(4.4,p109)
+
+- Scala compiler daemon,
+- the initial job is done only once.
+
+/\
+Run scala appliacion.
+(4.4,p109)
+
+scala Foo something
+Foo - object containing a main method
+something - command line argument
+
+/\
+Sample scala application without main.
+(4.5,p110)
+
+object Foo extends App {
+  println("Hello, world with args: " + args.mkString)
+}

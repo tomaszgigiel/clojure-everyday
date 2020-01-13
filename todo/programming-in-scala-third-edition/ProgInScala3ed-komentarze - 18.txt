@@ -1,0 +1,129 @@
+/\
+Example of class contains vars and still purely functional.
+(18.1;p397)
+
+A class that caches the result of an expensive operation in a field for optimization purposes.
+
+class MemoKeyed extends Keyed {
+  private var keyCache: Option[Int] = None
+  override def computeKey: Int = {
+    if (!keyCache.isDefined) keyCache = Some(super.computeKey)
+    {
+      keyCache.get
+    }
+  }
+}
+
+/\
+Example of class mutable without defining or inheriting any vars.
+(18.1;p397)
+
+A class that forwards method calls to other objects that have mutable state.
+
+/\
+Example of getter and setter.
+(18.2;p398)
+
+class Time {
+  var hour = 12
+  var minute = 0
+}
+
+->
+
+class Time {
+  private[this] var h = 12
+  private[this] var m = 0
+  def hour: Int = h
+  def hour_=(x: Int) = { h = x }
+  def minute: Int = m
+  def minute_=(x: Int) = { m = x }
+}
+
+val time = new Time()
+time.hour = 13
+time.hour
+
+/\
+Define getter and setter directly.
+(18.2;p399)
+
+class Time {
+  private[this] var h = 12
+  private[this] var m = 0
+
+  def hour: Int = h
+  def hour_= (x: Int) = {
+    require(0 <= x && x < 24)
+    h = x
+  }
+
+  def minute = m
+  def minute_= (x: Int) = {
+    require(0 <= x && x < 60)
+    m = x
+  }
+}
+
+/\
+Explain "= _" as the “initializing value” in class.
+(18.2;p400)
+
+
+"= _" an initializer assigns a zero value to field (0 for numeric types, false for booleans, null for reference types).
+
+class Sample {
+  var a : Int = _
+  var b : String = _
+  // var c : char // an abstract variable, not an uninitialized one
+}
+
+val sample = new Sample()
+sample.a == 0
+sample.b == null
+
+/\
+Difference:
+var a: Int = _
+var b: Int = 0
+var c: Int
+(18.2;p400)
+
+a, b the same
+c abstract variable
+
+/\
+Example of getter and setter without variable.
+(18.2;p400)
+
+class Thermometer {
+  var celsius: Float = _
+  def fahrenheit = celsius * 9 / 5 + 32
+  def fahrenheit_= (f: Float) = { celsius = (f 32) * 5 / 9 }
+  override def toString = fahrenheit + "F/" + celsius + "C"
+}
+
+/\
+What does it mean?
+val a, b, c = new Wire
+(18.4;p400)
+
+val a = new Wire
+val b = new Wire
+val c = new Wire
+
+/\
+How to to disable the warning "warning: match is not exhaustive!"?
+(18.5;p409)
+
+i.e.
+(agenda: @unchecked) match {
+  case item :: rest =>
+    agenda = rest
+    curtime = item.time
+    item.action()
+}
+
+/\
+TODO
+(18.6;p409)

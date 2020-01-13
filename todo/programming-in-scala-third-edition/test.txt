@@ -1,0 +1,25 @@
+
+{
+import scala.{_}
+import scala.LowPriorityImplicits
+
+"abc" == "abc".reverse.reverse
+println("abc")
+}
+
+
+
+{
+import scala.{_}
+
+"abc" == "abc".reverse.reverse
+println("abc")
+}
+
+
+class List2[T] extends List[Nothing] {
+  def ::(x: T): List2[T] = new scala.::(x, this)
+  override def isEmpty = true
+  def head: Nothing = throw new NoSuchElementException("head of empty list")
+  def tail: List[Nothing] = throw new NoSuchElementException("tail of empty list")
+}

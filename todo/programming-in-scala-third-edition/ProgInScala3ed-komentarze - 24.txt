@@ -1,0 +1,1076 @@
+/\
+Collection hierarchy:
+(24.2;p532)
+
+Traversable
+  Iterable
+    Seq
+      IndexedSeq
+        Vector
+        ResizableArray
+        GenericArray
+      LinearSeq
+        MutableList
+        List
+        Stream
+      Buffer
+        ListBuffer
+        ArrayBuffer
+    Set
+      SortedSet
+        TreeSet
+      HashSet (mutable)
+      LinkedHashSet
+      HashSet (immutable)
+      BitSet
+      EmptySet, Set1, Set2, Set3, Set4
+    Map
+      SortedMap
+        TreeMap
+      HashMap (mutable)
+      LinkedHashMap (mutable)
+      HashMap (immutable)
+      EmptyMap, Map1, Map2, Map3, Map4
+
+/\
+What are the abstract operations in the Traversable?
+(24.3;p533)
+
+def foreach[U](f: Elem => U)
+
+/\
+List the methods in the Traversable.
+(24.3;p533)
+
+Addition: ++
+Map operations: map, flatMap, collect
+Conversions: toIndexedSeq, toIterable, toStream, toArray, toList, toSeq, toSet, toMap
+Copying operations: copyToBuffer, copyToArray
+Size operations: isEmpty, nonEmpty, size, hasDefiniteSize
+Element retrieval operations: head, last, headOption, lastOption, find
+Subcollection retrieval operations: takeWhile, tail, init, slice, take, drop, filter, dropWhile, filterNot, withFilter
+Subdivision operations: splitAt, span, partition, groupBy
+Element tests: exists, forall, count
+Folds: foldLeft, foldRight, /:, :\, reduceLeft, reduceRight
+Specific folds: sum, product, min, max
+String operations: mkString, addString, stringPrefix
+View operations: view
+
+/\
+What is the ordered alternative for HashSet?
+(24.3;p534)
+
+The ordered alternative for HashSet is LinkedHashSet.
+
+/\
+What is specific for trait Iterable?
+(24.4;p538)
+
+All methods in trait Iterable are defined in terms of an abstract method, iterator,
+which yields the collection’s elements one by one.
+
+/\
+List the methods in trait Iterable.
+(24.4;p540)
+
+iterator
+grouped
+sliding
+takeRight
+dropRight
+zip
+zipAll
+zipWithIndex
+sameElements
+
+/\
+Compile:
+val xs = List(1, 2, 3, 4, 5)
+xs grouped 3
+git.next()
+git.next()
+(24.4;p539)
+
+List(1, 2, 3)
+List(4, 5)
+
+/\
+Compile:
+val xs = List(1, 2, 3, 4, 5)
+xs sliding 3
+git.next()
+git.next()
+git.next()
+(24.4;p539)
+
+List(1, 2, 3)
+List(2, 3, 4)
+List(3, 4, 5)
+
+/\
+Why have both Traversable and Iterable?
+(24.4;p540)
+
+sealed abstract class Tree
+case class Branch(left: Tree, right: Tree) extends Tree
+case class Node(elem: Int) extends Tree
+
+// visiting all elements of a tree went up from about 2N
+sealed abstract class Tree extends Traversable[Int] {
+  def foreach[U](f: Int => U) = this match {
+    case Node(elem) => f(elem)
+    case Branch(l, r) => l foreach f; r foreach f
+  }
+}
+
+// N log(N)
+sealed abstract class Tree extends Iterable[Int] {
+  def iterator: Iterator[Int] = this match {
+    case Node(elem) => Iterator.single(elem)
+    case Branch(l, r) => l.iterator ++ r.iterator
+  }
+}
+
+/\
+Compile:
+Seq(1, 2, 3)(1)
+(24.4;p542)
+
+2
+
+/\
+Compile:
+Set('a', 'b', 'c')('b')
+(24.4;p542)
+
+true
+
+/\
+Explain relation between Seq and PartialFunction.
+(24.5;p542)
+
+Seq[T] extends PartialFunction[Int, T].
+A sequence of type Seq[T] is a partial function that takes an Int argument (an index) 
+and yields a sequence element of type T.
+
+/\
+Compile:
+Map('a' -> 1, 'b' -> 10, 'c' -> 100)('b')
+(24.4;p542)
+
+10
+
+/\
+List the methods in trait Iterable.
+(24.5;p542)
+
+Indexing and length operations: apply, isDefinedAt, length, indices, lengthCompare
+Index search operations: indexOf, lastIndexOf, indexOfSlice, lastIndexOfSlice, indexWhere, lastIndexWhere, segmentLength, prefixLength
+Addition operations: +:, :+, padTo
+Update operations: updated, patch, update (mutable)
+Sorting operations: sorted, sortWith, sortBy
+Reversal operations: reverse, reverseIterator, reverseMap
+Comparison operations: startsWith, endsWith, contains, corresponds, containsSlice
+Multiset operations: intersect, diff, union, distinct
+
+/\
+What is difference between sortWith and sortBy?
+(24.5;p542)
+
+sortBy: Sort by a given attribute using the attribute's type.
+sortWith: Takes a comparator function.
+
+val xs = Seq(1, 3, 2)
+xs.sortWith(_<_) //1,2,3
+persons.sortBy(_.age)
+
+/\
+Explain relation between LinearSeq and IndexedSeq.
+(24.5;p546)
+
+do not add any new operations
+LinearSeq: efficient head and tail
+IndexedSeq: efficient apply, length, and (if mutable) update
+
+Vector has both effectively constant time indexing overhead and constant time linear access overhead.
+
+/\
+Characterize Buffers.
+(24.5;p546)
+
+Buffers allow:
+- updates of existing elements,
+- element insertions,
+- element removals, 
+- efficient additions of new elements at the end of the buffer.
+
+/\
+List the methods in trait Set.
+(24.6;p548)
+
+Tests: contains, apply, subsetOf
+Additions: +, ++, +=, ++=
+Removals: -, --, -=, --=, retain, clear
+Set operations: intersect, union, diff, &, |, &~
+Update: =
+Cloning: clone
+
+/\
+What is default implementation of a mutable set?
+(24.6;p551)
+
+The current default implementation of a mutable set uses a hash table.
+
+/\
+What is default implementation of a immutable set?
+(24.6;p551)
+
+- sets of sizes up to four are represented by a single object that stores all elements as fields,
+- more than four elements, immutable sets are implemented as hash tries.
+
+/\
+Example of Map.
+(24.7;p552)
+
+Map("x" -> 24, "y" -> 25, "z" -> 26)
+Map(("x", 24), ("y", 25), ("z", 26))
+
+/\
+List the methods in trait Set.
+(24.7;p552)
+
+Lookups: apply, get, getOrElse, contains, isDefinedAt
+Additions and updates: +, ++, updated, put, getOrElseUpdate
+Removals: -, --
+Subcollection producers: keys, keySet, keysIterator, valuesIterator, values
+Transformations: filterKeys, mapValues
+
+/\
+Describe "ms getOrElseUpdate (key, op)".
+(24.7;p556)
+
+def f(x: String) = {
+  println("taking my time."); Thread.sleep(100)
+  x.reverse
+}
+
+def cachedF(s: String) = cache.getOrElseUpdate(s, f(s))
+cachedF("abc")
+cachedF("abc")
+
+def getOrElseUpdate(key: K, op: => V): V
+
+"op: => V" is “by-name" parameter so the computation of f("abc") above is only performed
+if getOrElseUpdate requires the value of its second argument.
+
+// alternative:
+def cachedF(arg: String) = cache get arg match {
+  case Some(result) => result
+  case None =>
+    val result = f(arg)
+    cache(arg) = result
+    result
+}
+
+/\
+List immutable collection classes in standard library.
+(24.8;p557)
+
+List: finite immutable sequences, constant time head, tail
+Stream: like a list but its elements are computed lazily
+Vector: "between the list and the array"
+Stack: LIFO, subsumed by lists
+Queue: FIFO
+Range: an ordered sequence of integers that are equally spaced apart
+Hash trie: ("Trie" comes from the word "retrieval" and is pronounced tree or try.)
+BitSet: a bit set
+ListMap: a linked list of key-value pairs
+
+/\
+Example of a stream.
+(24.8;p557)
+
+> val stream = 1 #:: 2 #:: 3 #:: Stream.empty
+str: scala.collection.immutable.Stream[Int] = Stream(1, ?)
+
+/\
+Example of a stream (a Fibonacci sequence).
+(24.8;p557)
+
+def fibFrom(a: Int, b: Int): Stream[Int] = a #:: fibFrom(b, a + b)
+val fibs = fibFrom(1, 1).take(7)
+
+/\
+Decribe the Vector.
+(24.8;p558)
+
+Every tree node contains up to 32 elements of the vector or contains up to 32 other tree nodes. 
+Balance between fast random selections and fast random functional updates.
+
+/\
+Example of a Vector.
+(24.8;p558)
+
+val vec = Vector.empty :+ 1 :+ 2
+
+/\
+What is currently the default implementation of immutable indexed sequences?
+Why?
+(24.8;p559)
+
+"Vector", because a good balance between:
+- fast random selections 
+- and fast random functional updates.
+
+> collection.immutable.IndexedSeq(1, 2, 3)
+res1: scala.collection.immutable.IndexedSeq[Int] = Vector(1, 2, 3)
+
+/\
+Example of a Stack.
+(24.8;p559)
+
+val stack = scala.collection.immutable.Stack.empty
+val hasOne = stack.push(1)
+hasOne.top
+hasOne.pop
+
+/\
+Example of a Queue.
+(24.8;p560)
+
+val empty = scala.collection.immutable.Queue[Int]()
+val has1 = empty.enqueue(1)
+val has123 = has1.enqueue(List(2, 3))
+val (element, has23) = has123.dequeue
+
+/\
+Example of a Range.
+(24.8;p561)
+
+> 1 to 3
+res1: scala.collection.immutable.Range.Inclusive = Range(1, 2, 3)
+
+> 5 to 14 by 3 
+res2: scala.collection.immutable.Range = Range(5, 8, 11, 14)
+
+> 1 until 3
+res3: scala.collection.immutable.Range = Range(1, 2)
+
+/\
+Characterize of a Range.
+(24.8;p561)
+
+Because they can be defined by three numbers:
+- represented in constant space,
+- most operations on ranges are extremely fast.
+
+/\
+Characterize of a "Hash trie".
+(24.8;p561)
+
+- a standard way to implement immutable sets and maps,
+- representation is similar to vectors (every node has 32 elements or 32 subtrees),
+- selection is based on a hash code,
+- balance between lookups and insertions or deletions.
+
+/\
+Example of a BitSet.
+(24.8;p562)
+
+> val bits = scala.collection.immutable.BitSet.empty
+
+> val moreBits = bits + 3 + 4 + 4
+moreBits: scala.collection.immutable.BitSet = BitSet(3, 4)
+
+> moreBits(3)
+res1: Boolean = true
+
+> moreBits(0)
+res2: Boolean = false
+
+/\
+Characterize of a "BitSet".
+(24.8;p561)
+
+- an array of 64-bit Longs,
+- fast.
+
+/\
+Example of a ListMap.
+(24.8;p563)
+
+> val map = collection.immutable.ListMap(1 -> "one", 2 -> "two")
+map: scala.collection.immutable.ListMap[Int,String] = Map(1 -> one, 2 -> two)
+> map(2)
+res1: String = "two"
+
+/\
+Characterize of a "ListMap".
+(24.8;p563)
+
+- standard immutable maps are almost always faster,
+- usage: the first elements in the list are selected much more often than the other elements.
+
+/\
+List mutable collection classes in standard library.
+(24.9;p563)
+
+ArrayBuffer: useful for building arrays
+ListBuffer: useful for building lists
+StringBuilder: useful for building strings
+LinkedList: easy to insert an element or linked list into another linked list
+DoubleLinkedList: element removal very fast
+MutableList: append is a constant time operation
+Queue: the dequeue method just remove the head element from the queue and return it
+ArraySeq: 
+Stack: 
+ArrayStack: an alternative implementation of a mutable stack, generally slightly more efficient
+Hash table: base for the default mutable map and set types
+Weak hash map: a wrapper "java.util.WeakHashMap"
+ConcurrentMap: can be accessed by several threads at once
+BitSet: slightly more efficient
+
+/\
+Example of a ArrayBuffer.
+(24.9;p563)
+
+val buf = collection.mutable.ArrayBuffer.empty[Int]
+buf += 1
+buf.toArray
+
+/\
+Characterize of a "ArrayBuffer".
+(24.9;p563)
+
+- holds an array and a size,
+- can add data efficiently to the end,
+- uses an array internally.
+
+/\
+Example of a "ListBuffer".
+(24.9;p564)
+
+val buf = collection.mutable.ListBuffer.empty[Int]
+buf += 1
+buf.toList
+
+/\
+Characterize of a "ListBuffer".
+(24.9;p564)
+
+- uses a linked list internally,
+- usage: if you plan to convert the buffer to a list once it is built up.
+
+/\
+Example of a StringBuilder.
+(24.9;p565)
+
+val buf = new StringBuilder
+buf += 'a'
+buf ++= "bcdef"
+buf.toList
+
+/\
+Characterize of a "StringBuilder".
+(24.9;p565)
+
+- imported into the default namespace,
+- useful for building strings.
+
+/\
+Characterize of a "MutableList".
+(24.9;p565)
+
+- a single linked list and a pointer that refers to the terminal empty node of that list,
+- append is a constant time operation,
+- the standard implementation of mutable.LinearSeq.
+
+/\
+Example of a "Queue".
+(24.9;p566)
+
+val queue = new scala.collection.mutable.Queue[String]
+queue += "a"
+queue ++= List("b", "c")
+queue.dequeue // remove and return
+
+/\
+Characterize of a "ArraySeq".
+(24.9;p566)
+
+- mutable sequences of fixed size,
+- internally in an Array[AnyRef],
+- to create generic instances of the sequence where you do not know the type (no a ClassTag).
+
+/\
+Example of a "Stack".
+(24.9;p567)
+
+val stack = new scala.collection.mutable.Stack[Int]
+stack.push(1)
+stack.push(2)
+stack.top
+stack.pop
+
+/\
+Difference "a regular hash map or set" vs "a linked hash map or set".
+(24.9;p568)
+
+"a regular hash map or set": iteration is not guaranteed to occur in any particular order.
+"a linked hash map or set": also includes a linked list of the elements in the order they were added.
+
+/\
+Characterize of a "weak hash map".
+(24.9;p568)
+
+- the garbage collector does not follow links from the map to the keys stored in it,
+- as soon as a key object becomes unreachable, it’s entry is removed from the weak hash map,
+- usage: caching,
+- a wrapper "java.util.WeakHashMap".
+
+/\
+List ConcurrentMap atomic operations.
+(24.9;p569)
+
+m putIfAbsent(k, v)
+m remove (k, v)
+m replace (k, old, new)
+m replace (k, v)
+
+/\
+Example of a "BitSet".
+(24.9;p569)
+
+val bits = scala.collection.mutable.BitSet.empty
+bits += 1
+bits += 3
+
+/\
+Compare Java and Scala arrays.
+(24.10;p570)
+
+int[] == Array[Int], double[] == array[Double], ...
+
+generic, Array[T]
+Array[T] -[implicit conversion to WrappedArray]-> Seq[T]
+
+/\
+How Scala arrays support all sequence operations?
+(24.10;p570)
+
+Because of implicit conversion to WrappedArray:
+val seq: Seq[Int] = Array(1, 2, 3)
+seq: Seq[Int] = WrappedArray(1, 2, 3)
+
+/\
+Difference:
+val a1 = Array(1, 2, 3)
+val seq: Seq[Int] = a1
+val ops: collection.mutable.ArrayOps[Int] = a1
+(24.10;p571)
+
+> seq.reverse
+res1: Seq[Int] = WrappedArray(3, 2, 1)
+
+vs.
+> ops.reverse
+res2: Array[Int] = Array(3, 2, 1)
+
+- result in an Array, not a Seq
+- implicit: Array(3, 2, 1).reverse
+- short-lived or avoided
+
+/\
+Discuss performance in concrete and generic arrays.
+(24.10;p572)
+
+- Scala compiler maps Array[T] to java.lang.Object[]
+- a sequence of type tests at run-time followed by the correct Java array operation
+so:
+accesses to generic arrays is three to four times slower
+
+/\
+Generate:
+error: cannot find class tag for element type T
+(24.10;p573)
+
+// This is wrong!
+def evenElems[T](xs: Vector[T]): Array[T] = {
+  val arr = new Array[T]((xs.length + 1) / 2)
+  for (i <- 0 until xs.length by 2) arr(i / 2) = xs(i)
+  arr
+}
+
+/\
+Correct error:
+// This is wrong!
+def evenElems[T](xs: Vector[T]): Array[T] = {
+  val arr = new Array[T]((xs.length + 1) / 2)
+  for (i <- 0 until xs.length by 2) arr(i / 2) = xs(i)
+  arr
+}
+(24.10;p573)
+
+// help the compiler
+import scala.reflect.ClassTag
+def evenElems[T: ClassTag](xs: Vector[T]): Array[T] = {
+  val arr = new Array[T]((xs.length + 1) / 2)
+  for (i <- 0 until xs.length by 2) arr(i / 2) = xs(i)
+  arr
+}
+
+> evenElems(Vector(1, 2, 3, 4, 5))
+res1: Array[Int] = Array(1, 3, 5)
+
+/\
+Generate:
+error: No ClassTag available for U
+(24.10;p574)
+
+import scala.reflect.ClassTag
+def evenElems[T: ClassTag](xs: Vector[T]): Array[T] = {
+  val arr = new Array[T]((xs.length + 1) / 2)
+  for (i <- 0 until xs.length by 2) arr(i / 2) = xs(i)
+  arr
+}
+def wrap[U](xs: Vector[U]) = evenElems(xs)
+
+/\
+How Scala String support all sequence operations?
+(24.11;p575)
+
+because of implicit conversion to:
+high-priority: StringOps
+low-priority: WrappedString -> immutable.IndexedSeq
+
+/\
+Performance characteristics of sequence types.
+(24.12;p576)
+
+IMMUTABLE
+              | head | tail | apply | update | prepend | append | insert
+List          |  C   |  C   |  L    |  L     |  C      |  L     |  -
+Stream        |  C   |  C   |  L    |  L     |  C      |  L     |  -
+Vector        | eC   | eC   | eC    | eC     | eC      | eC     |  -
+Stack         |  C   |  C   |  L    |  L     |  C      |  L     |  -
+Queue         | aC   | aC   |  L    |  L     |  L      |  C     |  -
+Range         |  C   |  C   |  C    |  -     |  -      |  -     |  -
+String        |  C   |  L   |  C    |  L     |  L      |  L     |  -
+
+MUTABLE
+              | head | tail | apply | update | prepend | append | insert
+ArrayBuffer   |  C   |  L   |  C    |  C     |  L      | aC     |  L
+ListBuffer    |  C   |  L   |  L    |  L     |  C      |  C     |  L
+StringBuilder |  C   |  L   |  C    |  C     |  L      | aC     |  L
+MutableList   |  C   |  L   |  L    |  L     |  C      |  C     |  L
+Queue         |  C   |  L   |  L    |  L     |  C      |  C     |  L
+ArraySeq      |  C   |  L   |  C    |  C     |  -      |  -     |  -
+Stack         |  C   |  L   |  L    |  L     |  C      |  L     |  L
+ArrayStack    |  C   |  L   |  C    |  C     | aC      |  L     |  L
+Array         |  C   |  L   |  C    |  C     |  -      |  -     |  -
+
+/\
+Performance characteristics of set and map types.
+(24.12;p576)
+
+IMMUTABLE
+                | lookup | add | remove | min
+HashSet/HashMap | eC     | eC  | eC     | L
+TreeSet/TreeMap | Log    | Log | Log    | Log
+BitSet          | C      | L   | L      | eCa
+ListMap         | L      | L   | L      | L
+MUTABLE
+HashSet/HashMap | eC     | eC  | eC     | L
+WeakHashMap     | eC     | eC  | eC     | L
+BitSet          | C      | aC  | C      | eCa
+
+/\
+When collections are equal?
+(24.13;p578)
+
+- the same category ("sequence", "set/map"),
+- the same elements (order no matters),
+- List(1, 2, 3) == Vector(1, 2, 3),
+- HashSet(1, 2) == TreeSet(2, 1).
+
+/\
+Compile:
+import collection.mutable.{HashMap, ArrayBuffer}
+val buf = ArrayBuffer(1, 2, 3)
+val map = HashMap(buf -> 3)
+map(buf)
+?
+buf(0) += 1
+?
+map.keys
+(24.13;p578)
+
+3
+java.util.NoSuchElementException: key not found: ArrayBuffer(2, 2, 3)
+res1: Iterable[scala.collection.mutable.ArrayBuffer[Int]] = Set(ArrayBuffer(2, 2, 3))
+
+/\
+What is "transformer"?
+(24.14;p579)
+
+Collections' methods that construct new collections.
+
+/\
+Example of "transformer".
+(24.14;p579)
+
+map, filter, ++
+
+/\
+What are two principal ways to implement transformers?
+(24.14;p579)
+
+- strict
+- nonstrict(lazy): elements are constructed on demand
+
+def lazyMap[T, U](coll: Iterable[T], f: T => U) = new Iterable[U] {
+  def iterator = coll.iterator map f
+  override def toString: String = "I am lazy"
+}
+val col = lazyMap[Int, Int](List(1, 2, 3), x => 1 / (x - 2))
+col.take(1) // ok
+col.take(2) // java.lang.ArithmeticException: / by zero
+col.take(3) // java.lang.ArithmeticException: / by zero
+col.take(1) // ok
+
+/\
+What is a view?
+(24.14;p580)
+
+A view is a special kind of collection that represents some base collection,
+but implements all of its transformers lazily.
+
+/\
+How to go from a collection to its view?
+(24.14;p580)
+
+val v = Vector(1 to 10: _*)
+v.view map (_ + 1)
+
+v: scala.collection.immutable.Vector[Int] = Vector(1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
+res1: scala.collection.SeqView[Int,Seq[_]] = SeqViewM(...)
+
+/\
+How to go from a view to strict collection?
+(24.14;p580)
+
+val v = Vector(1 to 10: _*)
+(v.view map (_ + 1)).force
+
+v: scala.collection.immutable.Vector[Int] = Vector(1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
+res01: Seq[Int] = Vector(2, 3, 4, 5, 6, 7, 8, 9, 10, 11)
+
+/\
+How to improve?
+val v = Vector(1 to 10: _*)
+v map (_ + 1) map (_ * 2)
+(24.14;p580)
+
+avoid the intermediate results:
+(v.view map (_ + 1) map (_ * 2)).force
+
+/\
+When:
+res01: scala.collection.SeqView[Int,Seq[_]] = SeqViewMMSR(...)
+(24.14;p581)
+
+Vector(1 to 10: _*).view.map(_ + 1).map(_ + 1).slice(1, 3).reverse
+
+/\
+What result type is when applying delayed operations?
+(24.14;p581)
+
+Array(1 to 3: _*).view.map (_ + 1).force
+res01: Array[Int] = Array(2, 3, 4)
+but others:
+Vector(1 to 3: _*).view.map (_ + 1).force
+res02: Seq[Int] = Vector(2, 3, 4)
+
+/\
+Why using views?
+(24.14;p581)
+
+- preformance: intermediate results can be avoided,
+- performance and modularity: no intermediary sequence, i.e. findFirst(words take 1000000) vs. findFirst(words.view take 1000000)
+- performance and modularity: to separate "what" from "how", i.e. 
+
+val arr = (0 to 9).toArray
+val subarr = arr.view.slice(3, 6) // what
+def negate(xs: collection.mutable.Seq[Int]) = for (i <- 0 until xs.length) xs(i) = - xs(i) // how
+negate(subarr)
+
+/\
+Why not using views?
+(24.14;p583)
+
+- small strict collections are faster,
+- evaluation can be confusing if the delayed operations have side effects.
+
+/\
+Which collections are lazy?
+(24.14;p583)
+
+- streams,
+- views.
+
+/\
+What is an iterator?
+(24.15;p584)
+
+An object that enables a programmer to traverse a container.
+A way to access the elements of a collection one by one.
+
+/\
+Use an iterator and a while loop.
+(24.15;p584)
+
+while (it.hasNext) println(it.next())
+(two basic operations)
+
+/\
+Use an iterator and a foreach.
+(24.15;p585)
+
+it foreach println
+(iterator provide analogues of most of the methods the Traversable, Iterable, Seq traits)
+
+/\
+Use an iterator and a for.
+(24.15;p585)
+
+for (elem <- it) println(elem)
+
+/\
+val it = Iterator("a", "b", "c")
+it foreach print
+it foreach print
+println ("ok")
+(24.15;p585)
+
+abc
+ok
+
+/\
+val it = Iterator("a", "b", "c")
+it foreach print
+it.next()
+println ("ok")
+Why?
+(24.15;p585)
+
+abc
+java.util.NoSuchElementException: next on empty iterator
+Because:
+- the operations that Iterator has in common with Traversable change the iterator,
+- no re-use iterator.
+
+/\
+val it = Iterator("a", "bb", "ccc")
+val it2 = it.map(_.length)
+it2 foreach print
+it.next()
+Why?
+(24.15;p586)
+
+123
+java.util.NoSuchElementException: next on empty iterator
+Because:
+- the operations that Iterator has in common with Traversable change the iterator,
+- no re-use iterator.
+
+/\
+How to re-use the same iterator?
+(24.15;p586)
+
+val (it1, it2) = it.duplicate
+- two iterators,
+- work independently,
+- "it" is advanced to end.
+
+/\
+What is a common supertrait of Traversable and Iterator?
+(24.15;p586)
+
+TraversableOnce
+
+/\
+List operations in trait Iterator.
+(24.15;p587)
+
+Abstract methods:
+it.next()
+it.hasNext
+
+Variations:
+it.buffered
+it grouped size
+xs sliding size
+
+Copying:
+it copyToBuffer buf
+it copyToArray(arr, s, l)
+
+Duplication:
+it.duplicate
+
+Additions:
+it ++ jt
+it padTo (len, x)
+
+Maps:
+it map f
+it flatMap f
+it collect f
+
+Conversions:
+it.toArray
+it.toList
+it.toIterable
+it.toSeq
+it.toIndexedSeq
+it.toStream
+it.toSet
+it.toMap
+
+Size info:
+it.isEmpty
+it.nonEmpty
+it.size
+it.length
+it.hasDefiniteSize
+
+Element retrieval index search:
+it find p
+it indexOf x
+it indexWhere p
+
+Subiterators:
+it take n
+it drop n
+it slice (m, n)
+it takeWhile p
+it dropWhile p
+it filter p
+it withFilter p
+it filterNot p
+
+Subdivisions:
+it partition p
+
+Element conditions:
+it forall p
+it exists p
+it count p
+
+Folds:
+(z /: it)(op)
+(it :\ z)(op)
+it.foldLeft(z)(op)
+it.foldRight(z)(op)
+it reduceLeft op
+it reduceRight op
+
+Specific folds:
+it.sum
+it.product
+it.min
+it.max
+
+Zippers:
+it zip jt
+it zipAll (jt, x, y)
+it.zipWithIndex
+
+Update:
+it patch (i, jt, r)
+
+Comparison:
+it sameElements jt
+
+Strings:
+it addString (b, start, sep, end)
+it mkString (start, sep, end)
+
+/\
+Explein "it collect f".
+(24.15;p588)
+
+val l = List(2, 4, 6) // PartiaLFunction, isDefinedAt(0), isDefinedAt(1), isDefinedAt(2)
+val it = Iterator(1, 2, 3, 4)
+val lit = it collect l
+lit.mkString(";") // 4;6
+
+/\
+Explein BufferedIterator.
+(24.15;p591)
+
+- a subtrait of Iterator,
+- add one extra method, head,
+
+def skipEmptyWords(it: BufferedIterator[String]) = while (it.head.isEmpty) { it.next() }
+
+val it = Iterator(1, 2, 3, 4)
+val bit = it.buffered
+bit.head // 1
+bit.next() // 1
+
+/\
+Create sample collections from scratch.
+(24.16;p592)
+
+Traversable(1, 2, 3) // List(1, 2, 3)
+mutable.Traversable(1, 2, 3) // ArrayBuffer(1, 2, 3)
+List(1, 2)
+Vector(1, 2)
+Iterator(1, 2, 3)
+Set(1, 2, 2, 3)
+scala.collection.immutable.HashSet(1, 2, 2, 3)
+Map('a' -> 1, 'b' -> 2)
+
+/\
+List the factory methods for sequences.
+(24.16;p594)
+
+S.empty
+S(x, y, z)
+S.concat(xs, ys, zs)
+S.fill(n)(e)
+S.fill(m, n)(e)
+S.tabulate(n)(f)
+S.tabulate(m, n)(f)
+S.range(start, end)
+S.range(start, end, step)
+S.iterate(x, n)(f)
+
+/\
+List conversions between Java and Scala collections.
+(24.17;p594)
+
+Iterator <-> java.util.Iterator
+Iterator <-> java.util.Enumeration
+Iterable <-> java.lang.Iterable
+Iterable <-> java.util.Collection
+mutable.Buffer <-> java.util.List
+mutable.Set <-> java.util.Set
+mutable.Map <-> java.util.Map
+
+Seq -> java.util.List
+mutable.Seq -> java.util.List
+Set -> java.util.Set
+Map -> java.util.Map
+
+Explain conversions between Java and Scala collections.
+(24.17;p594)
+
+- import collection.JavaConversions._
+- "wrapper" object, collections are never copied,
+- Java does not distinguish between mutable and immutable:
+
+val jul: java.util.List[Int] = List(1, 2, 3)
+jul.add(4)
+-> java.lang.UnsupportedOperationException

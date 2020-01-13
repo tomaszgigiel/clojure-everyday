@@ -1,0 +1,370 @@
+/\
+Example Future.
+(32.2;p717)
+
+> import scala.concurrent.Future
+> import scala.concurrent.ExecutionContext.Implicits.global
+> val fut = Future { Thread.sleep(10000); 21 + 21 }
+fut: scala.concurrent.Future[Int] = Future(<not completed>)
+
+> fut.isCompleted
+res1: Boolean = false
+> fut
+res2: scala.concurrent.Future[Int] = Future(<not completed>)
+> fut.value
+res3: Option[scala.util.Try[Int]] = None
+
+> fut.isCompleted
+res4: Boolean = true
+> fut
+res5: scala.concurrent.Future[Int] = Future(Success(42))
+> fut.value
+res6: Option[scala.util.Try[Int]] = Some(Success(42))
+
+> val fut = Future { Thread.sleep(10000); 21 / 0 }
+> fut.value
+res7: Option[scala.util.Try[Int]] = Some(Failure(java.lang.ArithmeticException: / by zero))
+
+/\
+How to tranform Futures with map?
+(32.3;p719)
+
+val fut = Future { Thread.sleep(10000); 21 + 21 }
+val result = fut.map(x => x + 1)
+result.value
+
+res1: Option[scala.util.Try[Int]] = Some(Success(43))
+
+/\
+How to tranform Futures with for expressions?
+(32.3;p719)
+
+val fut1 = Future { Thread.sleep(10000); 21 + 21 }
+val fut2 = Future { Thread.sleep(10000); 23 + 23 }
+
+for {
+  x <- fut1
+  y <- fut2
+} yield x + y
+
+// 20 seconds
+res28: Option[scala.util.Try[Int]] = Some(Success(88))
+
+Because:
+fut1.flatMap(x => fut2.map(y => x + y))
+
+/\
+How to create Future?
+(32.3;p721)
+
+import scala.concurrent.Future
+Future.successful { 21 + 21 } // scala.concurrent.Future[Int] = Future(Success(42))
+Future.failed(new Exception("bummer!")) // scala.concurrent.Future[Nothing] = Future(Failure(java.lang.Exception: bummer!))
+
+import scala.util.{Success,Failure}
+Future.fromTry(Success { 21 + 21 }) // scala.concurrent.Future[Int] = Future(Success(42))
+Future.fromTry(Failure(new Exception("bummer!"))) // scala.concurrent.Future[Nothing] = Future(Failure(java.lang.Exception: bummer!))
+
+import scala.concurrent.Promise
+val pro = Promise[Int] // pro: scala.concurrent.Promise[Int] = Future(<not completed>)
+val fut = pro.future // fut: scala.concurrent.Future[Int] = Future(<not completed>)
+fut.value // Option[scala.util.Try[Int]] = None
+pro.success(42) // pro.type = Future(Success(42))
+fut.value // Option[scala.util.Try[Int]] = Some(Success(42))
+
+/\
+How to filter Future?
+(32.3;p722)
+
+val fut = Future { 42 }
+val valid = fut.filter(res => res > 0)
+valid.value // res0: Option[scala.util.Try[Int]] = Some(Success(42))
+
+val invalid = fut.filter(res => res < 0)
+invalid.value // res1: Option[scala.util.Try[Int]] = Some(Failure(java.util.NoSuchElementException: Future.filter predicate is not satisfied))
+
+/\
+Explain Future and for expression filters.
+(32.3;p723)
+
+Because Future.withFilter:
+
+val valid = for (res <- fut if res > 0) yield res
+valid.value // res0: Option[scala.util.Try[Int]] = Some(Success(42))
+
+val invalid = for (res <- fut if res < 0) yield res
+invalid.value // res1: Option[scala.util.Try[Int]] = Some(Failure(java.util.NoSuchElementException: Future.filter predicate is not satisfied))
+
+/\
+Validate the future value and transform it in one operation.
+(32.3;p723)
+
+val valid = fut collect { case res if res > 0 => res + 46 }
+valid.value // res0: Option[scala.util.Try[Int]] = Some(Success(88))
+
+val invalid = fut collect { case res if res < 0 => res + 46 }
+invalid.value // res1: Option[scala.util.Try[Int]] = Some(Failure(java.util.NoSuchElementException: Future.collect partial function is not defined at: 42))
+
+/\
+Transform a failed future of any type into a successful Future.
+(32.3;p724)
+
+val failure = Future { 42 / 0 } // failure: scala.concurrent.Future[Int] = ...
+failure.value // res0: Option[scala.util.Try[Int]] = Some(Failure(java.lang.ArithmeticException: / by zero))
+// but:
+val expectedFailure = failure.failed // expectedFailure: scala.concurrent.Future[Throwable] = ...
+expectedFailure.value // res1: Option[scala.util.Try[Throwable]] = Some(Success(java.lang.ArithmeticException: / by zero))
+// but:
+val success = Future { 42 / 1 }
+val unexpectedSuccess = success.failed // unexpectedSuccess: scala.concurrent.Future[Throwable] = ...
+unexpectedSuccess.value // res2: Option[scala.util.Try[Throwable]] = Some(Failure(java.util.NoSuchElementException: Future.failed not completed with a throwable.))
+
+
+/\
+Explain Future.fallbackTo.
+(32.3;p725)
+
+import scala.concurrent.Future
+import scala.concurrent.ExecutionContext.Implicits.global
+val failure = Future { 42 / 0 }
+val success = Future { 42 / 1 }
+val fallback = failure.fallbackTo(success) // fallback: scala.concurrent.Future[Int] = ...
+fallback.value // res0: Option[scala.util.Try[Int]] = Some(Success(42))
+// but:
+val failure2 = Future { List() (9)}
+val fallback = failure.fallbackTo(failure2)
+fallback.value // res3: Option[scala.util.Try[Int]] = Some(Failure(java.lang.ArithmeticException:/ by zero))
+
+/\
+Explain Future.recover.
+(32.3;p725)
+
+val failure = Future { 42 / 0 }
+failure.value // res0: Option[scala.util.Try[Int]] = Some(Failure(java.lang.ArithmeticException: / by zero))
+val recovered = failure.recover {case ex: ArithmeticException => 1}
+recovered.value // res1: Option[scala.util.Try[Int]] = Some(Success(1))
+
+/\
+Explain Future.recoverWith.
+(32.3;p726)
+
+val failure = Future { 42 / 0 }
+failure.value // res0: Option[scala.util.Try[Int]] = Some(Failure(java.lang.ArithmeticException: / by zero))
+val recovered = failure.recoverWith {case ex: ArithmeticException => Future { 1 } }
+recovered.value // res1: Option[scala.util.Try[Int]] = Some(Success(1))
+
+/\
+Explain Future.transform.
+(32.3;p726)
+
+val success = Future { 99 }.transform(
+  res => "ok: " + res,
+  ex => new Exception("exception")
+)
+success.value // res1: Option[scala.util.Try[String]] = Some(Success(ok: 99))
+
+val failure = Future { 1/0 }.transform(
+  res => "ok: " + res,
+  ex => new Exception("!!!")
+)
+failure.value // res1: Option[scala.util.Try[String]] = Some(Failure(java.lang.Exception: !!!))
+
+import scala.util.{Success,Failure}
+val alwaysSuccess = Future { 1/0 }.transform { // Scala 2.12
+  case Success(res) => Success("ok - 1")
+  case Failure(_) => Success("ok - 2")
+}
+alwaysSuccess.value
+
+/\
+Explain Future.zip.
+(32.3;p728)
+
+val first = Future { 1 }
+val second = Future { 2 }
+val zipped = first.zip(second) // zipped: scala.concurrent.Future[(Int, Int)] = Future(Success((1,2)))
+
+val first = Future { 1/0 }
+val second = Future { List()(9) }
+val zipped = first.zip(second) // zipped: scala.concurrent.Future[(Int, Nothing)] = Future(Failure(java.lang.ArithmeticException: / by zero))
+
+/\
+Explain Future.foldLeft.
+(32.3;p729)
+
+val futures = List(Future{1}, Future{2}, Future{3})
+val folded = Future.foldLeft(futures)(0) { (acc, num) => acc + num }
+folded.value // res0: Option[scala.util.Try[Int]] = Some(Success(6))
+
+/\
+Explain Future.sequence.
+(32.3;p730)
+
+val futures = List(Future{1}, Future{2}, Future{3})
+val sequenced = Future.sequence(futures)
+sequenced.value // res0: Option[scala.util.Try[List[Int]]] = Some(Success(List(1, 2, 3)))
+
+/\
+Explain Future.traverse.
+(32.3;p730)
+
+val traversed = Future.traverse(List((1, 2, 3))) { i => Future(i) }
+traversed.value // res0: Option[scala.util.Try[List[(Int, Int, Int)]]] = Some(Success(List((1,2,3))))
+
+/\
+Perform a side effect after a future completes.
+(32.3;p730)
+
+val success = Future { 1 }
+success.foreach(res => println(res))
+// or:
+for (res <- success) println(res)
+> 1
+
+val failure = Future { 1/0 }
+failure.foreach(ex => println(ex)) // "println" not executed
+// or:
+for (res <- failure) println(res) // "for" not executed
+
+/\
+Explain registering “callback” functions in Futures.
+(32.3;p731)
+
+val success = Future { 1 }
+val res : Unit = success onComplete {
+  case Success(res) => println(res)
+  case Failure(ex) => println(ex)
+} // 1
+
+val failure = Future { 1/0 }
+val res : Unit = failure onComplete {
+  case Success(res) => println(res)
+  case Failure(ex) => println("Fail:" + ex)
+} // Fail:java.lang.ArithmeticException: / by zero
+
+/\
+Explain Future.andThen.
+(32.3;p731)
+
+import scala.concurrent.Future
+import scala.concurrent.ExecutionContext.Implicits.global
+import scala.util.{Success,Failure}
+
+val fut = Future {
+  Thread.sleep(5000)
+  println("a")
+  1
+}.andThen{ case Success(x) =>
+  Thread.sleep(3000)
+  println("b = " + x)
+  2
+}.andThen{ case Success(x) =>
+  Thread.sleep(1000)
+  println("c = " + x)
+  3 / 0
+}.andThen{ case Success(x) =>
+  println("d = " + x)
+  4
+}
+
+a
+b = 1
+c = 1
+java.lang.ArithmeticException: / by zero
+d = 1
+fut: scala.concurrent.Future[Int] = Future(Success(1))
+
+/\
+Explain Future.flatten.
+(32.3;p732)
+
+val nestedFuture = Future { Future { 42 } }
+// nestedFuture: Future[Future[Int]] = ...
+val flattened = nestedFuture.flatten
+// flattened: scala.concurrent.Future[Int] = Future(Success(42))
+
+/\
+Explain Future.zip.
+(32.3;p732)
+
+val first = Future { 21 }
+val second = Future { "ok" }
+val zipped = first zip second
+// zipped: scala.concurrent.Future[(Int, String)] = Future(Success((21,ok)))
+zipped.value.get.get._1
+zipped.value.get.get._2
+// 21
+val third = zipped map { case (a, b) => s"$a $b" }
+third.value
+// res0: Option[scala.util.Try[String]] = Some(Success(21 ok))
+
+/\
+Explain Future.zipWith.
+(32.3;p732)
+
+val first = Future { 21 }
+val second = Future { "ok" }
+val third = first.zipWith(second) { case (a, b) => s"$a $b" }
+third.value
+// res0: Option[scala.util.Try[String]] = Some(Success(21 ok))
+
+/\
+Explain Future.transformWith.
+(32.3;p733)
+
+val success = Future { "ok" }
+val flipped = success.transformWith {
+  case Success(res) => Future { throw new Exception(res.toString) }
+  case Failure(ex) => Future { 21 }
+}
+flipped.value
+// res0: Option[scala.util.Try[Int]] = Some(Failure(java.lang.Exception: ok))
+
+/\
+How to block on a future result?
+(32.4;p733)
+
+import scala.concurrent.Await
+import scala.concurrent.duration._
+
+val first = Future { Thread.sleep(5000); 21 }
+val result = Await.result(first, 70.seconds)
+result: Int = 21 // after 5 seconds
+
+/\
+Explain Future.futureValue.
+(32.4;p734)
+
+import scala.concurrent.Future
+import scala.concurrent.ExecutionContext.Implicits.global
+import org.scalatest.concurrent.ScalaFutures._
+import org.scalatest._
+import Matchers._
+
+val first = Future { Thread.sleep(5000); 21 }
+first.futureValue should be (21)
+// res0: org.scalatest.Assertion = Succeeded
+
+/\
+Example "org.scalatest.AsyncFunSpec".
+(32.4;p735)
+
+import org.scalatest.AsyncFunSpec
+import scala.concurrent.Future
+
+class AddSpec extends AsyncFunSpec {
+  def addSoon(addends: Int*): Future[Int] = Future { Thread.sleep(5000); addends.sum }
+
+  describe("addSoon") {
+    it("will eventually compute a sum of passed Ints") {
+      val futureSum: Future[Int] = addSoon(1, 2)
+      futureSum map { sum => assert(sum == 3) }
+    }
+  }
+}
+
+org.scalatest.run(new AddSpec)
+
+// AddSpec:
+// addSoon
+// - will eventually compute a sum of passed Ints

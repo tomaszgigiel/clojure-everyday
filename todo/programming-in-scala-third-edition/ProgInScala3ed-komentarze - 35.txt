@@ -1,0 +1,248 @@
+/\
+Example a Swing application.
+(35.4;p734)
+
+/\
+package org.stairwaybook.scells
+
+trait Formula
+
+case class Coord(row : Int, column : Int) extends Formula {
+  override def toString = ('A' + column).toChar.toString + row
+}
+
+case class Range(c1 : Coord, c2 : Coord) extends Formula {
+  override def toString = c1.toString + ":" + c2.toString
+}
+
+case class Number(value : Double) extends Formula {
+  override def toString = value.toString
+}
+
+case class Textual(value : String) extends Formula {
+  override def toString = value
+}
+
+case class Application(function : String, arguments : List[Formula]) extends Formula {
+  override def toString = function + arguments mkString ("(", ",", ")")
+}
+
+object Empty extends Textual("")
+
+/\
+package org.stairwaybook.scells
+
+import util.parsing.combinator._
+
+object FormulaParsers extends RegexParsers {
+
+  def ident   : Parser[String] = """[a-zA-Z_]\w*""".r
+  def decimal : Parser[String] = """-?\d+(\.\d*)?""".r
+
+  def cell : Parser[Coord] =
+    """[A-Za-z]\d+""".r ^^ { s =>
+      val column = (s charAt 0).toUpper - 'A'
+      val row    = (s substring 1).toInt
+      Coord(row, column)
+    }
+
+  def range : Parser[Range] =
+    cell ~ ":" ~ cell ^^ {
+      case c1 ~ ":" ~ c2 => Range(c1, c2)
+    }
+
+  def number : Parser[Number] =
+    decimal ^^ (d => Number(d.toDouble))
+
+  def application : Parser[Application] =
+    ident ~ "(" ~ repsep(expr, ",") ~ ")" ^^ {
+      case f ~ "(" ~ ps ~ ")" => Application(f, ps)
+    }
+
+  def expr : Parser[Formula] =
+    range | cell | number | application
+
+  def textual : Parser[Textual] =
+    """[^=].*""".r ^^ Textual
+
+  def formula : Parser[Formula] =
+    number | textual | "=" ~> expr
+
+  def parse(input : String) : Formula =
+    parseAll(formula, input) match {
+      case Success(e, _) => e
+      case f : NoSuccess => Textual("[" + f.msg + "]")
+    }
+}
+
+
+////////////////////////
+/\
+package org.stairwaybook.scells
+
+trait Evaluator {
+
+  this : Model =>
+
+  type Op = List[Double] => Double
+  val operations = new collection.mutable.HashMap[String, Op]
+
+  def evaluate(e : Formula) : Double =
+    try e match {
+      case Coord(row, column)               => cells(row)(column).value
+      case Number(v)                        => v
+      case Textual(_)                       => 0
+      case Application(function, arguments) => operations(function)(arguments flatMap evalList)
+    } catch {
+      case ex : Exception => Double.NaN
+    }
+
+  private def evalList(e : Formula) : List[Double] =
+    e match {
+      case Range(_, _) => references(e) map (_.value)
+      case _           => List(evaluate(e))
+    }
+
+  def references(e : Formula) : List[Cell] =
+    e match {
+      case Coord(row, column)                  => List(cells(row)(column))
+      case Range(Coord(r1, c1), Coord(r2, c2)) =>
+        for (row <- (r1 to r2).toList; column <- c1 to c2) yield cells(row)(column)
+      case Application(function, arguments)    => arguments flatMap references
+      case _                                   => List()
+    }
+}
+
+/\
+package org.stairwaybook.scells
+
+import swing._
+
+object Main extends SimpleSwingApplication {
+
+  def top = new MainFrame {
+    title    = "ScalaSheet"
+    contents = new Spreadsheet(100, 26)
+  }
+
+}
+
+/\
+package org.stairwaybook.scells
+
+import swing._
+
+class Model(val height : Int, val width : Int) extends Evaluator with Arithmetic {
+
+  case class ValueChanged(cell : Cell) extends event.Event
+
+  case class Cell(row : Int, column : Int) extends Publisher {
+
+    private var v : Double  = 0
+    private var f : Formula = Empty
+
+    def value   : Double  = v
+    def formula : Formula = f
+
+    def value_=(w : Double) : Unit =
+      if (v != w && !(v.isNaN && w.isNaN)) {
+        v = w
+        publish(ValueChanged(this))
+      }
+
+    def formula_=(g : Formula) : Unit = {
+      for (c <- references(formula)) deafTo(c)
+      f = g
+      for (c <- references(formula)) listenTo(c)
+      value = evaluate(f)
+    }
+
+    override def toString =
+      formula match {
+        case Textual(s) => s
+        case _          => value.toString
+      }
+
+    reactions += {
+      case ValueChanged(_) => value = evaluate(formula)
+    }
+
+  }
+
+  val cells : Array[Array[Cell]] =
+    Array.tabulate(height, width) {
+      (i, j) => new Cell(i, j)
+    }
+
+}
+
+/\
+package org.stairwaybook.scells
+
+import swing._
+import swing.event._
+
+class Spreadsheet(val height : Int, val width : Int) extends ScrollPane {
+
+  val cellModel = new Model(height, width)
+  import cellModel._
+
+  val table = new Table(height, width) {
+    rowHeight      = 25
+    autoResizeMode = Table.AutoResizeMode.Off
+    showGrid       = true
+    gridColor      = new java.awt.Color(150, 150, 150)
+
+    override def rendererComponent(isSelected : Boolean, hasFocus : Boolean, row : Int, column : Int) : Component =
+      if (hasFocus)
+        new TextField(userData(row, column))
+      else
+        new Label(cells(row)(column).toString) {
+          xAlignment = Alignment.Right
+        }
+
+    def userData(row : Int, column : Int) : String = {
+      val v = this(row, column)
+      if (v == null) "" else v.toString
+    }
+
+    reactions += {
+      case TableUpdated(table, rows, column) =>
+        for (row <- rows)
+          cells(row)(column).formula = FormulaParsers parse (userData(row, column))
+      case ValueChanged(cell) =>
+        updateCell(cell.row, cell.column)
+    }
+
+    for (row <- cells; cell <- row) listenTo(cell)
+
+  }
+
+  val rowHeader = new ListView(0 until height map (_.toString)) {
+    fixedCellWidth  = 30
+    fixedCellHeight = table.rowHeight
+  }
+
+  viewportView  = table
+  rowHeaderView = rowHeader
+
+}
+
+/\
+package org.stairwaybook.scells
+
+trait Arithmetic {
+
+  this : Evaluator =>
+
+  operations += (
+    "add"  -> { case List(x, y) => x + y },
+    "sub"  -> { case List(x, y) => x - y },
+    "div"  -> { case List(x, y) => x / y },
+    "mul"  -> { case List(x, y) => x * y },
+    "mod"  -> { case List(x, y) => x % y },
+    "sum"  -> { xs => (0.0 /: xs)(_ + _) },
+    "prod" -> { xs => (1.0 /: xs)(_ * _) }
+  )
+
+}

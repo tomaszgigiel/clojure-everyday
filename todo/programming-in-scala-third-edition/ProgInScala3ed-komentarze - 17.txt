@@ -1,0 +1,240 @@
+/\
+Example of Array.
+(17.1;p374)
+
+val fiveInts = new Array[Int](5)
+val fiveToOne = Array(5, 4, 3, 2, 1)
+
+fiveInts == Array(0, 0, 0, 0, 0)
+fiveToOne == Array(5, 4, 3, 2, 1)
+
+/\
+Example of ListBuffer.
+(17.1;p375)
+
+import scala.collection.mutable.ListBuffer
+val buf = new ListBuffer[Int]
+buf += 1
+buf += 2
+3 +=: buf
+buf.toList == List(3, 1, 2)
+
+/\
+Reason to use ListBuffer instead of List.
+(17.1;p375)
+
+- constant time append and prepend operations
+- to prevent for stack overflow: if recursive algorithm that would be required is not tail recursive
+
+/\
+Example of ArrayBuffer.
+(17.1;p376)
+
+import scala.collection.mutable.ArrayBuffer
+val buf = new ArrayBuffer[Int]()
+buf += 1
+buf += 2
+buf(0) == 1
+
+/\
+Application of StringOps.
+(17.1;p377)
+
+Thanks to "StringOps" you can treat any string like a sequence:
+- implements sequence methods
+- Predef has an implicit conversion from String to StringOps
+- i.e. def hasUpperCase(s: String) = s.exists(_.isUpper)
+
+/\
+Default map and set definitions in Predef.
+(17.2;p378)
+
+object Predef {
+  type Map[A, +B] = collection.immutable.Map[A, B]
+  type Set[A] = collection.immutable.Set[A]
+  val Map = collection.immutable.Map
+  val Set = collection.immutable.Set
+  // ...
+}
+
+/\
+Example of Set.
+(17.2;p379)
+
+import scala.collection.mutable
+val words = mutable.Set.empty[String]
+words += "a"
+words += "a"
+words += "b"
+words == Set("a", "b")
+
+/\
+Example of Map.
+(17.2;p381)
+
+import scala.collection.mutable
+val map = mutable.Map.empty[String, Int]
+map("hello") = 1
+map("there") = 2
+map += ("there" -> 3)
+map == Map("hello" -> 1, "there" -> 3)
+
+/\
+Explain the implementations of mutable and immutable sets.
+(17.2;p383)
+
+Number of elements -> Implementation
+0 -> scala.collection.immutable.EmptySet
+1 -> scala.collection.immutable.Set1
+2 -> scala.collection.immutable.Set2
+3 -> scala.collection.immutable.Set3
+4 -> scala.collection.immutable.Set4
+5 or more -> scala.collection.immutable.HashSet
+
+Similar to mutable sets.
+
+/\
+Explain the implementations of mutable and immutable maps.
+(17.2;p384)
+
+Number of elements -> Implementation
+0 -> scala.collection.immutable.EmptyMap
+1 -> scala.collection.immutable.Map1
+2 -> scala.collection.immutable.Map2
+3 -> scala.collection.immutable.Map3
+4 -> scala.collection.immutable.Pam4
+5 or more -> scala.collection.immutable.HashMap
+
+Similar to mutable maps.
+
+/\
+Example of sorted sets.
+(17.2;p385)
+
+- a red-black tree
+- Ordered trait
+
+import scala.collection.immutable.TreeSet
+val ts = TreeSet(9, 3, 1, 8, 0, 2, 7, 4, 6, 5)
+ts == TreeSet(0, 1, 2, 3, 4, 5, 6, 7, 8, 9)
+
+/\
+Example of sorted maps.
+(17.2;p385)
+
+- a red-black tree
+- Ordered trait
+
+import scala.collection.immutable.TreeMap
+var tm = TreeMap(3 -> 'x', 1 -> 'x', 4 -> 'x')
+tm == TreeMap(1 -> 'x', 3 -> 'x', 4 -> 'x')
+
+/\
+Why immutable maps and sets take less space than mutable?
+(17.3;p386)
+
+- empty immutable maps (and sets) are a single object that’s shared between all references,
+- immutable maps (and sets) with up to four entries are stored in a single object.
+
+/\
+How to switch from immutable to mutable collections, and vice versa?
+(17.3;p386)
+
+Use "var":
+- syntactic sugar for +=, -=, ++=,
+- every operator ending in = can be converted,
+- works on any kind of value, not just collections,
+- first create new object, second reassign (a = a + b).
+
+var people = Set("Nancy", "Jane")
+// people: scala.collection.immutable.Set[String] = Set(Nancy, Jane)
+people += "Bob"
+// scala.collection.immutable.Set[String] = Set(Nancy, Jane, Bob)
+
+vs.
+val people = Set("Nancy", "Jane")
+// as above
+people += "Bob"
+// error: value += is not a member of scala.collection.immutable.Set[String]
+
+/\
+Declare set to have elements of different types.
+(17.4;p389)
+
+import scala.collection.mutable
+val stuff = mutable.Set[Any](123)
+stuff += "abc"
+
+/\
+Initialize a collection with another collection.
+(17.4;p389)
+
+val colors = List("blue", "yellow", "red", "green")
+import scala.collection.immutable.TreeSet
+val treeSet = TreeSet[String]() ++ colors
+
+vs.
+val treeSet = TreeSet(colors)
+error: No implicit Ordering defined for List[String].
+
+/\
+How to convert TreeSet to list?
+(17.4;p390)
+
+treeSet.toList
+
+/\
+How to convert TreeSet to array?
+(17.4;p390)
+
+treeSet.toArray
+
+/\
+Convert between mutable and immutable sets.
+(17.4;p391)
+
+import scala.collection.immutable
+import scala.collection.mutable
+
+val immutaSet = immutable.Set('a', 'b', 'c')
+val mutaSet = mutable.Set.empty ++ immutaSet
+val immutaSet2 = immutable.Set.empty ++ mutaSet
+
+/\
+Convert between mutable and immutable maps.
+(17.4;p391)
+
+import scala.collection.immutable
+import scala.collection.mutable
+
+val immutaMap = immutable.Map(1 -> 'a', 2 -> 'b', 3 -> 'c')
+val mutaMap = mutable.Map.empty ++ immutaMap
+val immutaMap2 = immutable.Map.empty ++ mutaMap
+
+/\
+What is a tuple?
+(17.5;p392)
+
+A tuple:
+- combines a fixed number of items together,
+- that they can be passed around as a whole,
+- can hold objects with different types,
+- save you the effort of defining very simple class,
+- a common application is returning multiple values from a method.
+
+(1, "hello", Console)
+
+/\
+How to access elements of a tuple?
+(17.5;p393)
+
+(1, "hello", Console)._1 == 1
+(1, "hello", Console)._2 == "hello"
+(1, "hello", Console)._3 == Console
+
+/\
+"Pattern matching" and tuple.
+(17.5;p393)
+
+val item = ("the", 10)
+val (word, count) = item

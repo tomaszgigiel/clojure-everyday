@@ -1,0 +1,390 @@
+/\
+List queue operations.
+(19.1;p418)
+
+head - returns the first element of the queue
+tail - returns a queue without its first element
+enqueue - returns a new queue with a given element appended at the end
+
+/\
+Hide primary constructor.
+(19.2;p422)
+
+class Queue[T] private (
+  private val leading: List[T],
+  private val trailing: List[T]
+)
+
+/\
+How is the primary constructor defined?
+(19.2;p422)
+
+The primary constructor is defined implicitly by the class parameters and body.
+
+/\
+Hide the initialization and representation of a class Queue?
+(19.2;p422)
+
+- private members, private constructors and factory methods,
+- private classes.
+
+trait Queue[T] {
+  def head: T
+  def tail: Queue[T]
+  def enqueue(x: T): Queue[T]
+}
+
+object Queue {
+  def apply[T](xs: T*): Queue[T] = new QueueImpl[T](xs.toList, Nil)
+
+  private class QueueImpl[T](
+    private val leading: List[T],
+    private val trailing: List[T]
+  ) extends Queue[T] {
+
+    def mirror =
+      if (leading.isEmpty)
+        new QueueImpl(trailing.reverse, Nil)
+      else
+        this
+
+    def head: T = mirror.leading.head
+
+    def tail: QueueImpl[T] = {
+      val q = mirror
+      new QueueImpl(q.leading.tail, q.trailing)
+    }
+    def enqueue(x: T) = new QueueImpl(leading, x :: trailing)
+  }
+}
+
+/\
+How to hide constructors?
+(19.2;p422)
+
+- private the primary constructor (private modifier, auxiliary constructor, factory method),
+- private class (trait, companion object, factory method).
+
+/\
+Define the auxiliary constructor.
+(19.2;p423)
+
+class Queue[T] private (
+  private val leading: List[T],
+  private val trailing: List[T]
+  def this(elems: T*) = this(elems.toList, Nil)
+)
+
+/\
+Explain:
+- type,
+- type parameter,
+- parameterized type,
+- type constructor,
+- generic
+?
+(19.3;p425)
+
+class Foo[T] {...}
+
+type: Foo[String] 
+parameterized type: Foo enables to specify parameterized types, such as Foo[String], Foo[Int]...
+type constructor: Foo
+generic: Foo
+
+Foo is a type constructor/generic because you can construct a parameterized type with it by specifying a type parameter.
+
+/\
+Explain covariant, contravariant, bivariant, invariant.
+(https://en.wikipedia.org/wiki/Covariance_and_contravariance_(computer_science))
+
+Within the type system of a programming language, a typing rule or a type constructor is:
+- covariant: if it preserves the ordering of types (<=), which orders types from more specific to more generic; i.e. String <= Any, so List[String] is a subtype of List[Any]
+- contravariant: if it reverses this ordering; i.e. Function1[Any, Any] is a subtype of Function1[String, Any]
+- bivariant: if both of these apply (i.e., both I<A> <= I<B> and I<B> <= I<A> at the same time);
+- invariant: or nonvariant if neither of these applies.
+
+/\
+Explain covariant (or “flexible”).
+(19.3;p426)
+
+A covariant annotation can be applied to a type parameter of a class or trait by putting a plus sign (+) before the type parameter.
+The class or trait then subtypes covariantly with—in the same direction as—the type annotated parameter.
+For example, List is covariant in its type parameter, so List[String] is a subtype of List[Any].
+
+/\
+Explain nonvariant (or “rigid”).
+(19.3;p426)
+
+A type parameter of a class or trait is by default nonvariant.
+The class or trait then does not subtype when that parameter changes.
+For example, because class Array is nonvariant in its type parameter,
+Array[String] is neither a subtype nor a supertype of Array[Any].
+
+/\
+How to demand covariant (flexible) subtyping?
+(19.3;p426)
+
+trait Queue[+T] { ... }
+i.e. Queue[String] is considered a subtype of Queue[AnyRef]
+
+/\
+Explain contravariant.
+(19.3;p426)
+
+trait Foo[-T] { ... }
+If T is a subtype of type S, then Foo[S] is a subtype of Foo[T].
+
+A contravariant annotation can be applied to a type parameter of a class or trait by putting a minus sign (-) before the type parameter.
+The class or trait then subtypes contravariantly with—in the opposite direction as—the type annotated parameter.
+For example, Function1 is contravariant in its first type parameter, and so Function1[Any, Any] is a subtype of Function1[String, Any].
+
+/\
+Explain variance.
+(19.3;p426)
+
+A type parameter of a class or trait can be marked with a variance annotation, either covariant (+) or contravariant (-).
+Such variance annotations indicate how subtyping works for a generic class or trait.
+For example, the generic class List is covariant in its type parameter, and thus List[String] is a subtype of List[Any].
+By default, i.e., absent a + or annotation, type parameters are nonvariant.
+
+/\
+Explain variance annotations.
+(19.3;p426)
+
+The variance annotation is the + and - symbols you can place next to type parameters.
+
+/\
+Explain subtyping (covariant/nonvariant/contravariant) in a purely functional world vs. a mutable world.
+(19.3;p426)
+
+In a purely functional world, many types are naturally covariant (flexible).
+
+In mutable world:
+
+// not compilie:
+// <console>:14: error: covariant type T occurs in contravariant position in type T of value x
+//         def set(x: T) = { current = x }
+//                 ^
+class Cell[+T](init: T) {
+  private[this] var current = init
+  def get = current
+  def set(x: T) = { current = x }
+}
+// because:
+val c1 = new Cell[String]("abc")
+val c2: Cell[Any] = c1
+c2.set(1)
+val s: String = c1.get
+
+A Cell of String is not also a Cell of Any, 
+because there are things you can do with a Cell of Any that you cannot do with a Cell of String. 
+You cannot use set with an Int argument on a Cell of String, for example.
+
+/\
+Explain subtyping (covariant/nonvariant/contravariant) in array in Java vs. Scala.
+(19.3;p428)
+
+In Scala arrays are nonvariant.
+In Java arrays are covariant.
+Becasue of use:
+void sort(Object[] a, Comparator cmp) { ... }
+(after generics for compatibility)
+
+For interoperability:
+scala> val a2: Array[Object] = a1.asInstanceOf[Array[Object]]
+// might get: public class ArrayStoreException extends RuntimeException
+
+/\
+When variance is unsound?
+(19.4;p429)
+
+// error: covariant type T occurs in contravariant position in type T of value x
+class Queue[+T](elems: List[T]) { // Not efficient
+  def head = elems.head
+  def tail = new Queue(elems.tail)
+  def enqueue(x: T) = new Queue(elems ::: List(x))
+}
+
+class StrangeIntQueue (elems: List[Int]) extends Queue[Int] (elems) {
+  override def enqueue(x: Int) = {
+    println(math.sqrt(x))
+    super.enqueue(x)
+  }
+}
+
+val x: Queue[Any] = new StrangeIntQueue(Nil)
+x.enqueue("abc") //!
+
+- a generic parameter type appears as the type of a method parameter,
+- special case: a reassignable field (setter method).
+
+/\
+When will the Scala compiler check any variance annotations you place on type parameters?
+(19.4;p431)
+
+The Scala compiler will check any variance annotations you place on type parameters.
+For example, if you try to declare a type parameter to be covariant (by adding a +),
+but that could lead to potential runtime errors, your program won’t compile.
+
+/\
+How does the Scala compiler verify correctness of variance annotations?
+(19.4;p431)
+
+abstract class Cat[-T, +U] {
+  def meow[W-](volume: T-, listener: Cat[U+, T-]-) : Cat[Cat[U+, T-]-, U+]+
+}
+
+The top-level of the type or template is always in covariant position.
+meow[X-]                  : The type parameter of method is flipped.
+(volume: X-, listener: Y-): The method param is a contravariant position.
+listener: Cat[X+, Y-]-    : The type argument position of a type is flipped (C[Args], if C+ then Args the same, if C- then Args flipped, if C then Args neutral).
+                            Cat[-T (actual U), +U (actual T)]- -> Cat[U+, T-]- (Args flipped)
+result Cat[X-, Y+]+       : The top-level of the type or template is always in covariant position.
+                            Cat[-T (actual Cat[U, T]), U (actual U)]- -> Cat[Cat[U, T]-, U+]+ (Args the same)
+Cat[U, T]-                : The type argument position of a type is flipped (C[Args], if C+ then Args the same, if C- then Args flipped, if C then Args neutral).
+                            Cat[-T (actual U), +U (actual T)]- -> Cat[U+, T-]- (Args flipped)
+
+https://stackoverflow.com/questions/12451702/variance-annotation-keeping-track-positive-and-negative-positions-by-scala
+http://www.scala-lang.org/files/archive/spec/2.12/04-basic-declarations-and-definitions.html#variance-annotations
+
+/\
+Example a lower bound?
+(19.5;p432)
+
+class Queue[+T](private val leading: List[T], private val trailing: List[T]) {
+  private def mirror = if (leading.isEmpty) new Queue(trailing.reverse, Nil) else this
+  def head = mirror.leading.head
+  def tail = {val q = mirror; new Queue(q.leading.tail, q.trailing)}
+  def enqueue[U >: T](x: U) = new Queue[U](leading, x :: trailing)
+}
+
+"U >: T" 
+- T is a lower bound for U,
+- T is a subtype of U (T->U).
+
+class Fruit
+class Apple extends Fruit
+class Pear extends Fruit
+
+val a = new Queue[Apple](List.empty[Apple], List.empty[Apple])
+a.enqueue(new Apple()) // res1: Queue[Apple]
+a.enqueue(new Pear()) // res2: Queue[Fruit]
+a.enqueue(new Fruit()) // res3: Queue[Fruit]
+
+new Queue[Apple](List.empty[Pear], List.empty[Pear]) // error: type mismatch
+new Queue[Apple](List.empty[Fruit], List.empty[Fruit]) // error: type mismatch
+
+/\
+Are supertype and subtype relationships reflexive?
+(19.5;p432)
+
+Supertype and subtype relationships are reflexive, which means a type is both a supertype and a subtype of itself.
+
+/\
+Explain declarationsite variance vs. use-site variance.
+(19.5;p434)
+
+declarationsite variance:
+- Scala,
+- express your intent to the compiler,
+- compiler will check.
+
+use-site variance:
+- Java,
+- wildcards,
+- you are on your own (as a class designer or client).
+
+/\
+Example of Liskov Substitution Principle
+(19.6;p434)
+
+It is safe to assume that a type T is a subtype of a type U 
+if you can substitute a value of type T wherever a value of type U is required.
+The principle holds:
+- if T supports the same operations as U, 
+- and all of T’s operations require less,
+- and provide more than the corresponding operations in U.
+
+https://en.wikipedia.org/wiki/Liskov_substitution_principle
+
+trait OutputChannel[-T]
+{
+  def write(x: T)
+}
+
+An OutputChannel[AnyRef] can be a subtype of an OutputChannel[String] because:
+- the two support the same write operation, 
+- and this operation requires less in OutputChannel[AnyRef] than in OutputChannel[String].
+“Less” means the argument is only required to be an AnyRef in the first case,
+whereas it is required to be a String in the second case.
+
+/\
+Explain covariance and contravariance of Function1.
+(19.6;p435)
+
+In the standard library:
+trait Function1[-S, +T] {
+  def apply(x: S): T
+}
+
+Function1 is contravariant in the function argument, and covariant in the result type.
+This satisfies the Liskov Substitution Principle because arguments are something that’s required, whereas results are something that’s provided.
+
+/\
+Valid code with reassignable field of the covariant parameter type.
+(19.7;p438)
+
+class Queue[+T] private ( private[this] var leading: List[T], private[this] var trailing: List[T]) {
+  private def mirror() =
+    if (leading.isEmpty) {
+      while (!trailing.isEmpty) {
+        leading = trailing.head :: leading
+        trailing = trailing.tail
+      }
+    }
+  def head: T = {
+    mirror()
+    leading.head
+  }
+  def tail: Queue[T] = {
+    mirror()
+    new Queue(leading.tail, trailing)
+  }
+  def enqueue[U >: T](x: U) = new Queue[U](leading, x :: trailing)
+}
+
+Object private definitions are omitted if occurs only in positions that have the same variance classification.
+
+/\
+Explain upper bounds.
+(19.8;p439)
+
+class Person(val firstName: String, val lastName: String) extends Ordered[Person] {
+  def compare(that: Person) = {
+    val lastNameComparison =
+    lastName.compareToIgnoreCase(that.lastName)
+    if (lastNameComparison != 0)
+      lastNameComparison
+    else
+      firstName.compareToIgnoreCase(that.firstName)
+  }
+  override def toString = firstName + " " + lastName
+}
+
+def orderedMergeSort[T <: Ordered[T]](xs: List[T]): List[T] = {
+  def merge(xs: List[T], ys: List[T]): List[T] =
+    (xs, ys) match {
+      case (Nil, _) => ys
+      case (_, Nil) => xs
+      case (x :: xs1, y :: ys1) =>
+        if (x < y) x :: merge(xs1, ys)
+        else y :: merge(xs, ys1)
+    }
+  val n = xs.length / 2
+  if (n == 0) xs
+  else {
+    val (ys, zs) = xs splitAt n
+    merge(orderedMergeSort(ys), orderedMergeSort(zs))
+  }
+}

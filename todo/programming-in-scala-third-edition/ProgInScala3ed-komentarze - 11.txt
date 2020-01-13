@@ -1,0 +1,108 @@
+/\
+Draw class hierarchy of Scala.
+(11.1;248)
+
+/\
+"val a = new Int"?
+(11.1;248)
+
+> error: class Int is abstract
+
+/\
+"1 until 5"?
+(11.1;249)
+
+> res1: scala.collection.immutable.Range = Range(1, 2, 3, 4)
+
+/\
+"1 to 5"?
+(11.1;249)
+
+> res1: scala.collection.immutable.Range.Inclusive = Range(1, 2, 3, 4, 5)
+
+/\
+What is RichInt?
+(11.1;249)
+
+The class with methods min, max, until, to, abs...
+The booster class for Int.
+There is implicit conversions for value class.
+Similar rich classes exist for the other value classes.
+
+/\
+What is the reason AnyRef alias exists, instead of just using the name java.lang.Object?
+(11.2;250)
+
+The reason is because Scala was originally designed to work on both the Java and .NET platforms.
+
+/\
+Show difference between java and scala boxing.
+(11.2;250)
+
+// java
+boolean isEqual(Integer x, Integer y) {
+  return x == y;
+}
+System.out.println(isEqual(421, 421)); //false
+// because the number 421 is boxed twice, 
+// and == means reference equality on reference types
+
+//scala
+def isEqual(x: Int, y: Int) = x == y
+def isEqual(x: Any, y: Any) = x == y
+
+isEqual(421, 421)
+// always true
+
+similar for String
+
+val x = new String("abc")
+val y = new String("abc")
+assert(x == y)
+assert(x ne y)
+
+/\
+Justify type Nothing.
+(11.4;253)
+
+// in the Predef
+def error(message: String): Nothing = throw new RuntimeException(message)
+
+// result is Int
+def divide(x: Int, y: Int): Int = if (y != 0) x / y else error("can't divide by zero")
+
+/\
+Define your own value class.
+(11.4;253)
+
+class Dollars(val amount: Int) extends AnyVal {
+  override def toString() = "$" + amount
+}
+
+must have exactly one val parameter
+must have nothing inside it except defs
+cannot redefine equals or hashCode
+no other class can extend a value class
+
+/\
+How to get the most benefit from the Scala class hierarchy?
+(11.4;255)
+
+Avoid a types monoculture, define a new class for each domain concept.
+
+i.e.
+class Anchor(val value: String) extends AnyVal
+class Style(val value: String) extends AnyVal
+class Text(val value: String) extends AnyVal
+class Html(val value: String) extends AnyVal
+
+def title(text: Text, anchor: Anchor, style: Style): Html = 
+  new Html(s"<a id='${anchor.value}'>" 
+  + s"<h1 class='${style.value}'>" 
+  + text.value 
+  + "</h1></a>"
+)
+
+vs.
+
+def title(text: String, anchor: String, style: String): String = ???

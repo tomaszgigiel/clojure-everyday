@@ -1,0 +1,92 @@
+/\
+Create XML literal.
+(28.3;p647)
+
+<a>something</a>
+res1: scala.xml.Elem = <a>something</a>
+
+/\
+Mix XML and Scala.
+(28.3;p648)
+
+val year = 1976
+<a>{ if (year < 2000) <old>year = {year + 10}</old> else xml.NodeSeq.Empty }</a>
+res1: scala.xml.Elem = <a><old>year = 1986</old></a>
+
+/\
+Include a curly brace (‘{’ or ‘}’) as XML text.
+(28.4;p651)
+
+<a> {{{{brace yourself!}}}} </a>
+res1: scala.xml.Elem = <a> {{brace yourself!}} </a>
+
+/\
+Example methods available for the XML classes.
+(28.5;p651)
+
+<a> input &gt; output </a>.text // res1: String = " input -> output "
+<a><b><c>hello</c></b></a> \ "b" \ "c" //res1: scala.xml.NodeSeq = NodeSeq(<c>hello</c>)
+<a><b><c>hello</c></b></a> \\ "c" // res1: scala.xml.NodeSeq = NodeSeq(<c>hello</c>)
+<a><b><c>hello</c></b></a> \\ "a" // res1: scala.xml.NodeSeq = NodeSeq(<a><b><c>hello</c></b></a>)
+<employee name="Joe"/> \ "@name" // res1: scala.xml.NodeSeq = Joe
+
+/\
+Example of XML serialization.
+(28.6;p652)
+
+abstract class Foo {val description:String; override def toString = description; def toXML = <foo><description>{description}</description></foo>}
+val foo = new Foo {val description = "jupi"}
+def fromXML(node: scala.xml.Node): Foo = new Foo {val description = (node \ "description").text}
+fromXML(foo.toXML)
+
+/\
+Example of XML loading and saving.
+(28.7;p654)
+
+scala.xml.XML.save("foo.xml", node)
+val loadnode = xml.XML.loadFile("foo.xml")
+
+/\
+Get <a>apple</a>.
+(28.8;p654)
+
+def proc(node: scala.xml.Node): String =
+node match {
+  case <a>{contents}</a> => "processing: " + contents
+  case _ => "It's something else."
+}
+proc(<a>apple</a>)
+
+/\
+What's wrong:
+
+def proc(node: scala.xml.Node): String =
+node match {
+  case <a>{contents}</a> => "processing: " + contents
+  case _ => "It's something else."
+}
+proc(<a>a <em>red</em> apple</a>)
+(28.8;p654)
+
+res1: String = It's something else.
+
+/\
+Get <c>:
+
+val abc = <a>
+  <b>
+    <c>foo</c>
+  </b>
+  <b>
+    <c>boo</c>
+  </b>
+</a>
+(28.8;p657)
+
+abc match {
+  case <a>{as @ _*}</a> =>
+    for (b @ <b>{_*}</b> <- as) println("processing: " + (b \ "c").text)
+}
+
+_* : any sequence of XML nodes
+@ : bound to the variable

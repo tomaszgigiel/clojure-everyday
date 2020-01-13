@@ -1,0 +1,151 @@
+/\
+The List class
+(22.1;p500)
+
+abstract class List[+T] {
+  def isEmpty: Boolean
+  def head: T
+  def tail: List[T]
+
+/\
+The Nil object
+(22.1;p500)
+
+case object Nil extends List[Nothing] {
+  override def isEmpty = true
+  def head: Nothing = throw new NoSuchElementException("head of empty list")
+  def tail: List[Nothing] = throw new NoSuchElementException("tail of empty list")
+}
+
+/\
+The :: class
+(22.1;p501)
+
+Class ::, pronounced “cons” for “construct”, represents non-empty lists.
+
+final case class ::[T](head: T, tail: List[T]) extends List[T] {
+  override def isEmpty: Boolean = false
+}
+
+/\
+Explain the pattern x :: xs.
+(22.1;p501)
+
+The every infix operation in a pattern is treated as a constructor application of the infix operator to its arguments.
+The pattern x :: xs is treated as ::(x, xs) where :: is a case class.
+def ::[U >: T](x: U): List[U] = new scala.::(x, this)
+
+val apples = new Apple :: Nil // List[Apple]
+val fruits = new Orange :: apples // List[Fruit]
+
+/\
+Implement length, drop, map in List.
+(22.1;p502)
+
+def length: Int = if (isEmpty) 0 else 1 + tail.length
+def drop(n: Int): List[T] = if (isEmpty) Nil else if (n <= 0) this else tail.drop(n 1)
+def map[U](f: T => U): List[U] = if (isEmpty) Nil else f(head) :: tail.map(f)
+
+/\
+What's wrong (List):
+def ::(x: T): List[T] = new scala.::(x, this)
+(22.1;p504)
+
+The method parameters count as contravariant positions,
+so the list element type T is in contravariant position in the definition above.
+But then List cannot be declared covariant in T.
+
+def ::[U >: T](x: U): List[U] = new scala.::(x, this)
+
+/\
+Implement :::
+(22.1;p505)
+
+def :::[U >: T](prefix: List[U]): List[U] =
+  if (prefix.isEmpty) this 
+  else prefix.head :: prefix.tail ::: this
+
+/\
+What's wrong:
+
+var result = List[Int]()
+for (x <- xs) result = result ::: List(x + 1)
+result
+(22.1;p506)
+
+This is inefficient.
+Because ::: takes time proportional to the length of its first operand.
+
+/\
+How to build list?
+(22.1;p506)
+
+import scala.collection.mutable.ListBuffer
+
+val buf = new ListBuffer[Int]
+for (x <- xs) buf += x + 1
+buf.toList
+
+/\
+Implement List.map.
+(22.3;p507)
+
+final override def map[U](f: T => U): List[U] = {
+  val b = new ListBuffer[U]
+  var these = this
+  while (!these.isEmpty) {
+    b += f(these.head)
+    these = these.tail
+  }
+  b.toList
+}
+
+/\
+Implement class "::".
+(22.3;p508)
+
+Idealized definition:
+final case class ::[T](head: T, tail: List[T]) extends List[T] {
+  override def isEmpty: Boolean = false
+}
+
+Real definition:
+final case class ::[U](hd: U, private[scala] var tl: List[U]) extends List[U] {
+  def head = hd
+  def tail = tl
+  override def isEmpty: Boolean = false
+}
+- fast,
+- no recursion (but tail recursion is ok - fast),
+- tl is var, so is ListBuffer,
+- tl is private.
+
+/\
+Why is ListBuffer.toList fast?
+(22.3;p508)
+
+package scala.collection.immutable
+
+final class ListBuffer[T] extends Buffer[T] {
+  private var start: List[T] = Nil
+  private var last0: ::[T] = _
+  private var exported: Boolean = false
+  ...
+  override def toList: List[T] = {
+    exported = !start.isEmpty
+    start
+  }
+  ...
+  override def += (x: T) = {
+    if (exported) copy()
+    if (start.isEmpty) {
+      last0 = new scala.::(x, Nil)
+      start = last0
+    } else {
+      val last1 = last0
+      last0 = new scala.::(x, Nil)
+      last1.tl = last0
+    }
+  }
+...
+}

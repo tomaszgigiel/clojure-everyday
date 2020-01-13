@@ -1,0 +1,191 @@
+/\
+What are extractors?
+(26.2;p623)
+
+object EMail extends Function2[String, String, String] {
+  // The injection method (optional)
+  def apply(user: String, domain: String) = user + "@" + domain
+
+  // The extraction method (mandatory)
+  def unapply(str: String): Option[(String, String)] = {
+    val parts = str split "@"
+    if (parts.length == 2) Some(parts(0), parts(1)) else None
+  }
+}
+
+val selectorString = "tom@something.pl"
+selectorString match {
+  case EMail(user, domain) => user
+  case _ => "?"
+}
+// or
+val x: Any = 12
+x match { 
+  case EMail(user, domain) => user
+  case _ => "?"
+}
+
+
+/\
+Give two rules for the extractor design principles.
+(26.2;p625)
+
+1.
+If an injection method is included, it should be the dual to the extraction method.
+EMail.unapply(EMail.apply(user, domain))
+> Some(user, domain)
+
+2.
+If the match on obj succeeds, you’d expect to get back that same object from the apply.
+EMail.unapply(obj) match {
+  case Some(u, d) => EMail.apply(u, d)
+}
+
+/\
+Explain an extractor pattern:
+- binds just one variable,
+- does not bind any variables.
+(26.3;p626)
+
+object Twice {
+  def apply(s: String): String = s + s
+  def unapply(s: String): Option[String] = {
+    val length = s.length / 2
+    val half = s.substring(0, length)
+    if (half == s.substring(length)) Some(half) else None
+  }
+}
+
+object UpperCase {
+  def unapply(s: String): Boolean = s.toUpperCase == s
+}
+
+def userTwiceUpper(s: String) = s match {
+  case EMail(Twice(x @ UpperCase()), domain) => "match: " + x + " in domain " + domain
+  case _ => "no match"
+}
+
+userTwiceUpper("DIDI@hotmail.com")
+res0: String = match: DI in domain hotmail.com
+userTwiceUpper("DIDO@hotmail.com")
+res1: String = no match
+userTwiceUpper("didi@hotmail.com")
+res2: String = no match
+
+/\
+Explain variable argument extractors.
+(26.4;p627)
+
+object ExpandedEMail {
+  def unapplySeq(email: String) : Option[(String, Seq[String])] = {
+    val parts = email split "@"
+    if (parts.length == 2) Some(parts(0), parts(1).split("\\.").reverse)
+    else None
+  }
+}
+
+> val s = "tom@support.epfl.ch"
+s: String = tom@support.epfl.ch
+
+> val ExpandedEMail(name, topdom, subdoms @ _*) = s
+name: String = tom
+topdom: String = ch
+subdoms: Seq[String] = WrappedArray(epfl, support)
+
+/\
+Explain relation between extractors and sequence patterns.
+(26.5;p630)
+
+Sequence patterns are implemented using extractors in the standard Scala library, i.e.:
+
+package scala
+object List {
+  def apply[T](elems: T*) = elems.toList
+  def unapplySeq[T](x: List[T]): Option[Seq[T]] = Some(x)
+  ...
+}
+
+/\
+Extractors vs. case classes
+(26.6;p631)
+
+Patterns over extractors and patterns over case classes look exactly the same in Scala.
+
+extractors:
+- representation independence: break link between data representations and patterns.
+
+case classes:
+- expose the concrete representation of data,
+- easier, they require less code,
+- compiler can optimize patterns,
+- compiler can check exhaustiveness,
+- for a closed application.
+
+/\
+Expalain:
+ab?
+\d+
+[adAD]\w*
+(-)?(\d+)(\.\d*)?
+(26.7;p632)
+
+a, ab
+1, 12...
+a, A, aW, AW, ...
+1, -1.2, ...
+
+/\
+Example regular expression.
+(26.7;p633)
+
+import scala.util.matching.Regex
+val Decimal = Regex("""(-)?(\d+)(\.\d*)?""")
+
+/\
+Explain:
+val Decimal = """(-)?(\d+)(\.\d*)?""".r
+(26.7;p634)
+
+package scala.runtime
+import scala.util.matching.Regex
+class StringOps(self: String) ... {
+  ...
+  def r = new Regex(self)
+}
+
+/\
+Example of searching for regular expressions.
+(26.7;p634)
+
+val Decimal = """(-)?(\d+)(\.\d*)?""".r
+val input = "for -1.0 to 99 by 3"
+for (s <- Decimal findAllIn input) println(s)
+// -1.0
+// 99
+//3
+Decimal findFirstIn input
+// Some(1.0)
+Decimal findPrefixOf input
+// None
+
+/\
+Explain relation between regular expression and an extractor.
+(26.7;p635)
+
+Every regular expression defines an extractor:
+
+import scala.util.matching.Regex
+val Decimal = """(-)?(\d+)(\.\d*)?""".r
+val Decimal(sign, integerpart, decimalpart) = "1.23"
+sign: String = null
+integerpart: String = 1
+decimalpart: String = .23
+
+/\
+Example of mix extractors with regular expression.
+(26.7;p636)
+
+val Decimal = """(-)?(\d+)(\.\d*)?""".r
+val input = "for -1.0 to 99 by 3"
+for (Decimal(s, i, d) <- Decimal findAllIn input)
+  println("sign: " + s + ", integer: " + i + ", decimal: " + d)

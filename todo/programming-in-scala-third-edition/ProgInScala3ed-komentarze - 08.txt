@@ -1,0 +1,255 @@
+/\
+What is "a first-class function"?
+(8.3;p184)
+(https://stackoverflow.com/questions/10141124/any-difference-between-first-class-function-and-high-order-function)
+
+A language either has first-class functions/classes/etc., or it doesn't.
+A particular function is never considered being first-class or not.
+
+When a language has first-class functions, it means that the language treats functions as first-class citizens.
+First-class citizen (also type, object, entity, or value) is an entity which supports all the operations generally available to other entities.
+This means the language supports:
+- passing functions as arguments to other functions,
+- returning them as the values from other functions, 
+- assigning them to variables or storing them in data structures.
+
+"funkcja pierwszoklasowa"
+
+/\
+Discuss "a function literal" vs. "a function value".
+(8.3;p184)
+
+function literal: a function with no name in Scala source code, specified with function literal syntax, i.e. (x: Int, y: Int) => x + y.
+function value: a function object that can be invoked just like any other function.
+
+A function literal is compiled into a class that when instantiated at runtime is a function value.
+A function literal exist in the source code, whereas function value exist as object at runtime.
+
+/\
+Example of "a function literal" in Scala libraries.
+(8.3;p185)
+
+val a = List(5, 10, 15)
+a.foreach((x: Int) => println(x))
+a.filter((x: Int) => x > 5)
+
+/\
+Shorten.
+val a = List(5, 10, 15)
+a.foreach((x: Int) => println(x))
+a.filter((x: Int) => x > 5)
+(8.4;p186)
+(8.5;p187)
+
+val a = List(5, 10, 15)
+a.foreach(println)
+a.filter(_ > 5)
+
+- target typing: type inference that takes into account the type that’s expected,
+- placeholder syntax.
+
+/\
+Correct:
+val f = _ + _
+f(5, 10)
+(8.5;p187)
+
+val f = (_: Int) + (_: Int)
+f(5, 10)
+
+/\
+What is "a a partially applied function"?
+(8.6;p188)
+
+A partially applied function: an expression in which you don’t supply all of the arguments needed by the function.
+Instead, you supply some, or none, of the needed arguments.
+I.e.:
+def sum(a: Int, b: Int, c: Int) = a + b + c
+val partially = sum _
+val partially = sum(1, _: Int, 3)
+
+/\
+What is "a free variable"?
+(8.7;p191)
+
+free variable: a variable that’s used inside the expression but not defined inside the expression. 
+i.e.
+the function literal expression (x: Int) => (x, y), both variables x and y are used, but:
+y is a free variable
+x is a bound variable
+
+/\
+Discuss "the trailing underscore".
+(8.7;p192)
+
+def sum(a: Int, b: Int, c: Int) = a + b + c
+val partially = sum _
+println(partially)
+Scala: OK, partially is an object,
+classical functional languages: error.
+
+/\
+What is "a closure"?
+(8.7;p193)
+
+closure: a function object that captures free variables, and is said to be “closed” over the variables visible at the time it is created.
+The function value (the object) that’s created at runtime from this function literal.
+
+/\
+Example of "a closure".
+(8.7;p193)
+
+var more = 1
+val addMore = (x: Int) => x + more
+addMore(10)
+
+/\
+What is "a closed term"?
+(8.7;p193)
+
+closed term: a function literal with no free variables, such as (x: Int) => x + 1.
+
+/\
+What is "an open term"?
+(8.7;p193)
+
+open term: a function literal with free variables, such as (x: Int) => x + more.
+
+/\
+What is "a closure"?
+(8.7;p193)
+
+closure: the function value (the object) that’s created at runtime from open term.
+A function object that captures free variables.
+Is said to be “closed” over the variables visible at the time it is created.
+The name arises from the act of “closing” the function literal by “capturing” the bindings of its free variables.
+
+/\
+Compile:
+var more = 1
+val addMore = (x: Int) => x + more
+addMore(1)
+more = 10
+addMore(1)
+(8.7;p193)
+
+Closures capture variables themselves:
+2
+11
+
+/\
+Compile:
+val l = List(1, 2, 3)
+var sum = 0
+l.foreach(sum += _)
+sum
+(8.7;p193)
+
+Changes made by a closure to a captured variable are visible outside the closure:
+6
+
+/\
+Compile:
+def makeIncreaser(more: Int) = (x: Int) => x + more
+val inc1 = makeIncreaser(1)
+val inc10 = makeIncreaser(10)
+inc1(1)
+inc10(2)
+(8.7;p194)
+
+The instance used is the one that was active at the time the closure was created:
+2
+12
+
+/\
+Example of repeated parameters.
+(8.8;p195)
+
+def echo(args: String*) = for (arg <- args) println(arg)
+echo("hello", "world!")
+
+/\
+How to pass array as repeated parameter.
+(8.8;p196)
+
+def echo(args: String*) = for (arg <- args) println(arg)
+val arr = Array("What's", "up", "doc?")
+echo(arr: _*)
+
+/\
+Example of named arguments.
+(8.8;p197)
+
+def foo(a: Int, b: Int, c: Int): Int = a + b + c
+foo(1, 2, 3)
+foo(1, c = 3, b = 2)
+foo(c = 3, b = 2, a = 1)
+
+/\
+Example of default parameter values.
+(8.8;p197)
+
+def printTime(out: java.io.PrintStream = Console.out, divisor: Int = 1000) = out.println("time = " + System.currentTimeMillis()/divisor)
+
+printTime()
+
+/\
+Compile:
+def foo(a: Int = 1, b: Int = 1): Int = a + b
+foo
+(8.8;p198)
+
+error: missing argument list for method foo
+->
+foo()
+
+/\
+Compare:
+def approximate(guess: Double): Double = if (isGoodEnough(guess)) guess else approximate(improve(guess))
+vs.
+def approximateLoop(initialGuess: Double): Double = {
+  var guess = initialGuess
+  while (!isGoodEnough(guess))
+    guess = improve(guess)
+  guess
+}
+(8.9;p198)
+
+The recursive function:
+- brevity,
+- var avoidance,
+- execution time the same (thanks to tail recursion).
+
+/\
+How to turn the tail-call optimizations off?
+(8.9;p201)
+
+-g: notailcalls
+
+/\
+Compare a stack trace with tail-call optimizations and not.
+(8.9;p201)
+
+def bang(x: Int): Int = if (x == 0) throw new Exception("bang!") else bang(x - 1)
+bang(3)
+
+java.lang.Exception: bang!
+  at .bang(<console>:11)
+  ... 29 elided
+
+vs.
+:settings -g:notailcalls
+java.lang.Exception: bang!
+  at .bang(<console>:11)
+  at .bang(<console>:11)
+  at .bang(<console>:11)
+  at .bang(<console>:11)
+  ... 29 elided
+
+/\
+List limits of tail recursion.
+(8.9;p201)
+
+No tail-call optimization if:
+- no directly recursive calls back to the same function making the call,
+- the final call goes to a function value.

@@ -1,0 +1,436 @@
+/\
+Define parser:
+expr ::= term {"+" term | "-" term}
+term ::= factor {"*" factor | "/" factor}
+factor ::= floatingPointNumber | "(" expr ")"
+
+where:
+| alterantive
+{} repetition (zero or more)
+(33.1;p737)
+
+import scala.util.parsing.combinator._
+
+class Arithmetic extends JavaTokenParsers {
+  def expr: Parser[Any] = term~rep("+"~term | "-"~term)
+  def term: Parser[Any] = factor~rep("*"~factor | "/"~factor)
+  def factor: Parser[Any] = floatingPointNumber | "("~expr~")"
+}
+
+/\
+Run parser.
+(33.2;p739)
+
+object ParseExpr extends Arithmetic {
+  def main(args: Array[String]) = {
+    println("input : " + args(0))
+    println(parseAll(expr, args(0)))
+  }
+}
+
+ParseExpr.main(Array("2 * (3 + 7)"))
+input: 2 * (3 + 7)
+[1.12] parsed: ((2~List((*~(((~((3~List())~List((+~(7~List())))))~)))))~List())
+
+/\
+Define parser:
+[a-zA-Z_]\w*
+(33.3;p740)
+
+import scala.util.parsing.combinator._
+object MyParsers extends RegexParsers {
+  val ident: Parser[String] = """[a-zA-Z_]\w*""".r
+}
+MyParsers.parseAll(MyParsers.ident, "foo")
+res0: MyParsers.ParseResult[String] = [1.4] parsed: foo
+
+/\
+Explain parser operator: ^^.
+(33.3;p740)
+(http://bitwalker.org/posts/2013-08-10-learn-by-example-scala-parser-combinators/)
+
+If the left operand parses successfully, transform the result using the function on the right.
+
+import scala.util.parsing.combinator.JavaTokenParsers
+object FooParser extends JavaTokenParsers {
+  def foo: Parser[Float] = floatingPointNumber ^^ (_.toFloat)
+}
+FooParser.parseAll(FooParser.foo, "12.5")
+
+/\
+Explain parser operator: ~.
+(33.3;p740)
+(http://bitwalker.org/posts/2013-08-10-learn-by-example-scala-parser-combinators/)
+
+The ~ is the sequential combinator.
+Succeed if the left operand parses successfully, and then the right parses successfully on the remaining input.
+The ~ operator produces as its result an instance of a case class with the same name: ~. 
+
+import scala.util.parsing.combinator.JavaTokenParsers
+object FooParser extends JavaTokenParsers {
+  def foo1: Parser[~[String, String]] = stringLiteral~floatingPointNumber
+  def foo2: Parser[~[~[String, String], String]] = stringLiteral~":"~floatingPointNumber
+  def foo3: Parser[(String, Integer)] = stringLiteral~":"~floatingPointNumber ^^ { case name~":"~number => (name, Integer.parseInt(number, 10)) }
+}
+val a = FooParser.parseAll(FooParser.foo1, """"key"123""")
+val b = FooParser.parseAll(FooParser.foo2, """"key":123""")
+val c = FooParser.parseAll(FooParser.foo3, """"key":123""")
+
+The definition of that class ~, it’s an inner class of trait Parsers:
+case class ~[+A, +B](x: A, y: B) {
+  override def toString = "(" + x + "~" + y + ")"
+}
+The name of the class is intentionally the same as the name of the sequence combinator method, ~.
+
+/\
+Explain parser operator: ~>.
+(33.3;p740)
+(http://bitwalker.org/posts/2013-08-10-learn-by-example-scala-parser-combinators/)
+
+Succeed if the left operand parses successfully followed by the right, but do not include the left content in the result.
+
+import scala.util.parsing.combinator.JavaTokenParsers
+object FooParser extends JavaTokenParsers {
+  def foo: Parser[Float] = "["~> floatingPointNumber <~"]" ^^ (_.toFloat)
+}
+val a = FooParser.parseAll(FooParser.foo, "[1.0]")
+
+/\
+Explain parser operator: rep.
+(33.3;p740)
+(http://bitwalker.org/posts/2013-08-10-learn-by-example-scala-parser-combinators/)
+
+A repetition rep(P) or repsep(P, separator) returns a list of the results of all runs of P.
+
+import scala.util.parsing.combinator.JavaTokenParsers
+object FooParser extends JavaTokenParsers {
+  def foo: Parser[Integer] = repsep(floatingPointNumber, ", ") ^^ (_.size)
+}
+val a = FooParser.parseAll(FooParser.foo, "1.0, 2.0")
+
+/\
+Explain parser operator: opt.
+(33.5;p744)
+(https://stackoverflow.com/questions/31014795/scala-parser-combinators-opt-and-combination-strange-results)
+
+An option opt(P) returns an instance of Scala’s Option type.
+It returns Some(R) if P succeeds with result R and None if P fails.
+
+import scala.util.parsing.combinator.RegexParsers
+object FooParser extends RegexParsers {
+  val hour: Parser[String] = """2[0-3]|[01]?\d""".r
+  val minute: Parser[String] = """[0-5]?\d""".r
+  def foo: Parser[(Int, Int)] = hour ~ opt(opt(":") ~> minute) ^^ {
+    case h ~ None => (h.toInt,0)
+    case h ~ Some(m) => (h.toInt, m.toInt)}
+}
+val a = FooParser.parseAll(FooParser.foo, "23")
+val b = FooParser.parseAll(FooParser.foo, "2300")
+val c = FooParser.parseAll(FooParser.foo, "23:00")
+
+/\
+Define JSON parser.
+(33.5;p743)
+
+import scala.util.parsing.combinator.JavaTokenParsers
+object JSONParser extends JavaTokenParsers {
+  def obj: Parser[Map[String, Any]] = "{"~> repsep(member, ",") <~"}" ^^ (Map() ++ _)
+  def arr: Parser[List[Any]] = "["~> repsep(value, ",") <~"]"
+  def member: Parser[(String, Any)] = stringLiteral~":"~value ^^ { case name~":"~value => (name, value) }
+  def value: Parser[Any] = obj | arr | stringLiteral | floatingPointNumber ^^ (_.toDouble) | "null" ^^ (null) | "true" ^^ (true) | "false" ^^ (false)
+}
+val json = """{"address book":{"name":"John Smith","address":{"street":"10 Market Street","city":"San Francisco, CA","zip":94111},"phone numbers":["408 3384238","408 1116892"]}}"""
+val a = JSONParser.parseAll(JSONParser.value, json)
+
+/\
+Define simple calculator (RegexParsers).
+http://www.scala-lang.org/api/2.12.3/scala-parser-combinators/scala/util/parsing/combinator/RegexParsers.html
+
+object Calculator extends RegexParsers {
+  def number: Parser[Double] = """\d+(\.\d*)?""".r ^^ { _.toDouble }
+  def factor: Parser[Double] = number | "(" ~> expr <~ ")"
+  def term  : Parser[Double] = factor ~ rep( "*" ~ factor | "/" ~ factor) ^^ {
+    case number ~ list => (number /: list) {
+      case (x, "*" ~ y) => x * y
+      case (x, "/" ~ y) => x / y
+    }
+  }
+  def expr  : Parser[Double] = term ~ rep("+" ~ log(term)("Plus term") | "-" ~ log(term)("Minus term")) ^^ {
+    case number ~ list => list.foldLeft(number) { // same as before, using alternate name for /:
+      case (x, "+" ~ y) => x + y
+      case (x, "-" ~ y) => x - y
+    }
+  }
+
+  def apply(input: String): Double = parseAll(expr, input) match {
+    case Success(result, _) => result
+    case failure : NoSuccess => scala.sys.error(failure.msg)
+  }
+}
+
+/\
+Implement Parser.~ (the ~ combinator method)
+(33.6;p755)
+
+abstract class Parser[+T] extends (Input => ParseResult[T]) { p =>
+  def ~ [U](q: => Parser[U]) = new Parser[T~U] {
+    def apply(in: Input) = p(in) match {
+      case Success(x, in1) =>
+        q(in1) match {
+          case Success(y, in2) => Success(new ~(x, y), in2)
+          case failure => failure
+      }
+      case failure => failure
+  }
+}
+
+q: => Parser[U] - call by name parameter
+T~U - ~[T, U], analogous to P op Q == op(P, Q).
+
+/\
+Implement Parser.<~
+(33.6;p755)
+
+def <~ [U](q: => Parser[U]): Parser[T] = (p~q) ^^ { case x~y => x }
+def ~> [U](q: => Parser[U]): Parser[U] = (p~q) ^^ { case x~y => y }
+
+/\
+Explain T~U.
+(33.6;p755)
+
+Scala interprets a binary type operation such as A op B, as the parameterized type op[A, B].
+~[T, U]
+
+/\
+Implement Parser.|
+(33.6;p756)
+
+Alternative composition:
+def | (q: => Parser[T]) = new Parser[T] {
+  def apply(in: Input) = p(in) match {
+    case s1 @ Success(_, _) => s1
+    case failure => q(in)
+  }
+}
+
+/\
+Implement Parser.^^
+(33.6;p756)
+
+def ^^ [U](f: T => U): Parser[U] = new Parser[U] {
+  def apply(in: Input) = p(in) match {
+    case Success(x, in1) => Success(f(x), in1)
+    case failure => failure
+  }
+}
+
+/\
+Implement Parser.success
+(33.6;p757)
+
+def success[T](v: T) = new Parser[T] {
+  def apply(in: Input) = Success(v, in)
+}
+
+/\
+Implement Parser.failure
+(33.6;p757)
+
+def failure(msg: String) = new Parser[Nothing] {
+  def apply(in: Input) = Failure(msg, in)
+}
+
+/\
+Implement Parser.opt
+(33.6;p757)
+
+def opt[T](p: => Parser[T]): Parser[Option[T]] = (p ^^ Some(_) | success(None))
+
+/\
+Implement Parser.rep
+(33.6;p757)
+
+def rep[T](p: => Parser[T]): Parser[List[T]] = (p~rep(p) ^^ { case x~xs => x :: xs } | success(List()))
+
+/\
+Implement Parsers.repsep
+(33.6;p757)
+
+def repsep[T](p: => Parser[T], q: => Parser[Any]): Parser[List[T]] = ( p~rep(q~> p) ^^ { case r~rs => r :: rs } | success(List()))
+
+/\
+Implement RegexParsers.
+(33.7;p758)
+
+trait RegexParsers extends Parsers {
+  type Elem = Char
+  implicit def literal(s: String): Parser[String] = ...
+  implicit def regex(r: Regex): Parser[String] = ...
+  protected val whiteSpace = """\s+""".r
+}
+
+/\
+Why implicit:
+trait RegexParsers extends Parsers {
+  type Elem = Char
+  implicit def literal(s: String): Parser[String] = ...
+  implicit def regex(r: Regex): Parser[String] = ...
+  protected val whiteSpace = """\s+""".r
+}
+?
+(33.7;p758)
+
+Parser: "("~expr~")"
+is automatically expanded to: literal("(")~expr~literal(")")
+
+/\
+How RegexParsers handles white space beetween symbols?
+(33.7;p758)
+
+Calls a method named handleWhiteSpace before running a literal or regex parser.
+The handleWhiteSpace method skips the longest input sequence that conforms to the whiteSpace regular expression:
+protected val whiteSpace = """\s+""".r
+
+/\
+How to change RegexParsers treats white spaces?
+(33.7;p758)
+
+Override whiteSpace, i.e.:
+object MyParsers extends RegexParsers {
+  override val whiteSpace = "".r
+  ...
+}
+
+/\
+What is lexing?
+(33.8;p759)
+
+The lexing:
+- also called lexical analysis, tokenization,
+- first phase of syntax analysis,
+- converting a sequence of characters into a sequence of tokens.
+
+/\
+What is syntactical analysis?
+(33.8;p759)
+
+The syntactical analysis:
+- second phase of syntax analysis,
+- analyzes sequences of tokens,
+- also called parsing (imprecise),
+- analiza sk³adniowa.
+
+/\
+Parsing, lexing, syntactic analysis, syntax analysis, semantic analysis.
+(33.8;p759)
+
+?
+
+/\
+How to split parser into a separate lexer and syntactical analyzer?
+(33.8;p759)
+
+Instead Parsers use:
+scala.util.parsing.combinator.lexical
+scala.util.parsing.combinator.syntactical
+
+/\
+Improve error reporting.
+import scala.util.parsing.combinator.JavaTokenParsers
+object FooParser extends JavaTokenParsers {
+  def foo: Parser[String] = "token1" | "token2"
+}
+val a = FooParser.parseAll(FooParser.foo, "abc")
+(33.9;p760)
+
+a: FooParser.ParseResult[String] = [1.1] failure: `token2' expected but `a' found
+abc
+^
+
+import scala.util.parsing.combinator.JavaTokenParsers
+object FooParser extends JavaTokenParsers {
+  def foo: Parser[String] = "token1" | "token2" | failure("illegal start of value")
+}
+val a = FooParser.parseAll(FooParser.foo, "abc")
+
+a: FooParser.ParseResult[String] = [1.1] failure: illegal start of value
+abc
+^
+
+/\
+Implement scala.util.parsing.combinator.Parsers.Failure.
+(33.9;p761)
+
+case class Failure(msg: String, in: Input) extends ParseResult[Nothing] {
+  if (lastFailure.isDefined && lastFailure.get.in.pos <= in.pos)
+    lastFailure = Some(this)
+}
+
+/\
+Implement Parsers.phrase
+(33.10;p761)
+
+def phrase[T](p: Parser[T]) = new Parser[T] {
+  lastFailure = None
+  def apply(in: Input) = p(in) match {
+    case s @ Success(out, in1) =>
+      if (in1.atEnd) s
+      else Failure("end of input expected", in1)
+    case f : Failure =>
+      lastFailure
+  }
+}
+
+/\
+How do the parser combinator choose between different parsers in an alternative?
+(33.10;p761)
+
+The parser combinators employ backtracking to choose between different parsers in an alternative.
+P | Q, if P fails, then Q is run on the same input as P. 
+
+/\
+List backtracking disadventages.
+(33.10;p762)
+
+1. You need to avoid leftrecursive productions:
+expr ::= expr "+" term | term
+
+2. Potentially costly:
+expr ::= term "+" expr | term
+
+/\
+How to handle backtracking disadventages?
+(33.10;p762)
+
+expr ::= term "+" expr | term
+->
+expr ::= term [ "+" expr ]
+expr ::= term { "+" termg }
+
+/\
+What is “LL(1)” grammar?
+(33.10;p762)
+
+“LL(1)” grammar:
+- without backtracking,
+- input can be read sequentially,
+- input elements can be discarded once they are read,
+- usually more efficient than backtracking parsers.
+
+/\
+How to express the expectation that a grammar is LL(1) explicitly?
+(33.10;p762)
+
+Use operator ~!
+
+def expr : Parser[Any] = term ~! rep("+" ~! term | "-" ~! term)
+def term : Parser[Any] = factor ~! rep("*" ~! factor | "/" ~! factor)
+def factor: Parser[Any] = "(" ~! expr ~! ")" | floatingPointNumber
+
+/\
+List disadventages of Scala’s combinator parsing framework.
+(33.11;p762)
+
+Inefficiency:
+- backtracking (so use ~!),
+- a parser is generated anew for each input that’s parsed (new implementation).

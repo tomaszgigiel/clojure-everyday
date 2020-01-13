@@ -1,0 +1,55 @@
+/\
+How to split a module into separate files?
+(29.4;p667)
+
+Use trait.
+
+/\
+What is "self type"?
+(29.4;p669)
+
+A self type of a trait is the assumed type of this, the receiver, to be used within the trait. 
+Any concrete class that mixes in the trait must ensure that its type conforms to the trait’s self type.
+The most common use of self types is for dividing a large class into several traits.
+
+/\
+Example of self type.
+(29.4;p669)
+
+trait Simple { def name: String }
+trait Client {
+  user: Simple =>
+  def hello(msg: String) = println(s"$name: $msg")
+}
+trait Right extends Client with Simple {
+  val canDo = name
+}
+
+When you use self-types:
+trait A
+trait B { this: A => }
+B requires an A.
+When a concrete class finally extends/mixes-in these traits, some class/trait must implement A.
+
+/\
+What is "singleton type"?
+(29.4;p672)
+
+A singleton type:
+- is expressed in Scala using: object.type,
+- is extremely specific and holds only one object,
+- allows the compiler to know that a and b.c are the same object — enough information to eliminate the type error.
+
+/\
+Example of "singleton type"?
+(29.4;p672)
+
+class A { def method1: this.type = { println("A"); this } }
+class B extends A { def method2: this.type = { println("B"); this } }
+new B().method1.method2
+
+vs,
+class A { def method1 = { println("A"); this } }
+class B extends A { def method2: this.type = { println("B"); this } }
+new B().method1.method2
+// error: value method2 is not a member of A

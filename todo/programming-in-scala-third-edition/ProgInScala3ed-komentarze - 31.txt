@@ -1,0 +1,84 @@
+/\
+Explain the throws declarations.
+(31.2;p702)
+
+- Scala does not check that thrown exceptions are caught. 
+- Scala has no equivalent to Java’s throws declarations on methods.
+- All Scala methods are translated to Java methods that declare no thrown exceptions.
+- The Java bytecode verifier does not check the declarations.
+- The Java compiler checks the declarations.
+- In Scala use annotation: @throws(classOf[IOException]).
+
+/\
+A Scala method that declares a Java throws clause.
+(31.2;p703)
+
+import java.io._
+
+class Reader(fname: String) {
+  private val in = new BufferedReader(new FileReader(fname))
+  @throws(classOf[IOException])
+  def read() = in.read()
+}
+
+/\
+How to use Java annotations?
+(31.2;p704)
+
+import org.junit.Test
+import org.junit.Assert.assertEquals
+class SetTest {
+  @Test
+  def testMultiAdd = {
+    val set = Set() + 1 + 2 + 3 + 1 + 2 + 3
+    assertEquals(3, set.size)
+  }
+}
+scala -cp junit4.3.1.jar:. org.junit.runner.JUnitCore SetTest
+
+/\
+Write annotation.
+(31.2;p705)
+
+compile it with javac:
+
+import java.lang.annotation.*;
+@Retention(RetentionPolicy.RUNTIME)
+@Target(ElementType.METHOD)
+public @interface Ignore { }
+
+object Tests {
+  @Ignore
+  def testData = List(0, 1, 1, 5, 5)
+  def test1 = { assert(testData == (testData.head :: testData.tail)) }
+  def test2 = { assert(testData.contains(testData.head)) }
+}
+
+for {
+  method <- Tests.getClass.getMethods
+  if method.getName.startsWith("test")
+  if method.getAnnotation(classOf[Ignore]) == null
+} {
+  println("found a test method: " + method)
+}
+
+/\
+How to compile Scala and Java together?
+(31.4;p709)
+
+$ scalac -d bin InventoryAnalysis.scala InventoryItem.java Inventory.java
+$ javac -cp bin -d bin Inventory.java InventoryItem.java InventoryManagement.java
+$ scala -cp bin InventoryManagement
+
+/\
+Explain "single abstract method".
+(31.5;p711)
+
+Java 8/Scala 2.12 allow a function type to be used where 
+an instance of a class or trait declaring a single abstract method (SAM) is required.
+
+trait Increaser { def increase(i: Int): Int }
+def increaseOne(increaser: Increaser): Int = increaser.increase(1)
+increaseOne(new Increaser {def increase(i: Int): Int = i + 7 })
+or:
+increaseOne(i => i + 7)

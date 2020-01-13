@@ -1,0 +1,484 @@
+/\
+Example of list.
+(16.1;p340)
+
+val fruit = List("apples", "oranges", "pears")
+
+/\
+What is the difference List and Array?
+(16.1;p340)
+
+- lists are immutable (scala.collection.immutable.List vs. scala.collection.mutable.MutableList),
+- lists have a recursive structure, whereas arrays are flat.
+
+/\
+Characterise the list type.
+(16.2;p341)
+
+- homogeneous, the elements of a list all have the same type:
+val fruit: List[String] = List("apples", "oranges", "pears")
+
+- covariant, for each pair of types S and T, if S is a subtype of T, then List[S] is a subtype of List[T]:
+i.e. List[String] is a subtype of List[Object].
+
+- the empty list has type List[Nothing]:
+val xs: List[String] = List()
+
+/\
+List two fundamental building blocks for List.
+(16.3;p342)
+
+Nil (infix operator, ends in a colon so associates to the right)
+:: (pronounced “cons” for “construct”)
+
+/\
+List basic operations on lists.
+(16.4;p342)
+
+head - returns the first element of a list
+tail - returns a list consisting of all elements except the first
+isEmpty - returns true if the list is empty
+
+/\
+The insertion sort algorithm.
+(16.4;p343)
+(16.5;p344)
+
+def isort(xs: List[Int]): List[Int] =
+  if (xs.isEmpty) Nil
+  else insert(xs.head, isort(xs.tail))
+
+def insert(x: Int, xs: List[Int]): List[Int] =
+  if (xs.isEmpty || x <= xs.head) x :: xs
+  else xs.head :: insert(x, xs.tail)
+
+or (with pattern matching):
+
+def isort(xs: List[Int]): List[Int] = xs match {
+  case List() => List()
+  case x :: xs1 => insert(x, isort(xs1))
+}
+
+def insert(x: Int, xs: List[Int]): List[Int] = xs match {
+  case List() => List(x)
+  case y :: ys => if (x <= y) x :: xs
+    else y :: insert(x, ys)
+}
+
+/\
+Show the extractor pattern for a list.
+(16.5;p343)
+
+val List(a, b, c) = "apples" :: "oranges" :: "pears" :: Nil
+
+/\
+Show the infix operation pattern for a list.
+(16.5;p344)
+
+val a :: b :: rest = "apples" :: "oranges" :: "pears" :: Nil
+
+/\
+Concatenate two lists.
+(16.6;p345)
+
+List(1, 2) ::: List(3, 4, 5)
+
+or
+
+def append[T](xs: List[T], ys: List[T]): List[T] =
+xs match {
+  case List() => ys
+  case x :: xs1 => x :: append(xs1, ys)
+}
+
+/\
+Take the length of a list.
+(16.6;p347)
+
+List(1, 2, 3).length
+- expensive operation
+
+/\
+Why xs.isEmpty is better than xs.length == 0?
+(16.6;p347)
+
+xs.length needs to traverse the whole list.
+
+/\
+How to access the end of list?
+(16.6;p348)
+
+assert(List(1, 2, 3).last == 3)
+assert(List(1, 2, 3).init == List(1, 2))
+
+- need to traverse the whole list
+
+/\
+Reverse list.
+(16.6;p348)
+
+assert(List(1, 2, 3).reverse == List(3, 2, 1))
+
+def rev[T](xs: List[T]): List[T] = xs match {
+  case List() => xs
+  case x :: xs1 => rev(xs1) ::: List(x)
+}
+
+/\
+Take the first n elements of the list xs.
+(16.6;p350)
+
+assert(List(1, 2, 3, 4, 5).take(2) == List(1, 2))
+
+/\
+Drop the first n elements of the list xs.
+(16.6;p350)
+
+assert(List(1, 2, 3, 4, 5).drop(2) == List(3, 4, 5))
+
+/\
+Split the list at a given index.
+(16.6;p350)
+
+assert(List(1, 2, 3, 4, 5).splitAt(2) == (List(1, 2), List(3, 4, 5)))
+assert(List(1, 2, 3, 4, 5).splitAt(2) == (List(1, 2, 3, 4, 5).take(2), List(1, 2, 3, 4, 5).drop(2))
+
+/\
+Take the random element in list.
+(16.6;p351)
+
+assert(List(1, 2, 3).apply(2) == 2)
+assert(List(1, 2, 3) apply 2 == 2)
+assert(List(1, 2, 3)(2) == 2)
+
+/\
+Take the random element.
+(16.6;p351)
+
+assert(List(1, 2, 3).apply(2) == 2)
+assert(List(1, 2, 3) apply 2 == 2)
+assert(List(1, 2, 3)(2) == 2)
+
+xs apply n equals (xs drop n).head
+
+/\
+Take a list consisting of all valid indices of a given list.
+(16.6;p351)
+
+assert(List(1, 2, 3).indices == List(0, 1, 2))
+
+/\
+Take a list of lists and flattens it out to a single list.
+(16.6;p351)
+
+assert(List(List(1, 2), List(3), List(), List(4, 5)).flatten == List(1, 2, 3, 4, 5))
+assert(List("apples", "oranges", "pears").map(_.toCharArray).flatten == List('a', 'p', 'p', 'l', 'e', 's', 'o', ...))
+
+/\
+Takes two lists and forms a list of pairs.
+(16.6;p352)
+
+Range(10, 13) zip List("apple", "banana", "cherry") == Vector((10, "apple"), (11, "banana"), (12, "cherry"))
+List('a', 'b', 'c') zip List("apple", "banana", "cherry") == List(('a', "apple"), ('b', "banana"), ('c', "cherry"))
+List('a', 'b', 'c') zip List(1, 2, 3, 4) == List(('a', 1), ('b', 2), ('c', 3))
+
+/\
+Zip a list with its index.
+(16.6;p352)
+
+List('a', 'b', 'c').zipWithIndex == List(('a', 0), ('b', 1), ('c', 2))
+
+/\
+Change list of tuples into a tuple of lists.
+(16.6;p352)
+
+List(('a', 0), ('b', 1), ('c', 2)).unzip == (List('a', 'b', 'c'), List(0, 1, 2))
+
+/\
+Return the canonical string representation of a list.
+(16.6;p353)
+
+List(1, 2, 3).toString == "String = List(1, 2, 3)"
+
+/\
+Return string representation of a list.
+(16.6;p353)
+
+List(1, 2, 3).mkString("[", ", ", "]") == "[1, 2, 3]"
+List(1, 2, 3).mkString(", ") == "1, 2, 3"
+List(1, 2, 3).mkString == "123"
+
+/\
+Return string representation of a list (using scala.StringBuilder).
+(16.6;p353)
+
+val buf = new StringBuilder
+List(1, 2, 3).addString(buf, "[", ", ", "]") == new StringBuilder("[1, 2, 3]")
+
+/\
+Convert data between array and list.
+(16.6;p354)
+
+List(1, 2, 3).toArray
+Array(1, 2, 3).toList
+
+/\
+Copy list to array.
+(16.6;p354)
+
+val xs = List(1, 2, 3)
+val arr = new Array[Int](10)
+
+xs.copyToArray (arr, 3) == Array(0, 0, 0, 1, 2, 3, 0, 0, 0, 0)
+
+/\
+Use iterator for list.
+(16.6;p354)
+
+val it = List(1, 2, 3).iterator
+it.next == 1
+it.next == 2
+
+/\
+The merge sort algorithm.
+(16.6;p356)
+
+def msort[T](less: (T, T) => Boolean)(xs: List[T]): List[T] = {
+  def merge(xs: List[T], ys: List[T]): List[T] =
+    (xs, ys) match {
+      case (Nil, _) => ys
+      case (_, Nil) => xs
+      case (x :: xs1, y :: ys1) =>
+        if (less(x, y)) x :: merge(xs1, ys)
+        else y :: merge(xs, ys1)
+  }
+
+  val n = xs.length / 2
+  if (n == 0) xs
+  else {
+    val (ys, zs) = xs splitAt n
+    merge(msort(less)(ys), msort(less)(zs))
+  }
+}
+
+msort((x: Int, y: Int) => x < y)(List(5, 7, 1, 3))
+
+/\
+Transform every element of a list.
+(16.7;p357)
+
+List(1, 2, 3).map (_ + 1) == List(2, 3, 4)
+List("the", "quick", "brown", "fox").map(_.toList.reverse.mkString) == List("eht", "kciuq", "nworb", "xof")
+
+List("the", "quick", "brown", "fox").flatMap (_.toList) == List('t', 'h', 'e', 'q', 'u', 'i', 'c', 'k', 'b', 'r', 'o', 'w', 'n', 'f', 'o', 'x')
+- return a list of elements as its right operand
+
+/\
+Sum up all numbers in a list.
+(16.7;p359)
+
+var sum = 0
+List(1, 2, 3, 4, 5) foreach (sum += _)
+sum == 15
+
+/\
+Filter list.
+(16.7;p359)
+
+List(1, 2, 3, 4, 5) filter (_ % 2 == 0) == List(2, 4)
+
+/\
+Return pair a pair of list, one for which the predicate is true, other for false.
+(16.7;p359)
+
+xs partition p equals (xs filter p, xs filter (!p(_)))
+List(1, 2, 3, 4, 5) partition (_ % 2 == 0) == (List(2, 4), List(1, 3, 5))
+
+/\
+Take the first element satisfying a given predicate.
+(16.7;p360)
+
+List(1, 2, 3, 4, 5) find (_ % 2 == 0) == Some(2)
+List(1, 2, 3, 4, 5) find (_ <= 0) == Nome
+
+/\
+Take the longest prefix of list xs such that every element in the prefix satisfies p.
+(16.7;p360)
+
+List(1, 2, 3, 4, 5) takeWhile (_ < 3) == List(1, 2)
+
+/\
+Remove the longest prefix from list xs such that every element in the prefix satisfies p.
+(16.7;p360)
+
+List(1, 2, 3, 4, 5) dropWhile (_ < 3) == List(3, 4, 5)
+
+/\
+Take a pair of two lists, defined by (xs takeWhile p, xs dropWhile p).
+(16.7;p360)
+
+xs span p equals (xs takeWhile p, xs dropWhile p)
+List(1, 2, 3, 4, 5, 1) span (_ < 3) == (List(1, 2), List(3, 4, 5, 1))
+
+/\
+Check if all elements in the list satisfy p.
+(16.7;p361)
+
+List(1, 2, 3, 4, 5, 1).forall (_ > 0) == true
+
+/\
+Check if exist at least one element in the list satisfy p.
+(16.7;p361)
+
+List(1, 2, 3, 4, 5, 1).exists (_ == 5) == true
+
+/\
+Implement sum(List(a, b, c)) equals a + b + c
+(16.7;p361)
+
+def sum(xs: List[Int]): Int = (0 /: xs) (_ + _)
+
+/\
+Implement product(List(a, b, c)) equals a * b * c
+(16.7;p361)
+
+def product(xs: List[Int]): Int = (1 /: xs) (_ * _)
+
+/\
+Explain fold left operation.
+(16.7;p361)
+
+A fold left operation “(z /: xs) (op)”:
+- a start value z, 
+- a list xs to fold, 
+- a binary operation op,
+- foldLeft.
+
+(z /: List(a, b, c)) (op) equals op(op(op(z, a), b), c)
+   op
+   /\
+  op c
+  /\
+ op b
+/\
+z a
+
+/\
+The same but without " " ("" /: words) (_ + " " + _):
+(16.7;p362)
+
+(words.head /: words.tail) (_ + " " + _)
+
+/\
+Explain fold right operation.
+(16.7;p362)
+
+A right operation “(xs :\ z) (op)”:
+- a start value z, 
+- a list xs to fold, 
+- a binary operation op,
+- foldRight.
+
+(List(a, b, c) :\ z) (op) equals op(a, op(b, op(c, z)))
+
+ op
+ /\
+ a op
+   /\
+   b op
+     /\
+     c z
+
+/\
+Consider fold left and fold right in terms of efficiency.
+(16.7;p363)
+
+def flattenLeft[T](xss: List[List[T]]) = (List[T]() /: xss) (_ ::: _)
+def flattenRight[T](xss: List[List[T]]) = (xss :\ List[T]()) (_ ::: _)
+
+xs ::: ys, takes time proportional to its first argument xs
+->
+flattenRight is more efficient
+
+/\
+What is wrong?
+def flattenRight[T](xss: List[List[T]]) = (xss :\ List()) (_ ::: _)
+(16.7;p363)
+
+required a type annotation
+due to a limitation in Scala’s type inferencer, which fails to infer the correct type of the list automatically
+
+/\
+Implement linear reverseList.
+(16.7;p363)
+
+def reverseList[T](xs: List[T]) = (List[T]() /: xs) {(ys, y) => y :: ys}
+
+/\
+Create lists from their elements.
+(16.8;p365)
+
+List.apply(1, 2, 3)
+List(1, 2, 3)
+
+/\
+Create a range of numbers.
+(16.8;p366)
+
+List.range(1, 5) == List(1, 2, 3, 4)
+List.range(1, 9, 2) == List(1, 3, 5, 7)
+List.range(9, 1, 3) == List(9, 6, 3)
+
+/\
+Create uniform lists.
+(16.8;p366)
+
+List.fill(5)('a') == List('a', 'a', 'a', 'a', 'a')
+List.fill(2, 3)('b') == List(List('b', 'b', 'b'), List('b', 'b', 'b'))
+
+/\
+Creates a list whose elements are computed according to a supplied function.
+(16.8;p367)
+
+List.tabulate(5)(n => n * n) == List(0, 1, 4, 9, 16)
+List.tabulate(5,5)(_ * _) == List(List(0, 0, 0, 0, 0), List(0, 1, 2, 3, 4), List(0, 2, 4, 6, 8), List(0, 3, 6, 9, 12), List(0, 4, 8, 12, 16))
+
+/\
+Concatenate multiple lists.
+(16.8;p367)
+
+List.concat(List(), List('b'), List('c')) == List('b', 'c')
+
+/\
+Explain zipped method.
+(16.9;p367)
+
+(List(10, 20), List(3, 4, 5)).zipped.map(_ * _) == List(30, 80)
+(List("abc", "de"), List(3, 2)).zipped.forall(_.length == _) == true
+(List(1, 2, 3), List(10, 20, 30), List(100, 200, 300)).zipped.map(_ + _ + _) ==  List(111, 222, 333)
+
+/\
+Rapair "msort(_ > _)(abcde)".
+(16.10;p368)
+
+msort((x: Char, y: Char) => x > y)(abcde)
+msort[Char](_ > _)(abcde)
+msortSwapped(abcde)(_ > _) // def msortSwapped[T](xs: List[T])(less: (T, T) => Boolean): List[T] = {???}
+
+/\
+Why "def myfunction[T](xs: List[T])(less: (T, T) => Boolean): List[T] = {???}"?
+(16.10;p370)
+
+myfunction(abcde)(_ > _) // ok
+myfunction(_ > _)(abcde) // fail to determine the type parameter
+
+When designing a polymorphic method that takes some non-function arguments and a function argument, 
+place the function argument last in a curried parameter list on its own.
+
+/\
+Repair "(xss :\ List()) (_ ::: _)".
+(16.10;p371)
+
+(xss :\ List[T]()) (_ ::: _)
+(xs :\ z) (op) -> z is not related to the type of the list xs, type inference has no context information for z
+

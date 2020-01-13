@@ -1,0 +1,339 @@
+/\
+How to concatenate two arrays?
+(http://blog.bruchez.name/2013/05/scala-array-comparison-without-phd.html)
+
+assert((Array("aa", "bb") ++ Array("cc")).deep == Array("aa", "bb", "cc").deep)
+assert((Array("aa", "bb") ++ Array("cc")).sameElements(Array("aa", "bb", "cc")))
+
+/\
+Define 
+superclass, subclass, subtype, inheritance, composition, implementing, overriding, declaration, definition,
+polymorphism, dynamic binding, 
+
+/\
+Example zip.
+
+val arr1 = Array(1, 2, 3)
+val arr2 = Array("a", "b")
+
+arr1 zip arr2
+
+> res1: Array[(Int, String)] = Array((1,a), (2,b))
+
+/\
+Example zip and yeld.
+
+val arr1 = Array(1, 2, 3)
+val arr2 = Array("a", "b")
+
+for (
+  (line1, line2) <- arr1 zip arr2
+) yield line1 + line2
+
+> res1: Array[String] = Array(1a, 2b)
+
+/\
+How make string from sequence?
+
+Array(1, 2, 3) mkString "\n"
+> res1: String =
+1
+2
+3
+
+/\
+Members:
+Seq, List, Array,
+Any,
+AnyRef
+AnyVal
+
+/\
+https://en.wikipedia.org/wiki/Metasyntactic_variable
+
+/\
+DSL
+
+/\
+http://www.scalatest.org
+
+/\
+Compare abstract class vs. trait.
+(15.1;p307)
+
+abstract class:
+- more efficient
+
+/\
+What is "???"?
+(16.6;p347)
+
+- the method,
+- throws scala.NotImplementedError,
+- has result type Nothing,
+- can be used as a temporary implementation during development.
+
+/\
+http://stackoverflow.com/questions/10489548/what-is-the-triple-equals-operator-in-scala-koans
+
+/\
+wymien algorytmy sortowania, okresl zlozonosc
+(16.6;p355)
+
+/\
+predykat
+
+/\
+Example "multiple definitions" and tuple.
+(17.5;p393)
+
+scala> val a1, a2 = 'a'
+a1: Char = a
+a2: Char = a
+
+
+/\
+class Book(val title: String)
+vs.
+class Book(title: String)
+
+
+/\
+Compile:
+scala> lazy val a = { println("computing a"); util.Random.nextInt(10) }
+a: Int = <lazy>
+(https://tpolecat.github.io/2014/06/26/call-by-name.html)
+
+scala> List(a, a, a, a, a)
+computing a
+res6: List[Int] = List(4, 4, 4, 4, 4)
+
+/\
+Compile:
+scala> def five[A](a: => A): List[A] = List(a, a, a, a, a)
+five: [A](a: => A)List[A]
+
+scala> five { println("computing a"); util.Random.nextInt(10) }
+computing a
+computing a
+computing a
+computing a
+computing a
+res7: List[Int] = List(1, 4, 6, 1, 5)
+(https://tpolecat.github.io/2014/06/26/call-by-name.html)
+
+
+/\
+Section 24.8 Chapter 24 · Collections in Depth 562
+
+Sets and maps with one to four elements are stored as single objects that just contain the elements 
+(or key/value pairs in the case of a map) as fields. The empty immutable set and empty immutable
+map is in each case a singleton object—there’s no need to duplicate storage
+for those because an empty immutable set or map will always stay empty.
+
+/\
+Why:
+var index = 0
+List(1, 2, 3) map {println("only-one");index = index + 1; _ + 1}
+index
+only-one
+res1: List[Int] = List(2, 3, 4)
+res2: Int = 1
+
+but:
+
+var index = 0
+List(1, 2, 3) map {a => {println("only-one");index = index + 1; a + 1}}
+index
+only-one
+only-one
+only-one
+res1: List[Int] = List(2, 3, 4)
+res2: Int = 3
+
+(24.14;p579)
+
+map is a method which accepts a function as an argument
+val fun = {println("a");println("b");(x:Integer) => x*2} // 3 blocks, last is a function
+but not:
+val fun = (x:Integer) => {println("a");println("b");x*2} // a function
+
+https://stackoverflow.com/questions/39010662/what-is-the-difference-between-map-and-map
+https://stackoverflow.com/questions/4386127/what-is-the-formal-difference-in-scala-between-braces-and-parentheses-and-when?noredirect=1&lq=1
+
+
+/\
+scala> val it = Iterator("a", "b", "c")
+it: Iterator[String] = non-empty iterator
+
+scala> it foreach print
+abc
+scala> it next
+<console>:13: warning: postfix operator next should be enabled
+by making the implicit value scala.language.postfixOps visible.
+This can be achieved by adding the import clause 'import scala.language.postfixO
+ps'
+or by setting the compiler option -language:postfixOps.
+See the Scaladoc for value scala.language.postfixOps for a discussion
+why the feature should be explicitly enabled.
+       it next
+       
+       
+/\
+Why?
+Traversable(1, 2, 3) // List(1, 2, 3)
+https://stackoverflow.com/questions/18759913/what-is-the-difference-between-hashset-and-set-and-when-should-each-one
+
+Because
+calling apply will produce some default implementation of the trait.
+
+/\
+This makes use
+of the fact that both maps and arrays are functions because they inherit from
+the Function1 trait.
+
+abstract class Base
+case object A extends Base
+case object T extends Base
+case object G extends Base
+case object U extends Base
+object Base {
+val fromInt: Int => Base = Array(A, T, G, U)
+val toInt: Base => Int = Map(A >
+0, T >
+1, G >
+2, U >
+3)
+}
+/\
+https://alvinalexander.com/scala/collection-scala-flatmap-examples-map-flatten
+
+
+/\
+this.type
+
+
+http://www.scala-archive.org/this-type-doesn-t-mean-what-I-think-it-does-td2269225.html
+
+"this.type" is the type that is inhabited by only one object, the object 
+referenced to by "this". It's obviously not the return type you want for 
+a clone method. 
+
+this.type can be useful in the builder pattern: 
+http://gist.github.com/229164
+
+def += (kv: (String, T)): this.type = { update(kv._1, kv._2); this }
+def -= (s: String): this.type = { remove(s); this }
+
+/\
+:paste -raw
+ctrl+D
+http://codepodu.com/paste-mode-in-scala-repl/
+
+
+/\
+https://stackoverflow.com/questions/1990948/what-is-the-difference-between-self-types-and-trait-subclasses
+http://jonasboner.com/real-world-scala-dependency-injection-di/
+
+/\
+https://stackoverflow.com/questions/33052086/what-is-a-singleton-type-exactly
+
+/\
+https://docs.scala-lang.org/overviews/core/futures.html
+
+/\
+util.Properties.versionString
+
+
+/\
+Explain:
+List(("a",1), ("a",2), ("a",3), ("b",10), ("b",20), ("b",30)).groupBy(_._1).mapValues(_.map(_._2))
+http://blog.bruchez.name/2013/02/mapmap-vs-mapmapvalues.html
+
+List(("a",1), ("a",2), ("a",3), ("b",10), ("b",20), ("b",30)).groupBy(_._1)
+Map("b" -> List(("b",10), ("b",20), ("b",30)), "a" -> List(("a",1), ("a",2), ("a",3)))
+
+List(("b",10), ("b",20), ("b",30)).map(_._2)
+List(10, 20, 30)
+
+override def mapValues[C](f: B => C): Map[A, C] = new DefaultMap[A, C] {
+  ...
+  def get(key: A) = self.get(key).map(f)
+}
+
+List(("a",1), ("a",2), ("a",3), ("b",10), ("b",20), ("b",30)).groupBy(_._1).map{ case(k,v) => k -> v.map(_._2) }
+
+List(("a",1), ("a",2), ("a",3), ("b",10), ("b",20), ("b",30)).groupBy(_._1).map( ((String, List[(String, Int)])) => ??? )
+Note: Tuples cannot be directly destructured in method or function parameters.
+      Either create a single parameter accepting the Tuple2,
+      or consider a pattern matching anonymous function: `{ case (param1, param2) => ... }
+
+
+/\
+Explain by-value and by-name function parmeters.
+https://stackoverflow.com/questions/13337338/call-by-name-vs-call-by-value-in-scala-clarification-needed
+
+def something() = {
+  println("calling something")
+  1 // return value
+}
+
+def callByValue(x: Int) = {
+  println("x1=" + x)
+  println("x2=" + x)
+}
+
+scala> callByValue(something())
+calling something
+x1=1
+x2=1
+
+def callByName(x: => Int) = {
+  println("x1=" + x)
+  println("x2=" + x)
+}
+
+scala> callByName(something())
+calling something
+x1=1
+calling something
+x2=1
+
+/\
+https://stackoverflow.com/questions/3213510/what-is-a-manifest-in-scala-and-when-do-you-need-it
+https://stackoverflow.com/questions/4850976/why-is-classmanifest-needed-with-array-but-not-list
+https://stackoverflow.com/questions/12218641/scala-what-is-a-typetag-and-how-do-i-use-it?noredirect=1&lq=1
+https://www.scala-lang.org/api/2.12.2/scala/reflect/ClassTag.html
+https://stackoverflow.com/questions/8182993/how-do-you-define-implicit-conversion-in-modern-way
+
+ClassTag vs Manifest
+
+/\
+:paste
+==
+scala> 
+
+/\
+scala> String.[SPACE + TAB]
+
+/\
+https://stackoverflow.com/questions/10141124/any-difference-between-first-class-function-and-high-order-function
+
+
+/\
+val bytes = Array.fill[Byte](10)(0)
+val bytes = Array.ofDim[Byte](10)
+val a = Array.fill(10){scala.util.Random.nextInt(5)} 
+
+// reset
+bytes.zipWithIndex.foreach(x => bytes(x._2) = 0)
+
+/\
+Przemyœleæ u¿ycie view (nie kopiowanie kolekcji)
+  val MBCount: Int = 10
+  val bytes = (1 to MBCount * 1024 * 1024).view.toArray.map(_.toByte)
+  
+  
+/\
+https://stackoverflow.com/questions/7267760/how-can-a-time-function-exist-in-functional-programming?rq=1
+https://stackoverflow.com/questions/1722726/is-the-scala-2-8-collections-library-a-case-of-the-longest-suicide-note-in-hist?rq=1

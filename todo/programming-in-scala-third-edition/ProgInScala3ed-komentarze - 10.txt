@@ -1,0 +1,158 @@
+/\
+What is Composition?
+
+The relationship where one class holds a reference to another.
+
+/\
+What is Inheritance?
+
+The superclass/subclass relationship.
+
+/\
+What are combinators?
+(10.1;p219)
+
+Composing which combine elements of some domain into new elements.
+
+/\
+Declare abstract class and method.
+(10.2;219)
+
+abstract class Element {
+  def contents: Array[String]
+}
+
+/\
+Define parameterless method.
+(10.3;220)
+
+abstract class Element {
+  def contents: Array[String]
+  def height: Int = contents.length
+  def width: Int = if (height == 0) 0 else contents(0).length
+}
+
+/\
+Define empty-paren method.
+(10.3;220)
+
+abstract class Element {
+  def contents: Array[String]
+  def height(): Int = contents.length
+  def width(): Int = if (height == 0) 0 else contents(0).length
+}
+
+/\
+Compare parameterless method vs. empty-paren method.
+(10.3;221)
+
+parameterless methods:
+- def width: Int
+- supports the uniform access principle, 
+which says that client code should not be affected by a decision to implement an attribute as a field or method.
+
+empty-paren methods:
+- def width(): Int
+
+Scala is very liberal, you can:
+- override a parameterless method with an empty-paren method, and vice versa, because fields and methods belong to the same namespace,
+- leave off the empty parentheses on an invocation of any function that takes no arguments.
+
+It is possible to leave out all empty parentheses in Scala function calls.
+However, it is still recommended to write the empty parentheses when the invoked method represents more than a property of its receiver object:
+  "hello".length // no () because no sideeffect
+  println() // better to not drop the ()
+
+/\
+Declare subclass.
+(10.4;223)
+
+class ArrayElement(conts: Array[String]) extends Element {
+  def contents: Array[String] = conts
+}
+
+/\
+What is subtyping?
+(10.4;225)
+
+Subtyping means that a value of the subclass can be used wherever a value of the superclass is required.
+
+/\
+List scala namespaces.
+(10.5;226)
+
+- values (fields, methods, packages, and singleton objects),
+- types (class and trait names).
+
+/\
+What is parametric field?
+(10.6;228)
+
+A field defined as a class parameter.
+The contents parameter is prefixed by val.
+
+class Cat {
+  val dangerous = false
+}
+class Tiger(param1: Boolean, param2: Int) extends Cat {
+  override val dangerous = param1
+  private var age = param2
+}
+->
+class Tiger(
+  override val dangerous: Boolean,
+  private var age: Int
+) extends Cat
+
+/\
+How to invoke superclass constructor?
+(10.7;228)
+
+class LineElement(s: String) extends ArrayElement(Array(s)) {
+  override def width = s.length
+  override def height = 1
+}
+
+/\
+Define function to return n * char.
+(10.9;231)
+
+def manychars(ch: Char, n: Int) : String = {
+  ch.toString * n
+}
+manychars('a', 3)
+
+/\
+What is dynamic bound?
+(10.9;231)
+
+The dynamic bound means that the actual method implementation invoked is determined at run time 
+based on the class of the object, not the type of the variable or expression.
+
+/\
+Declare final member.
+(10.10;234)
+
+class ArrayElement extends Element {
+  final override def demo() = {
+    println("ArrayElement's implementation invoked")
+  }
+}
+
+/\
+Declare final class.
+(10.10;234)
+
+final class ArrayElement extends Element {
+  override def demo() = {
+    println("ArrayElement's implementation invoked")
+  }
+}
+
+/\
+Declare private class.
+(10.14;242)
+
+object MyObject {
+  private class MyClass
+}

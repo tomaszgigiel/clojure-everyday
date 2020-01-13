@@ -1,0 +1,1903 @@
+﻿OTHERS:
+https://github.com/TheDom/functional-programming-in-scala/blob/master/src/main/scala/com/dominikgruber/fpinscala/chapter05/Stream.scala
+http://docs.scala-lang.org/overviews/collections/performance-characteristics.html
+
+/\
+What is functional programming?
+(1,p3)
+(https://en.wikipedia.org/wiki/Functional_programming)
+
+Functional programming is:
+- a programming paradigm - a style of building the structure and elements of computer programs - that treats computation as the evaluation of mathematical functions and avoids changing-state and mutable data,
+- a programming programming using only pure functions (functions that have no side effects).
+
+/\
+Example of side effects.
+(1,p3)
+
+Modifying a variable
+Modifying a data structure in place
+Setting a field on an object
+Throwing an exception or halting with an error
+Printing to the console or reading user input
+Reading from or writing to a file
+Drawing on the screen
+
+/\
+What is the difference between an expression and a statement?
+(https://en.wikipedia.org/wiki/Statement_(computer_science))
+
+A statement is executed, while an expression is evaluated.
+In languages that mix imperative and functional styles, such as the Lisp family, the distinction between expressions and statements is not made.
+In purely functional programming, there are no statements; everything is an expression.
+
+/\
+What is "a referential transparency"?
+(1.2,p10)
+(https://en.wikipedia.org/wiki/Referential_transparency)
+
+Referential transparency and referential opacity are properties of parts of computer programs.
+An expression is said to be referentially transparent if it can be replaced with its corresponding value without changing the program's behavior.
+As a result, evaluating a referentially transparent function gives the same value for same arguments. Such functions are called pure functions.
+An expression that is not referentially transparent is called referentially opaque.
+
+/\
+What is "a pure function"?
+(1.2,p10)
+
+A function f is pure if the expression f(x) is referentially transparent for all referentially transparent x.
+
+/\
+What is "a substitution model"?
+(1.2,p10)
+(http://bkpathak.github.io/scala-substitution-model)
+
+A substitution model is a technique, when all evaluation does is reduce an expression to a value, which is a term that does not need further evaluation.
+
+/\
+What is "a higher order function"?
+(2,p14)
+
+A higher order function is a function that takes other functions as arguments and may themselves return functions as their output.
+
+/\
+Example of loops functionally without loop.
+(2.4.1,p20)
+
+import scala.annotation.tailrec
+
+def factorial(n: Int): Int = {
+  @tailrec
+  def loop(n: Int, acc: Int): Int = if (n <= 0) acc else loop(n - 1, n * acc)
+  loop(n, 1)
+}
+
+/\
+Write Fibonacci.
+(2.4.1,p21)
+
+import scala.annotation.tailrec
+
+def fibonacci(x: Int): BigInt = {
+  @tailrec
+  def helper(x: Int, prev: BigInt = 0, next: BigInt = 1): BigInt = x match {
+    case 0 => prev
+    case 1 => next
+    case _ => helper(x - 1, next, next + prev)
+  }
+  helper(x)
+}
+
+fibonacci(6)
+
+/\
+List kinds of polymorphism.
+(https://en.wikipedia.org/wiki/Polymorphism_(computer_science))
+
+Polymorphism:
+- ad hoc polymorphism: different implementations, function overloading,
+- parametric polymorphism: without any specific type, generics,
+- subtyping (also called subtype polymorphism or inclusion polymorphism): classes related by some common superclass.
+
+/\
+What is "a monomorphic function"?
+(2.5,p21)
+
+Not "a polymorphic function".
+
+/\
+What is "a parametric polymorphism"?
+(2.5,p21)
+
+Parametric Polymorphism is:
+- a way to define types or functions that are generic over other types,
+- another term for "Generics" in Java,
+
+/\
+What is "a polymorphic function"?
+(2.5,p21)
+
+The polymorphic function is a function that can deal with a number of different types of data.
+
+/\
+Write isSorted for Array.
+(2.5.1,p24)
+
+import scala.annotation.tailrec
+
+def isSorted[A](as: Array[A], ordered: (A, A) => Boolean): Boolean = {
+  @tailrec
+  def helper(as: Seq[A]): Boolean = Option(as) match {
+    case Some(Seq())              => true
+    case Some(Seq(a))             => true
+    case Some(Seq(a, bs @ _*))    => ordered(a, bs(0)) && helper(bs)
+    case None                     => false
+  }
+  helper(as)
+}
+
+def ordered(a: Int, b: Int): Boolean = { a <= b }
+assert(isSorted(null, ordered) == false)
+assert(isSorted(Array(), ordered))
+assert(isSorted(Array(1), ordered))
+assert(isSorted(Array(1, 2), ordered))
+assert(isSorted(Array(1, 2, 3), ordered))
+assert(isSorted(Array(1, 2, 1), ordered) == false)
+assert(isSorted(Array(1, 2, 1, 2), ordered) == false)
+assert(isSorted(Array(1, 1), ordered))
+assert(isSorted(Array(2, 1), ordered) == false)
+
+/\
+Explain "a syntactic sugar" in context:
+val myeq = (x: Int, y: Int) => x == y
+myeq(1, 2)
+(2.5.2,p25)
+
+val myeq = (x: Int, y: Int) => x == y
+is syntactic sugar for:
+val myeq = new Function2[Int, Int, Boolean] {
+  def apply(a: Int, b: Int) = a == b
+}
+myeq.apply(1, 2)
+
+/\
+Implement:
+def partial1[A,B,C](a: A, f: (A,B) => C): B => C = ???
+(2.6,p26)
+
+def partial1[A,B,C](a: A, f: (A,B) => C): B => C = (b) => f(a, b)
+partial1(1, (a: Int, b: Int) => 1)
+
+/\
+What is "a currying"?
+(2.6,p27)
+(https://en.wikipedia.org/wiki/Currying)
+
+Currying:
+- is the technique of translating the evaluation of a function that takes multiple arguments (or a tuple of arguments) into evaluating a sequence of functions, each with a single argument,
+- is the transformation that transform a function with multiple arguments into a chain of single-argument functions instead,
+- is related to, but not the same as, partial application,
+- rozwijanie funkcji.
+i.e.
+A "normal" add-function is of the type (Int, Int) => Int.
+A curried add-function would be of type Int => (Int => Int).
+
+def add(a: Int, b: Int): Int = a + b
+def add(a: Int)(b: Int): Int = {a + b}
+// longhand
+def add(a: Int): (Int => Int) = {(b: Int) => a + b}
+
+/\
+Implement:
+def curry[A,B,C](f: (A, B) => C): A => (B => C) = ???
+(2.6,p27)
+
+def curry[A,B,C](f: (A, B) => C): A => (B => C) = {(a) => (b) => f(a, b)}
+assert(curry[AnyVal, Byte, Char]((a, b) => 'c')(1)(2) == 'c')
+
+/\
+Implement:
+def uncurry[A,B,C](f: A => B => C): (A, B) => C = ???
+(2.6,p27)
+
+def uncurry[A,B,C](f: A => B => C): (A, B) => C = (a, b) => f(a)(b)
+assert(uncurry[AnyVal, Byte, Char](a => (b => 'c'))(1, 2) == 'c')
+
+/\
+Implement:
+def compose[A,B,C](f: B => C, g: A => B): A => C = ???
+(2.6,p27)
+
+def compose[A,B,C](f: B => C, g: A => B): A => C = {(a) => f(g(a))}
+def compose[A,B,C](f: B => C, g: A => B): A => C = {f compose g}
+def compose[A,B,C](f: B => C, g: A => B): A => C = {g andThen f}
+assert(compose[AnyVal, Byte, Char](b => 'c', a => 1)(1) == 'c')
+
+/\
+Implement:
+def cos(x: Double): Double
+using sin, Pi, andThen.
+(2.6,p27)
+
+val f = (x: Double) => math.Pi / 2 - x
+val cos = f andThen math.sin
+
+/\
+What is "a functional data structure"?
+(3.1,p29)
+
+A functional data structure:
+- sort of data structures,
+- is operated on using only pure functions,
+- by definition immutable.
+
+/\
+Implement List.
+(3.1,p30)
+
+sealed trait List[+A]
+case object Nil extends List[Nothing]
+case class Cons[+A](head: A, tail: List[A]) extends List[A]
+
+object List {
+  // not stack-safe
+  def foldRight[A,B](as: List[A], z: B)(f: (A, B) => B): B =
+    as match {
+      case Nil => z
+      case Cons(x, xs) => f(x, foldRight(xs, z)(f))
+    }
+  def sum(ns: List[Int]) = foldRight(ns, 0)((x,y) => x + y)
+  def product(ns: List[Double]) = foldRight(ns, 1.0)(_ * _)
+  def apply[A](as: A*): List[A] = if (as.isEmpty) Nil else Cons(as.head, apply(as.tail: _*))
+}
+
+/\
+What does "sealed" mean in:
+sealed trait List[+A]
+(3.1,p30)
+
+"sealed" means that all implementations of the trait must be declared in its file.
+zapieczętowany
+
+/\
+What is "Cons" in:
+case class Cons[+A](head: A, tail: List[A]) extends List[A]
+(3.1,p30)
+
+"Cons" is a data constructor. Traditionally short for construct.
+
+/\
+What is "+" in:
+trait List[+A]
+(3.1,p31)
+
+"+":
+- indicates that the type parameter A is covariant.
+- is a variance annotation that signals that A is a covariant or "positive" parameter of List,
+- i.e. if Dog is a subtype of Animal then List[Dog] is considered a subtype of List[Animal].
+
+/\
+Example of variadic function.
+(3.2,p34)
+
+def apply[A](as: A*): List[A] =
+  if (as.isEmpty) Nil
+  else Cons(as.head, apply(as.tail: _*))
+
+/\
+What is "_*"?
+(3.2,p34)
+
+"_*":
+- special type annotation,
+- allows to pass a Seq to a variadic method.
+
+/\
+What is "a data sharing in functional data structures"?
+(3.3,p35)
+
+"The data sharing in functional data structures":
+- reusing of data structure,
+- avoiding making copies.
+
+/\
+How to avoid anntotation x with its type:
+def dropWhile[A](l: List[A], f: A => Boolean): List[A]
+val xs: List[Int] = List(1,2,3,4,5)
+val ex1 = dropWhile(xs, (x: Int) => x < 4)
+(3.3,p38)
+
+// thanks to inference:
+val ex2 = dropWhile(xs)(x => x < 4)
+
+/\
+What is "ADT)"?
+(3.5,p44)
+
+Algebraic Data Type: a kind of composite type, i.e. Tree, Tuple.
+- a data type defined by one or more data constructors,
+- each of which may contain zero or more arguments,
+- so the data type is the sum or union of its data constructors,
+- and each data constructor is the product of its arguments,
+- hence the name algebraic data type.
+ADT, someties used for Abstract Data Type: a mathematical model for data types.
+
+/\
+Why making public the internal representation of a type (ADT) not violate encapsulation?
+(3.5,p46)
+
+Making public the internal representation of a type (ADT) not violate encapsulation because:
+- in FP there is no mutable state,
+- so exposing publicly not lead to bugs or violation of invariants.
+
+/\
+Why do exceptions break referential transparency?
+(4.1,p49)
+
+def failingFn(i: Int): Int = {
+  val y: Int = throw new Exception("fail!")
+  try {
+    1 + y
+  }
+  catch { case e: Exception => 1 }
+}
+failingFn(1)
+
+vs.
+
+def failingFn(i: Int): Int = {
+  try {
+    1 + ((throw new Exception("fail!")): Int)
+  }
+  catch { case e: Exception => 1 }
+}
+failingFn(1)
+
+/\
+Why aren't exceptions type-safe?
+(4.1,p50)
+
+Exceptions aren't type-safe because:
+- the type, i.e. Int => Int tells nothing about the fact that exceptions may occur,
+- compiler will not force callers to make a decision about how to handle exceptions,
+- an exception will be detected at runtime.
+
+/\
+Why checked exceptions don't work for higher-order functions?
+(4.1,p50)
+
+i.e. def map[A,B](l: List[A])(f: A => B): List[B]
+How would map know what exceptions were possible?
+
+/\
+List benefit of exceptions.
+(4.1,p50)
+
+- consolidate and centralize error-handling logic.
+
+/\
+Discuss an alternative to exceptions.
+(4.1,p50)
+
+- instead of throwing an exception, return a value indicating that an exceptional condition has occurred,
+- instead of using error codes (C), introduce a new generic type for "possibly defined values",
+- use higher-order functions to encapsulate common patterns of handling and propagating errors.
+
+/\
+What is "a partial function"?
+(4.2,p51)
+
+The partial function:
+- not defined for some inputs,
+- not terminate for some inputs.
+
+/\
+List the drawbacks of using some kind of error value.
+(4.2,p51)
+
+- silent errors propagation,
+- boilerplate code (whether the caller has received a "real" result),
+- not for polymorphic code (not always exists error value),
+- when suppling error value, immediate callers have direct knowledge of how to handle error.
+
+/\
+What is "Option"?
+(4.3,p52)
+
+- scala.Option
+- represents optional values,
+- an instance of scala.Some or the object None.
+
+/\
+Example of using Option (as a collection or monad).
+(https://www.scala-lang.org/api/current/scala/Option.html)
+
+val maybe: Option[String] = None
+val processed = maybe map { _.trim } filter { _.length != 0 } map { _.toUpperCase } getOrElse "none"
+println(processed)
+
+/\
+Example of using Option (pattern matching).
+(https://www.scala-lang.org/api/current/scala/Option.html)
+
+val maybe: Option[String] = None
+maybe match {
+  case Some(name) => println(name.trim.toUpperCase)
+  case None => println("none")
+}
+
+/\
+Implement Option data type.
+(4.3,p52)
+(https://github.com/astorije/fpinscala-exercises/blob/master/src/main/scala/ch4errorhandling/Option.scala)
+
+sealed trait Option[+A] {
+  def map[B](f: A => B): Option[B] = this match {
+    case None    => None
+    case Some(a) => Some(f(a))
+  }
+  def flatMap[B](f: A => Option[B]): Option[B] = map(f) getOrElse None
+  def foreach[U](f: A => U) = this match {
+    case None    => {}
+    case Some(a) => f(a)
+  }
+  def filter(f: A => Boolean): Option[A] = flatMap((a: A) => if (f(a)) Some(a) else None)
+  def getOrElse[B >: A](default: => B): B = this match {
+    case None    => default
+    case Some(a) => a
+  }
+  def orElse[B >: A](ob: => Option[B]): Option[B] = map(Some(_)) getOrElse ob
+}
+
+case class Some[+A](get: A) extends Option[A]
+case object None extends Option[Nothing]
+
+/\
+Implement Option.try.
+(https://github.com/astorije/fpinscala-exercises/blob/master/src/main/scala/ch4errorhandling/Option.scala)
+
+object Option {
+  def Try[A](a: => A): Option[A] =
+    try Some(a)
+    catch { case e: Exception => None }
+}
+
+/\
+Implement Option.mean.
+(https://github.com/astorije/fpinscala-exercises/blob/master/src/main/scala/ch4errorhandling/Option.scala)
+
+object Option {
+  def mean(xs: Seq[Double]): Option[Double] =
+    if (xs.isEmpty) None
+    else Some(xs.sum / xs.length)
+}
+
+/\
+Implement Option.variance.
+(https://github.com/astorije/fpinscala-exercises/blob/master/src/main/scala/ch4errorhandling/Option.scala)
+(4.3.1,p55)
+
+object Option {
+  def variance(xs: Seq[Double]): Option[Double] =
+    mean(xs).flatMap(m => mean(xs.map(x => math.pow(x - m, 2))))
+}
+
+/\
+How to convert the None case of an Option back to an exception?
+(4.3.1,p56)
+
+o.getOrElse(throw new Exception("FAIL"))
+
+/\
+What is the type of "_"?
+def lift[A,B](f: A => B): Option[A] => Option[B] = _ map f
+(4.3.2,p56)
+
+Option.
+Function A => B is transformed to function Option[A] => Option[B].
+Where Option[A] is argument, "_ map f" is body.
+
+/\
+How to transform:
+A => B
+->
+Option[A] => Option[B]
+(4.3.2,p56)
+
+def lift[A, B](f: A => B): Option[A] => Option[B] = _ map f
+val absOption: Option[Double] => Option[Double] = lift(math.abs)
+absOption(None)
+absOption(Some(-1.5))
+
+/\
+How to make binary function "Option-aware"?
+(https://github.com/astorije/fpinscala-exercises/blob/master/src/main/scala/ch4errorhandling/Option.scala)
+(4.3.2,p58)
+
+object Option {
+  def map2[A, B, C](a: Option[A], b: Option[B])(f: (A, B) => C): Option[C] =
+    a flatMap (aa => b map (bb => f(aa, bb)))
+}
+val optOne = Some(1)
+val optTwo = Some(2)
+Option.map2(optOne, optTwo)(java.lang.Math.max)
+
+// for-comprehensions in place of explicit calls to flatMap and map:
+object Option {
+  def map2[A, B, C](a: Option[A], b: Option[B])(f: (A, B) => C): Option[C] =
+    for {
+      aa <- a
+      bb <- b
+    } yield f(aa, bb)
+}
+
+/\
+What is "a for-comprehension"?
+(4.3.2,p58)
+
+"a for-comprehension":
+- a syntactic construct,
+- that expands automatically to a series of flatMap and map calls.
+
+object Option {
+  def map2[A, B, C](a: Option[A], b: Option[B])(f: (A, B) => C): Option[C] =
+    a flatMap (aa => b map (bb => f(aa, bb)))
+}
+val optOne = Some(1)
+val optTwo = Some(2)
+Option.map2(optOne, optTwo)(java.lang.Math.max)
+
+// for-comprehensions in place of explicit calls to flatMap and map:
+object Option {
+  def map2[A, B, C](a: Option[A], b: Option[B])(f: (A, B) => C): Option[C] =
+    for {
+      aa <- a
+      bb <- b
+    } yield f(aa, bb)
+}
+
+/\
+Implement Option.sequence (list of Options -> Option with list).
+(https://github.com/astorije/fpinscala-exercises/blob/master/src/main/scala/ch4errorhandling/Option.scala)
+(4.3.2,p59)
+
+object Option {
+  def map2[A, B, C](a: Option[A], b: Option[B])(f: (A, B) => C): Option[C] =
+    a.flatMap(va => b.map(vb => f(va, vb)))
+
+  def sequence[A](a: List[Option[A]]): Option[List[A]] =
+    a.foldRight[Option[List[A]]](Some(Nil))((oa, ob) => map2(oa, ob)(_ :: _))
+}
+
+/\
+What is wrong?
+def parseInts(a: List[String]): Option[List[Int]] = sequence(a map (i => Try(i.toInt)))
+(4.3.2,p59)
+(https://github.com/astorije/fpinscala-exercises/blob/master/src/main/scala/ch4errorhandling/Option.scala)
+
+This is inefficient, since it traverses the list twice.
+Better:
+object Option {
+  def map2[A, B, C](a: Option[A], b: Option[B])(f: (A, B) => C): Option[C] =
+    a.flatMap(va => b.map(vb => f(va, vb)))
+
+  def traverse[A, B](a: List[A])(f: A => Option[B]): Option[List[B]] =
+    a.foldRight[Option[List[B]]](Some(Nil))((x, y) => map2(f(x), y)(_ :: _))
+}
+
+/\
+Implement Option.sequenceViaTraverse.
+(https://github.com/astorije/fpinscala-exercises/blob/master/src/main/scala/ch4errorhandling/Option.scala)
+
+object Option {
+  def sequenceViaTraverse[A](a: List[Option[A]]): Option[List[A]] =
+    traverse(a)(x => x)
+}
+
+/\
+What is wrong with "Option"?
+(4.4p60)
+
+"Option" doesn't tell anything about what went wrong in the case of an exceptional condition.
+Use "Either" data type.
+
+/\
+Implement "Either".
+(4.4,p60)
+
+sealed trait Either[+E, +A] {
+  def map[B](f: A => B): Either[E, B] = this match {
+    case Left(e)  => Left(e)
+    case Right(a) => Right(f(a))
+  }
+  def flatMap[EE >: E, B](f: A => Either[EE, B]): Either[EE, B] = this match {
+    case Left(e)  => Left(e)
+    case Right(a) => f(a)
+  }
+  def orElse[EE >: E, B >: A](b: => Either[EE, B]): Either[EE, B] = this match {
+    case Left(_)  => b
+    case Right(a) => Right(a)
+  }
+  def map2[EE >: E, B, C](b: Either[EE, B])(f: (A, B) => C): Either[EE, C] =
+    flatMap(a => b.map(bb => f(a, bb)))
+}
+
+case class Left[+E](value: E) extends Either[E, Nothing]
+case class Right[+A](value: A) extends Either[Nothing, A]
+
+/\
+How to make binary function "Either-aware"?
+(4.4,p60)
+
+object Either {
+  def map2[E, A, B, C](a: Either[E, A], b: Either[E, B])(f: (A, B) => C): Either[E, C] =
+    a flatMap (aa => b map (bb => f(aa, bb)))
+}
+val thOne = Right(1)
+val thTwo = Right(2)
+Either.map2(thOne, thTwo)(java.lang.Math.max)
+thOne.map2(thTwo)(java.lang.Math.max) // if in trait Either
+
+// for-comprehensions in place of explicit calls to flatMap and map:
+object Option {
+  def map2[A, B, C](a: Option[A], b: Option[B])(f: (A, B) => C): Option[C] =
+    for {
+      aa <- a
+      bb <- b
+    } yield f(aa, bb)
+}
+
+/\
+Implement Either.try.
+(4.4,p61)
+
+object Either {
+  def Try[A](a: => A): Either[Exception, A] =
+    try Right(a)
+    catch { case e: Exception => Left(e) }
+}
+
+/\
+Implement Either.sequence (list of Eithers -> Either with list).
+(https://github.com/astorije/fpinscala-exercises/blob/master/src/main/scala/ch4errorhandling/Option.scala)
+(4.4,p62)
+
+object Either {
+  def map2[E, A, B, C](a: Either[E, A], b: Either[E, B])(f: (A, B) => C): Either[E, C] =
+    a flatMap (aa => b map (bb => f(aa, bb)))
+
+  def sequence[E, A](es: List[Either[E, A]]): Either[E, List[A]] =
+    es.foldRight[Either[E, List[A]]](Right(Nil))(
+      (e: Either[E, A], acc: Either[E, List[A]]) => e.map2(acc)(_ :: _))
+}
+
+/\
+Implement Either.traverse (list of Eithers -> Either with list).
+(https://github.com/astorije/fpinscala-exercises/blob/master/src/main/scala/ch4errorhandling/Option.scala)
+(4.4,p62)
+
+object Either {
+  def map2[E, A, B, C](a: Either[E, A], b: Either[E, B])(f: (A, B) => C): Either[E, C] =
+    a flatMap (aa => b map (bb => f(aa, bb)))
+
+  def traverse[E, A, B](as: List[A])(f: A => Either[E, B]): Either[E, List[B]] =
+    as.foldRight[Either[E, List[B]]](Right(Nil))(
+      (a: A, acc: Either[E, List[B]]) => f(a).map2(acc)(_ :: _))
+}
+
+/\
+List ways of using "Either".
+(4.4,p60)
+
+1.
+Handling errors without exceptions.
+An alternative to scala.Option for dealing with possibly missing values.
+A scala.util.Left can contain useful information about error.
+
+2.
+To encode one of two possibilities in cases where it isn't worth defining a new data type.
+
+/\
+What is non-strictness?
+(5.1,p65)
+
+Non-strictness is a property of a function.
+
+/\
+What is "a non-strict function"?
+(5.1,p65)
+
+"a non-strict function" is a function that may choose not to evaluate one or more of its arguments.
+
+/\
+What is "a strict function"?
+(5.1,p65)
+
+"a strict function" is a function that always evaluate its arguments.
+
+/\
+Example of "non-strictness":
+(5.1,p66)
+
+- the short-circuiting Boolean functions: val result = false && { sys.error("never"); true }
+- the if control construct: val result = if (true) "ok" else sys.error("never")
+
+/\
+What is "thunk"?
+(5.1,p66)
+
+"thunk" is the unevaluated form of an expression.
+
+/\
+Write "strict function" using "thunk" (almost "non-strict functions").
+(5.1,p66)
+
+def if2[A](cond: Boolean, onTrue: () => A, onFalse: () => A): A = if (cond) onTrue() else onFalse()
+if2(true, () => println("a"), () => println("b"))
+a
+
+/\
+Example of "a non-strict function":
+(5.1,p67)
+
+Use an arrow "=>":
+def if3[A](cond: Boolean, onTrue: => A, onFalse: => A): A = if (cond) onTrue else onFalse
+if3(true, println("a"), sys.error("never"))
+a
+
+/\
+Run:
+def foo(a: => Int) : Int = a + a
+foo({println("ok"); 1})
+(5.1,p67)
+
+An argument that is passed unevaluated to a function will be evaluated once for each place it is referenced in the body of the function.
+ok
+ok
+2
+
+/\
+Improve to evaluate once:
+def foo(a: => Int) : Int = a + a
+foo({println("ok"); 1})
+(5.1,p67)
+
+Use "lazy" to a val (to caching the result):
+def foo(a: => Int) : Int = {
+  lazy val aa = a
+  aa + aa
+}
+foo({println("ok"); 1})
+ok
+2
+
+/\
+Implement Stream.
+(5.2,p68)
+
+sealed trait Stream[+A] {
+  def headOption: Option[A] = this match {
+    case Empty      => None
+    case Cons(h, t) => Some(h())
+  }
+}
+case object Empty extends Stream[Nothing]
+case class Cons[+A](h: () => A, t: () => Stream[A]) extends Stream[A]
+
+implicit class ByName[T](getValue: => T) extends Proxy {
+  def apply(): T = getValue
+  def self = apply()
+}
+
+object Stream {
+  // returns Stream as type, not Cons or Empty
+  def cons[A](hd: => A, tl: => Stream[A]): Stream[A] = {
+    lazy val head = hd
+    lazy val tail = tl
+    Cons(() => head, () => tail)
+  }
+  def empty[A]: Stream[A] = Empty
+  // have same type after erasure
+  def apply2[A](as: A*): Stream[A] =
+    if (as.isEmpty) empty else cons(as.head, apply2(as.tail: _*))
+  def apply[A](as: ByName[A]*): Stream[A] =
+    if (as.isEmpty) empty else cons(as(0).self, apply(as.tail: _*))
+}
+
+val x: Stream[Int] = Cons(() => { println("long operation"); 1 }, () => Empty)
+x.headOption // long operation
+x.headOption // long operation
+
+val y: Stream[Int] = Stream({ println("long operation"); 1 }, 2, 3) // long operation
+y.headOption
+y.headOption
+
+val z: Stream[Int] = Stream(ByName({ println("long operation"); 1 }), ByName(2), ByName(3))
+z.headOption // long operation
+z.headOption
+
+/\
+What is "a smart constructor"?
+(5.2.1,p69)
+
+"A smart constructor":
+- a function that provides something extra (validation, performance) compared to the "real" constructor,
+- by convention, smart constructors typically lowercase the first letter.
+
+object Stream {
+  def cons[A](hd: => A, tl: => Stream[A]): Stream[A] = {
+    lazy val head = hd
+    lazy val tail = tl
+    Cons(() => head, () => tail)
+  }
+}
+
+/\
+Write "toList" inside Stream trait.
+(5.2.1,p69)
+
+sealed trait Stream[+A] {
+  def toList: List[A] = this match {
+    case Cons(h, t) => h() :: t().toList
+    case Empty      => Nil
+  }
+}
+
+/\
+Write "take" inside Stream trait.
+(5.2.1,p70)
+
+sealed trait Stream[+A] {
+  def take(n: Int): Stream[A] = this match {
+    case Cons(h, _) if n == 1 => cons(h(), Empty)
+    case Cons(h, t) if n > 0  => cons(h(), t().take(n - 1))
+    case _                    => Empty
+  }
+}
+
+/\
+Write "drop" inside Stream trait.
+(5.2.1,p70)
+
+sealed trait Stream[+A] {
+  def drop(n: Int): Stream[A] = this match {
+    case Cons(_, t) if n == 1 => t()
+    case Cons(_, t) if n > 0  => t().drop(n - 1)
+    case _                    => this
+  }
+}
+
+/\
+Write "takeWhile" inside Stream trait.
+(5.2.1,p70)
+
+sealed trait Stream[+A] {
+  def takeWhile(p: A => Boolean): Stream[A] = this match {
+    case Cons(h, t) =>
+      val hh = h()
+      if (p(hh)) Stream.cons(hh, t().takeWhile(p))
+      else Empty
+    case _ => Empty
+  }
+}
+
+/\
+Write "exists" inside Stream trait (use recursion).
+(5.3,p70)
+
+// the tail is never executed
+sealed trait Stream[+A] {
+  def exists(p: A => Boolean): Boolean = this match {
+    case Cons(h, t) => p(h()) || t().exists(p)
+    case _          => false
+  }
+}
+
+/\
+Write "foldRight" inside Stream trait.
+(5.3,p71)
+
+sealed trait Stream[+A] {
+  def foldRight[B](z: => B)(f: (A, => B) => B): B =
+    this match {
+      case Cons(h, t) => f(h(), t().foldRight(z)(f))
+      case _          => z
+    }
+}
+
+/\
+Write "exists" inside Stream trait (use "foldRight").
+(5.3,p71)
+
+// the tail is never executed
+sealed trait Stream[+A] {
+  def foldRight[B](z: => B)(f: (A, => B) => B): B =
+    this match {
+      case Cons(h, t) => f(h(), t().foldRight(z)(f))
+      case _          => z
+    }
+  def exists(p: A => Boolean): Boolean =
+    foldRight(false)((a, b) => p(a) || b)
+}
+
+/\
+Write "forAll" inside Stream trait.
+(5.3,p71)
+
+sealed trait Stream[+A] {
+  def foldRight[B](z: => B)(f: (A, => B) => B): B =
+    this match {
+      case Cons(h, t) => f(h(), t().foldRight(z)(f))
+      case _          => z
+    }
+  def forAll(p: A => Boolean): Boolean =
+    foldRight(true)((a, b) => p(a) && b)
+}
+
+/\
+Write "takeWhile" inside Stream trait (use "foldRight").
+(5.3,p71)
+
+sealed trait Stream[+A] {
+  def foldRight[B](z: => B)(f: (A, => B) => B): B =
+    this match {
+      case Cons(h, t) => f(h(), t().foldRight(z)(f))
+      case _          => z
+    }
+  def takeWhile(p: A => Boolean): Stream[A] =
+    foldRight(Empty: Stream[A])((h, t) =>
+      if (p(h)) cons(h, t)
+      else Empty)
+}
+
+/\
+Write "headOption" inside Stream trait (use "foldRight").
+(5.3,p71)
+
+sealed trait Stream[+A] {
+  def foldRight[B](z: => B)(f: (A, => B) => B): B =
+    this match {
+      case Cons(h, t) => f(h(), t().foldRight(z)(f))
+      case _          => z
+    }
+  def headOption: Option[A] =
+    foldRight(None: Option[A])((a, _) => Some(a))
+}
+
+/\
+Write "map" inside Stream trait (use "foldRight").
+(5.3,p72)
+
+sealed trait Stream[+A] {
+  def foldRight[B](z: => B)(f: (A, => B) => B): B =
+    this match {
+      case Cons(h, t) => f(h(), t().foldRight(z)(f))
+      case _          => z
+    }
+  def map[B](f: A => B): Stream[B] =
+    foldRight(Empty: Stream[B])((h, t) => cons(f(h), t))
+}
+
+/\
+Write "filter" inside Stream trait (use "foldRight").
+(5.3,p72)
+
+sealed trait Stream[+A] {
+  def foldRight[B](z: => B)(f: (A, => B) => B): B =
+    this match {
+      case Cons(h, t) => f(h(), t().foldRight(z)(f))
+      case _          => z
+    }
+  def filter(p: A => Boolean): Stream[A] =
+    foldRight(Empty: Stream[A])((h, t) =>
+      if (p(h)) cons(h, t)
+      else t)
+}
+
+/\
+Write "append" inside Stream trait (use "foldRight").
+(5.3,p72)
+
+sealed trait Stream[+A] {
+  def foldRight[B](z: => B)(f: (A, => B) => B): B =
+    this match {
+      case Cons(h, t) => f(h(), t().foldRight(z)(f))
+      case _          => z
+    }
+  def append[B >: A](s: Stream[B]): Stream[B] =
+    foldRight(s)(cons(_, _))
+}
+
+/\
+Write "flatMap" inside Stream trait (use "foldRight").
+(5.3,p72)
+
+sealed trait Stream[+A] {
+  def foldRight[B](z: => B)(f: (A, => B) => B): B =
+    this match {
+      case Cons(h, t) => f(h(), t().foldRight(z)(f))
+      case _          => z
+    }
+  def flatMap[B](f: A => Stream[B]): Stream[B] =
+    foldRight(Empty: Stream[B])((h, t) => f(h).append(t))
+}
+
+/\
+Write "find" inside Stream trait (use "foldRight").
+(5.3,p73)
+
+sealed trait Stream[+A] {
+  def find(p: A => Boolean): Option[A] =
+    filter(p).headOption
+}
+
+/\
+Discuss the incremental nature of the stream transformation.
+(5.3,p73)
+
+- generate the requested elements only,
+- i.e.
+Stream(() => 1,() => 2,() => 3,() => {println("never"); 4}).map(_() + 10).filter(_ % 2 == 0).head
+List(() => 1,() => 2,() => 3,() => {println("unneeded "); 4}).map(_() + 10).filter(_ % 2 == 0).head
+- strams are called "first-class loops" (whose logic can be combined using higher-order functions like map and filter),
+- the stream requires only enough working memory to store and transform the current element.
+
+/\
+Example of infinite stream.
+(5.4,p73)
+
+val ones: Stream[Int] = Stream.cons(1, ones)
+ones.take(3).toList
+
+/\
+Write of infinite "constant" stream.
+(5.4,p74)
+
+def constant[A](a: A): Stream[A] = Stream.cons(a, constant(a))
+val as = constant('a')
+as.take(3).toList
+
+/\
+Write of infinite "from" stream (n, n + 1, n + 2, ...).
+(5.4,p74)
+
+def from(n: Int): Stream[Int] = Stream.cons(n, from(n + 1))
+val incs = from(1)
+incs.take(3).toList
+
+/\
+Write of infinite "fibs" stream.
+(5.4,p75)
+
+def fibs: Stream[Int] = {
+  def innerFibs(a: Int, b: Int): Stream[Int] = {
+    Stream.cons(a, innerFibs(b, a + b))
+  }
+  innerFibs(0, 1)
+}
+fibs.take(5).toList
+
+/\
+Write of infinite "unfold" stream.
+(5.4,p75)
+
+def unfold[A, S](z: S)(f: S => Option[(A, S)]): Stream[A] = f(z) match {
+  case Some((a, s)) => Stream.cons(a, unfold(s)(f))
+  case None         => Stream.Empty
+}
+def worker(a: Int): Option[(Int, Int)] = if (a < 10) Some(a, a + 1) else None
+unfold(1)(worker).force
+
+/\
+What is "a corecursive function"?
+(5.4,p75)
+
+- a recursive function consumes data,
+- terminate by recursing on smaller inputs,
+
+vs.
+- a corecursive function produces data,
+- no terminate as remain productive,
+- "unfold" function is productive as long as f terminates,
+- sometimes called "guarded recursion",
+- productivity sometimes called "cotermination".
+
+/\
+Discuss a memory sharing.
+(5.4,p75)
+
+Sharing memory in streams is delicate:
+- using sharing memory (recursive version consumes constant memory):
+val ones: Stream[Int] = Stream.cons(1, ones)
+ones.take(3).toList
+- not using sharing memory ("unfold"):
+unfold(1)(Int => Option(1, 1)).take(3).toList
+- not using:
+xs.map(x => x)
+
+/\
+Write of infinite "fibs" stream (use "unfold").
+(5.4,p75)
+
+sealed trait Stream[+A] {
+  def fibs: Stream[Int] =
+    unfold((0, 1))(x => Some((x._1, (x._2, x._1 + x._2))))
+}
+
+/\
+Write of infinite "from" stream (use "unfold").
+(5.4,p75)
+
+sealed trait Stream[+A] {
+  def from(n: Int): Stream[Int] =
+    unfold(n)(x => Some((x, x + 1)))
+}
+
+/\
+Write of infinite "constant" stream (use "unfold").
+(5.4,p75)
+
+sealed trait Stream[+A] {
+  def constant[A](a: A): Stream[A] =
+    unfold(a)(x => Some(x, x))
+}
+
+/\
+Write of infinite "ones" stream (use "unfold").
+(5.4,p75)
+
+sealed trait Stream[+A] {
+  val ones: Stream[Int] =
+    unfold(1)(x => Some(x, x))
+}
+
+/\
+Write of infinite "map" stream (use "unfold").
+(5.4,p76)
+
+sealed trait Stream[+A] {
+  def map[B](f: A => B): Stream[B] =
+    unfold(this) {
+      case Cons(h, t) => Some((f(h()), t()))
+      case Empty      => None
+    }
+}
+
+/\
+Write of infinite "take" stream (use "unfold").
+(5.4,p76)
+
+sealed trait Stream[+A] {
+  def take(n: Int): Stream[A] =
+    unfold((this, n))(x => x._1 match {
+      case Cons(h, t) if x._2 > 0 => Some((h(), (t(), x._2 - 1)))
+      case _                      => None
+    })
+}
+
+/\
+Write of infinite "takeWhile" stream (use "unfold").
+(5.4,p76)
+
+sealed trait Stream[+A] {
+  def takeWhile(p: A => Boolean): Stream[A] =
+    unfold(this) {
+      case Cons(h, t) if p(h()) => Some((h(), t()))
+      case _                    => None
+    }
+}
+
+/\
+Write of infinite "zipWith" stream (use "unfold").
+(5.4,p76)
+
+sealed trait Stream[+A] {
+  def zipWith[B, C](s2: Stream[B])(f: (A, B) => C): Stream[C] =
+    unfold((this, s2)) {
+      case (Cons(h1, t1), Cons(h2, t2)) => Some((f(h1(), h2()), (t1(), t2())))
+      case _                            => None
+    }
+}
+
+/\
+Write of infinite "zipAll" stream (use "unfold").
+(5.4,p76)
+
+sealed trait Stream[+A] {
+  def zipAll[B](s2: Stream[B]): Stream[(Option[A], Option[B])] =
+    unfold((this, s2)) {
+      case (Cons(h1, t1), Cons(h2, t2)) => Some((Some(h1()), Some(h2())), (t1(), t2()))
+      case (Cons(h1, t1), Empty)        => Some((Some(h1()), None: Option[B]), (t1(), Empty))
+      case (Empty, Cons(h2, t2))        => Some((None: Option[A], Some(h2())), (Empty, t2()))
+      case _                            => None
+    }
+}
+
+/\
+Write of infinite "zip" stream (use "unfold").
+(5.4,p76)
+
+sealed trait Stream[+A] {
+  def zip[B](s2: Stream[B]): Stream[(A, B)] =
+    zipWith(s2)((_, _))
+}
+
+/\
+Write of infinite "startsWith" stream (use some zip).
+(5.4,p76)
+
+sealed trait Stream[+A] {
+  def startsWith[A](s: Stream[A]): Boolean =
+    zipAll(s).takeWhile(_._2 != None).forAll {
+      case (Some(x), Some(y)) if x == y => true
+      case _                            => false
+    }
+}
+
+/\
+Write of infinite "tails" stream (use "unfold").
+i.e. S(1,2,3) -> S(S(1,2,3),S(2,3),S(3),S())
+(5.4,p76)
+
+sealed trait Stream[+A] {
+  def tails: Stream[Stream[A]] =
+    unfold(this)(x => x match {
+      case Cons(h, t) => Some(x, t())
+      case Empty      => None
+    }) append (Stream(Empty))
+}
+
+/\
+Write of infinite "hasSubsequence" stream.
+(5.4,p76)
+
+sealed trait Stream[+A] {
+  def hasSubsequence[A](s: Stream[A]): Boolean =
+    tails exists (_ startsWith s)
+}
+
+/\
+Generalize "tails" to the function "scanRight" for infinite stream.
+i.e. S(1,2,3) -> L(1+2+3+0, 2+3+0, 3+0, 0)
+(5.4,p76)
+
+sealed trait Stream[+A] {
+  def scanRight[B](z: => B)(f: (A, => B) => B): Stream[B] =
+    foldRight((z, Stream(z)))((a, b) => {
+      val b2 = f(a, b._1)
+      (b2, cons(b2, b._2))
+    })._2
+}
+
+/\
+Write "find" inside Stream trait (without "foldRight").
+(https://github.com/TheDom/functional-programming-in-scala/blob/master/src/main/scala/com/dominikgruber/fpinscala/chapter05/Stream.scala)
+
+sealed trait Stream[+A] {
+  @annotation.tailrec
+  final def find(f: A => Boolean): Option[A] = this match {
+    case Empty      => None
+    case Cons(h, t) => if (f(h())) Some(h()) else t().find(f)
+  }
+}
+
+/\
+Generate random numbers in Scala.
+(6.1,p78)
+
+val rng = new scala.util.Random(100)
+rng.nextInt(100)
+
+/\
+Implement w purely functional random number generator.
+(6.2,p81)
+
+trait RNG {
+  def nextInt: (Int, RNG)
+}
+case class SimpleRNG(seed: Long) extends RNG {
+  def nextInt: (Int, RNG) = {
+    val newSeed = (seed * 0x5DEECE66DL + 0xBL) & 0xFFFFFFFFFFFFL
+    val nextRNG = SimpleRNG(newSeed)
+    val n = (newSeed >>> 16).toInt
+    (n, nextRNG)
+  }
+}
+val rng = SimpleRNG(42)
+val (n1, rng2) = rng.nextInt
+val (n2, rng3) = rng2.nextInt
+
+/\
+Discuss an efficiency loss comes with computing next states using pure functions.
+(6.3,p81)
+
+- no mutate the data in place
+->
+- the state is just i.e. a single Long,
+- use efficient purely functional data structures,
+- mutate the data in place without breaking referential transparency. TODO: after part 4
+
+/\
+Write a function to generate a random integer [0, Int.maxValue).
+(6.3,p82)
+
+def nonNegativeInt(rng: RNG): (Int, RNG) = {
+  val (i, next) = rng.nextInt
+  if (i > 0) (i, next)
+  else if (i == Int.MinValue) (-(i + 1), next)
+  else (-i, next)
+}
+
+/\
+Write a function to generate a random double [0, 1).
+(6.3,p83)
+
+def double(rng: RNG): (Double, RNG) = {
+  val (i, next) = rng.nextInt
+  val d = 
+    if (i > 0) i / Int.MaxValue.toDouble
+    else i / Int.MinValue.toDouble
+  (d, next)
+}
+
+val rng = SimpleRNG(42)
+val (n1, rng2) = double(rng)
+val (n2, rng3) = double(rng2)
+
+/\
+Write a function to generate a list of random integers.
+(6.3,p83)
+
+// @annotation.tailrec
+def ints(count: Int)(rng: RNG): (List[Int], RNG) = {
+  if (count <= 0) (Nil, rng)
+  else {
+    val (x, rng2) = rng.nextInt
+    val (xs, rng3) = ints(count - 1)(rng2)
+    (x :: xs, rng3)
+  }
+}
+
+def ints(count: Int)(rng: RNG): (List[Int], RNG) = {
+  @annotation.tailrec
+  def loop(l: List[Int], count: Int, rng: RNG): (List[Int], RNG) = {
+    if(count <= 0) {
+      (l, rng)
+    } else {
+      val (i, next) = rng.nextInt
+      loop(i::l, count - 1, next)
+    }
+  }
+  loop(Nil, count, rng)
+}
+
+val rng = SimpleRNG(42)
+val a = ints(3)(rng)
+val b = ints(2)(rng)
+val c = ints(1)(b._2)
+assert(a._1.last == b._1.last)
+assert(a._1.head == c._1.head)
+assert(a._2 == c._2)
+
+/\
+What is "a state action"?
+(6.4,p84)
+
+The function a type of the form STATE => (VALUE, STATE).
+- also called state transition,
+- transform state from one to the next,
+- state actions can be combined using combinators,
+- combinators pass the state from one action to the next.
+
+/\
+Example of "a state action".
+(6.4,p84)
+
+trait RNG {
+  def nextInt: (Int, RNG)
+}
+type Rand[+A] = RNG => (A, RNG)
+// i.e.
+val int: Rand[Int] = _.nextInt
+def unit[A](a: A): Rand[A] = rng => (a, rng)
+
+A value of type Rand[A] is "a state action":
+- a program that depends on some RNG,
+- uses it to generate an A,
+- transitions the RNG to a new state.
+
+/\
+Write a function to generate a random double [0, 1) (use map).
+(6.4,p85)
+
+trait RNG {
+  def nextInt: (Int, RNG)
+}
+case class SimpleRNG(seed: Long) extends RNG {
+  def nextInt: (Int, RNG) = {
+    val newSeed = (seed * 0x5DEECE66DL + 0xBL) & 0xFFFFFFFFFFFFL
+    val nextRNG = SimpleRNG(newSeed)
+    val n = (newSeed >>> 16).toInt
+    (n, nextRNG)
+  }
+}
+
+type Rand[+A] = RNG => (A, RNG)
+def map[A,B](s: Rand[A])(f: A => B): Rand[B] =
+  rng => {
+    val (a, rng2) = s(rng)
+    (f(a), rng2)
+  }
+def s: Rand[Int] = rng => rng.nextInt
+def f(a: Int): Double = {
+  if (a > 0) a / Int.MaxValue.toDouble
+  else  a / Int.MinValue.toDouble
+}
+def double: Rand[Double] = map(s)(f)
+
+// RNG => (A, RNG)
+double(SimpleRNG(42))
+
+/\
+Write:
+def map2[A,B,C](ra: Rand[A], rb: Rand[B])(f: (A, B) => C): Rand[C]
+(6.4,p85)
+
+type Rand[+A] = RNG => (A, RNG)
+def map2[A,B,C](ra: Rand[A], rb: Rand[B])(f: (A, B) => C): Rand[C] = 
+  rng => {
+    val (a, rng2) = ra(rng)
+    val (b, rng3) = rb(rng2)
+    (f(a, b), rng3)
+  }
+
+def both[A,B](ra: Rand[A], rb: Rand[B]): Rand[(A,B)] = map2(ra, rb)((_, _))
+
+def double: Rand[Double] = map(s)(f)
+
+val randIntDouble: Rand[(Int, Double)] = both(nonNegativeInt, double)
+val randDoubleInt: Rand[(Double, Int)] = both(double, nonNegativeInt)
+
+// RNG => (A, RNG)
+randIntDouble(SimpleRNG(42))
+
+/\
+What is "a combinator"?
+(6.4,p84)
+
+- higher-order function,
+- allows to implement, in a succinct and elegant way, functions that were otherwise tedious and error-prone to write,
+- general-purpose function for working with state actions (unit, map, map2, flatMap, sequence),
+- to do not care about the type of the state.
+
+/\
+Write (tailrec):
+def sequence[A](fs: List[Rand[A]]): Rand[List[A]]
+(6.4,p85)
+
+def sequence[A](fs: List[Rand[A]]): Rand[List[A]] =
+  rng => {
+    @annotation.tailrec
+    def loop(fs: List[Rand[A]], acc: List[A], rng: RNG): (List[A], RNG) = {
+      fs match {
+        case Nil  => (acc, rng)
+        case h::t => {val a = h(rng); loop(t, a._1::acc, a._2)}
+      }
+    }
+    loop(fs, Nil, rng)
+  }
+
+val int: Rand[Int] = _.nextInt
+val r = sequence(List.fill(3)(int))(SimpleRNG(123))
+val r1 = sequence(List.fill(1)(int))(SimpleRNG(123))
+val r2 = sequence(List.fill(1)(int))(r1._2)
+val r3 = sequence(List.fill(1)(int))(r2._2)
+
+assert(r1._1.head == r._1(2))
+assert(r2._1.head == r._1(1))
+assert(r3._1.head == r._1(0))
+assert(r3._2 == r._2)
+
+/\
+Write (use map2):
+def sequence[A](fs: List[Rand[A]]): Rand[List[A]]
+(6.4,p85)
+
+def unit[A](a: A): Rand[A] = rng => (a, rng)
+def map2[A,B,C](ra: Rand[A], rb: Rand[B])(f: (A, B) => C): Rand[C] =
+  rng => {
+    val (a, rng1) = ra(rng)
+    val (b, rng2) = rb(rng1)
+    (f(a, b), rng2)
+  }
+def sequence[A](fs: List[Rand[A]]): Rand[List[A]] =
+  fs.foldRight(unit(List[A]())) { (f, acc) => map2(f, acc)(_ :: _) }
+
+val int: Rand[Int] = _.nextInt
+def ints(count: Int): Rand[List[Int]] = sequence(List.fill(count)(int))
+ints(3)(SimpleRNG(123))
+
+/\
+Write (use recursion):
+def sequence[A](fs: List[Rand[A]]): Rand[List[A]]
+(6.4,p85)
+
+def sequence[A](fs: List[Rand[A]]): Rand[List[A]] =
+  rng => {
+    // @annotation.tailrec
+    def loop(fs: List[Rand[A]], rng: RNG): (List[A], RNG) = {
+      fs match {
+        case Nil    => (Nil, rng)
+        case h :: t => { val a = h(rng); val b = loop(t, a._2); (a._1 :: b._1, b._2) }
+      }
+    }
+    loop(fs, rng)
+  }
+
+val int: Rand[Int] = _.nextInt
+val r = sequence(List.fill(3)(int))(SimpleRNG(123))
+val r1 = sequence(List.fill(1)(int))(SimpleRNG(123))
+val r2 = sequence(List.fill(1)(int))(r1._2)
+val r3 = sequence(List.fill(1)(int))(r2._2)
+
+assert(r1._1.head == r._1(0))
+assert(r2._1.head == r._1(1))
+assert(r3._1.head == r._1(2))
+assert(r3._2 == r._2)
+
+val r = sequence(List.fill(999)(int))(SimpleRNG(123))
+
+/\
+Write (use for):
+def sequence[A](fs: List[Rand[A]]): Rand[List[A]]
+(6.4,p85)
+
+def sequence[A](fs: List[Rand[A]]): Rand[List[A]] =
+  rng => {
+    var r = rng
+    (for (f <- fs) yield { val y = f(r); r = y._2; y._1 }, r)
+  }
+
+val int: Rand[Int] = _.nextInt
+val r = sequence(List.fill(3)(int))(SimpleRNG(123))
+val r1 = sequence(List.fill(1)(int))(SimpleRNG(123))
+val r2 = sequence(List.fill(1)(int))(r1._2)
+val r3 = sequence(List.fill(1)(int))(r2._2)
+
+assert(r1._1.head == r._1(0))
+assert(r2._1.head == r._1(1))
+assert(r3._1.head == r._1(2))
+assert(r3._2 == r._2)
+
+val r = sequence(List.fill(99999)(int))(SimpleRNG(123))
+
+/\
+Implement (without combinators):
+def nonNegativeLessThan(n: Int): Rand[Int]
+(6.4.2,p86)
+
+def nonNegativeLessThan(n: Int): Rand[Int] = { rng =>
+  val (i, rng2) = nonNegativeInt(rng)
+  val mod = i % n
+  if (i + (n-1) - mod >= 0)
+    (mod, rng2)
+  else nonNegativeLessThan(n)(rng)
+}
+
+/\
+Implement:
+def flatMap[A,B](f: Rand[A])(g: A => Rand[B]): Rand[B]
+(6.4.2,p87)
+
+def flatMap[A,B](f: Rand[A])(g: A => Rand[B]): Rand[B] =
+  rng => {
+    val (a, rng1) = f(rng)
+    g(a)(rng1)
+  }
+
+flatMap allows us to generate a random A with Rand[A],
+and then take that A 
+and choose a Rand[B] based on its value
+
+/\
+Implement (use flatMap):
+def nonNegativeLessThan(n: Int): Rand[Int]
+(6.4.2,p87)
+
+def nonNegativeLessThan(n: Int): Rand[Int] =
+  flatMap(nonNegativeInt) { i =>
+    val mod = i % n
+    if (i + (n - 1) - mod >= 0) unit(mod)
+      else nonNegativeLessThan(n)
+  }
+
+nonNegativeLessThan(10)(SimpleRNG(123))
+
+/\
+Implement (use flatMap):
+def map[A,B](s: Rand[A])(f: A => B): Rand[B] =
+(6.4.2,p87)
+
+def map[A,B](s: Rand[A])(f: A => B): Rand[B] = flatMap(s)(a => unit(f(a)))
+
+/\
+Implement (use flatMap):
+def map[A,B,C](ra: Rand[A], rb: Rand[B])(f: (A, B) => C): Rand[C]
+(6.4.2,p87)
+
+def map2ViaFlatMap[A,B,C](ra: Rand[A], rb: Rand[B])(f: (A, B) => C): Rand[C] =
+    flatMap(ra)(a => map(rb)(b => f(a, b)))
+
+/\
+Fix def rollDie: Rand[Int] = nonNegativeLessThan(6)
+(6.4.2,p87)
+
+def rollDie: Rand[Int] = nonNegativeLessThan(6)
+val zero = rollDie(SimpleRNG(5))._1
+zero: Int = 0
+->
+def rollDie: Rand[Int] = map(nonNegativeLessThan(6))(_ + 1)
+
+/\
+Implement a general state action data type (type alias).
+(6.5, p88)
+
+type State[S,+A] = S => (A,S)
+def map[S,A,B](a: S => (A,S))(f: A => B): S => (B,S) = ...
+def map2[S,A,B,C](ra: S => (A,S), rb: S => (B,S))(f: (A, B) => C): S => (C,S) = ...
+
+/\
+Implement a general state action data type (class).
+(6.5, p88)
+
+case class State[S,+A](run: S => (A,S)) {
+  import State._
+
+  def map[B](f: A => B): State[S,B] = flatMap(a => unit(f(a)))
+  def map2[B,C](sb: State[S,B])(f: (A, B) => C): State[S,C] = flatMap(a => sb.map(b => f(a, b)))
+  def flatMap[B](f: A => State[S,B]): State[S,B] =
+    State(s => {
+      val (a, s1) = run(s)
+      f(a).run(s1)
+    })
+}
+
+object State {
+  def unit[S,A](a: A): State[S, A] = State(s => (a, s))
+  def sequence[S,A](fs: List[State[S,A]]): State[S,List[A]] =
+    fs.foldRight(unit[S,List[A]](Nil)) { (f, acc) =>
+      f.map2(acc)(_ :: _)
+    }
+  def modify[S](f: S => S): State[S, Unit] = for {
+    s <- get
+    _ <- set(f(s))
+  } yield ()
+  def get[S]: State[S, S] = State(s => (s, s))
+  def set[S](s: S): State[S, Unit] = State(_ => ((), s))
+}
+
+
+/\
+What can be:
+type State[S,+A] = S => (A,S)
+?
+(6.5, p88)
+
+Here State is short for:
+- computation that carries some state along,
+- state action, state transition,
+- statement (TODO: next section).
+
+/\
+Write:
+type State[S,+A] = S => (A,S)
+as class.
+(6.5, p88)
+
+case class State[S,+A](run: S => (A,S))
+
+/\
+Write with "for":
+val ns: Rand[List[Int]] =
+  int.flatMap(x => 
+    int.flatMap(y => 
+      ints(x).map(xs => 
+        xs.map(_ % y))))
+(6.6, p89)
+
+val ns: Rand[List[Int]] = for {
+  x <- int
+  y <- int
+  xs <- ints(x)
+} yield xs.map(_ % y)
+
+/\
+How to express the stateful computation?
+(https://stackoverflow.com/questions/34559865/getting-and-setting-state-in-scala)
+
+case class State[S, +A](run: S => (A, S))
+- the stateful computation is expressed with the run function,
+- function represent a transition from one state S to another state S,
+- A is a value we could produce when moving from one state to the other.
+
+/\
+What is a state monad?
+(https://www.quora.com/What-is-a-state-monad)
+(https://en.wikipedia.org/wiki/Monad_(functional_programming)#State_monads)
+(https://www.quora.com/Why-is-the-state-monad-a-function)
+
+The State monad is an abstraction for a function that takes a state 
+and returns an intermediate value and some new state value.
+
+The State monad wraps computations in the context of reading and modifying a global state object.
+
+The two main state monad functions are get and put.
+
+The State monad allows us to have a global readable and writable state.
+By separating stateful code from pure code, pure code becomes easier to reason about.
+
+The state monad has to be the same kind of thing as any other monad, or we wouldn’t be able to write generic functions that work with monads.
+Monads aren't functions; they're data types with associated functions.
+There are functions to create monads, 
+functions to extract values from monads, 
+functions for lifting other functions into the monadic context, 
+functions for chaining monadic functions etc. 
+
+The state monad is not a function. 
+It is a data type which contains state, 
+coupled with functions that allow you to compose your own expressions within a pipeline that preserves that state and carries it from one function to the next.
+
+/\
+Explain:
+State.getClass
+State(fun).getClass
+(6.5, p88)
+
+1. companion object
+res1: Class[_ <: State.type] = class State$
+
+2. object of class
+res2: Class[_ <: State[SimpleRNG,Int]] = class State
+
+/\
+Explain:
+State.get
+State.get[Int]
+State(fun).get
+State.get(1)
+(6.5, p88)
+
+case class State[S,+A](run: S => (A,S)) {???}
+
+object State {
+  ???
+  def get[S]: State[S, S] = State(s => (s, s))
+}
+
+1. res1: State[Nothing,Nothing] = State(State$$$Lambda$3268/1030609845@6167a205)
+2. res2: State[Int,Int] = State(State$$$Lambda$3281/286102980@1a9d117e)
+3. get is not a member of State[SimpleRNG,Int]
+4. get does not take parameters
+
+/\
+Explain:
+State.get[Int]
+(6.5, p88)
+
+case class State[S,+A](run: S => (A,S))
+object State { def get[S]: State[S, S] = State(s => (s, s)) }
+val s = State.get[Int]
+s.run(10) // (10, 10)
+
+- returns object: State[Int,Int],
+- res1: State[Int,Int] = State(State$$$Lambda$3268/1030609845@6167a205)
+- combinator for getting the current state and returning is as the current state and the value,
+- useful because is a combinator.
+
+/\
+State monad example.
+(6.5, p88)
+
+- state monad is data type with associated function,
+- state monad is a data type which contains state,
+- coupled with functions,
+- that allow you to compose your own expressions within a pipeline,
+- that preserves that state and carries it from one function to the next.
+
+case class MyState(seed: Long) {
+  def nextInt: (Int, MyState) = {
+    val newSeed = (seed * 0x5DEECE66DL + 0xBL) & 0xFFFFFFFFFFFFL
+    val nextMyState = MyState(newSeed)
+    val n = (newSeed >>> 16).toInt
+    (n, nextMyState)
+  }
+}
+def fun(s: MyState): (Int, MyState) = s.nextInt
+case class StateMonad[S,+A](run: S => (A,S))
+StateMonad(fun).run(MyState(1))
+
+/\
+Rewrite with "for":
+val ns: Rand[List[Int]] =
+  int.flatMap(x =>
+    int.flatMap(y =>
+      ints(x).map(xs => xs.map(_ % y))))
+      
+where:
+Rand[A] is type alias for State[RNG, A])
+(6.6, p89)
+
+val ns: Rand[List[Int]] = for {
+  x <- int // generates an integer x
+  y <- int // generates an integer y
+  xs <- ints(x) // generates a list xs of length x
+} yield xs.map(_ % y)
+
+where:
+map and flatMap are defined
+
+an imperative program that maintains some state
+
+/\
+How to facilitate imperative programming with for-comprehensions (or flatMaps)?
+(6.6, p89)
+
+Implement two primitive State combinators:
+- one for reading the state,
+- one for writing the state.
+
+/\
+Write State combinator that can modify the state in arbitrary ways.
+(https://stackoverflow.com/questions/34559865/getting-and-setting-state-in-scala)
+(6.6, p90)
+
+object State {
+  def get[S]: State[S, S] = State(s => (s, s))
+  def set[S](s: S): State[S, Unit] = State(_ => ((), s))
+  def modify[S](f: S => S): State[S, Unit] = for {
+    s <- get
+    _ <- set(f(s))
+  } yield ()
+}
+
+def next(s: (Int, RNG)): (Int, RNG) = {
+  s._2.nextInt
+}
+
+val geted = State.get[Int]
+geted.run(10) // (Int, Int) = (10,10)
+val seted = State.set(1)
+seted.run(10) // (Unit, Int) = ((),1)
+
+
+
+s.run(1).set(1)
+
+s.set[Int]((1, SimpleRNG(42)))
+
+val a = State.modify(next)
+val rng = SimpleRNG(42)
+a.run(SimpleRNG(42).nextInt)
+
+/\
+Explein state operations.
+
+
+val statefullComputationsCombined = for {
+  a <- State.get[Int]
+  b <- State.set(10)
+  c <- State.get[Int]
+  d <- State.set(100)
+  e <- State.get[Int]
+} yield (a, c, e)
+
+statefullComputationsCombined.run(1)._1
+
+
+/\
+How to implement any kind of state machine or stateful program in a purely functional way?
+(6.6, p90)
+
+These two simple actions, together with the State combinators that we wrote—unit,
+map, map2, and flatMap—are all the tools we need to implement any kind of state
+machine or stateful program in a purely functional way.

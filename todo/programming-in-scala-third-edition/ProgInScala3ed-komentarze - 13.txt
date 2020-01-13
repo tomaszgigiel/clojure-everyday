@@ -1,0 +1,204 @@
+/\
+What is "packaging"?
+(13.1;p277)
+
+Below syntax is called a packaging:
+package pl.qux {
+  class Foo
+}
+
+/\
+Show example of packages.
+(13.2;p278)
+
+package pl.qux {
+  package bar {
+    class Foo
+    package tests {
+      class FooSuite
+    }
+  }
+}
+
+/\
+What is "chained package clauses"?
+(13.2;p280)
+
+The style of multiple package clauses without braces:
+
+package pl
+package qux
+
+class Foo
+
+/\
+How to access i.e. class, considering that a nested package shadows the top-level one?
+(13.2;p281)
+
+Use a package named _root_ that is outside any package a user can write, i.e.:
+
+package  foobar {
+  class Foo
+}
+
+package corge {
+  package  foobar {
+    package  qux {
+      class Bar {
+        val a = new _root_.foobar.Foo
+      }
+    }
+  }
+}
+
+/\
+How to import all member of package, class, all members of class?
+(13.3;p281)
+
+import foobar._
+import foobar.Foo
+import foobar.Foo._
+
+
+/\
+Why scala imports are flexible?
+(13.3;p283)
+
+In Scala, imports:
+- may appear anywhere,
+- may refer to objects (singleton or regular) in addition to packages,
+- let you rename and hide some of the imported members,
+- can import packages themselves, not just their non-package members.
+
+/\
+How to import and hide?
+(13.3;p283)
+
+
+This imports only Foo and Bar.
+
+/\
+How to import and hide or rename?
+(13.3;p283)
+
+import java.sql.{Date => SDate}
+import java.{sql => S}
+import foobar.{_}
+import foobar.{Foo, Bar}
+import foobar.{Foo => _, _}
+
+/\
+Which imports does scala add imlicitly to every program?
+(13.4;p285)
+
+import java.lang._
+import scala._
+import Predef._
+
+/\
+What is special in three implicit import clauses?
+(13.4;p286)
+
+The later imports overshadow earlier ones, i.e.:
+java.lang.StringBuilder
+scala.StringBuilder
+->
+StringBuilder == scala.StringBuilder
+
+/\
+Where is a private member accessible?
+(13.5;p286)
+
+A private member is accessible from:
+- the class or object that contains the member definition,
+- also definition of inner class.
+(In Java also an outer class can access private member of its inner class.)
+
+/\
+Explein:
+class Outer {
+  class Inner {
+    private def f() = { println("f") }
+    class InnerMost {
+      f() // ?1
+    }
+  }
+  (new Inner).f() // ?2
+}
+(13.5;p286)
+
+1 - OK
+2 - error: A member labeled private is visible only inside the class or object that contains the member definition. (In Java ok.)
+
+/\
+Where is a protected member accessible?
+(13.5;p287)
+
+A protected member is only accessible from subclasses of the class in which the member is defined.
+(In Java also in from other classes in the same package.)
+
+/\
+Show modifier for public members.
+(13.5;p287)
+
+Scala has no explicit modifier for public members: Any member not labeled private or protected is public.
+
+/\
+What does mean modifier of the form private[X] or protected[X]?
+(13.5;p288)
+
+A modifier of the form private[X] or protected[X] means that access is private or protected “up to” X, 
+where X designates some enclosing package, class or singleton object.
+
+/\
+How to define things that are visible in several sub-packages?
+(13.5;p289)
+
+package a.b.c.d
+  private [a.b.c] class Foo
+
+The class Foo is visible in all classes and objects that are contained in package "a", "a.b", "a.b.c".
+But package "a.b.c.d" and others cannot access class Foo.
+
+/\
+What is "object-private"?
+(13.5;p289)
+
+A definition labeled private[this].
+Is accessible only from within the same object that contains the definition.
+
+/\
+Describe access rights a class and its companion object.
+(13.5;p289)
+
+A class shares all its access rights with its companion object and vice versa.
+
+/\
+What is "package object"?
+(13.6;p291)
+
+- object to share to all in package,
+- a special kind of object scoped at the level of the package,
+- any definitions placed in a package object are considered members of the package itself,
+- max one package object in package,
+- compiled to class files named "package.class" (sic!).
+
+/\
+How to put common code in Scala package objects?
+(http://alvinalexander.com/scala/scala-package-objects-how-to-name-location-cookbook-recipe)
+(13.6;p291)
+
+By convention, create a file named package.scala (sic!) in the directory where you want your code to be available.
+
+package foo.bar
+
+package object qux {
+  val MAGIC_NUM = 42
+  def echo(a: Any) { println(a) }
+  object Margin extends Enumeration {
+    type Margin = Value
+    val TOP, BOTTOM, LEFT, RIGHT = Value
+  }
+  type MutableMap[K, V] = scala.collection.mutable.Map[K, V]
+  val MutableMap = scala.collection.mutable.Map
+}

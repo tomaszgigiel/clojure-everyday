@@ -1,0 +1,161 @@
+/\
+What is trait?
+(12;p257)
+
+unit of code reuse
+encapsulates method and field definitions
+cannot have any “class” parameters
+super calls are dynamically bound
+class can mix in any number of traits
+
+/\
+Show example od trait.
+(12.1;p257)
+
+trait Philosophical {
+  def philosophize() = {
+    println("I consume memory, therefore I am!")
+  }
+}
+
+/\
+Difference between mixed in using the extends or with.
+(12.1;p258)
+
+In extends class implicitly inherit the trait’s superclass (i.e. AnyRef).
+
+/\
+Show example of mix in.
+(12.1;p259)
+
+class Animal
+trait Philosophical
+trait HasLegs
+
+class Frog extends Animal with Philosophical with HasLegs
+
+/\
+What is it about rich interfaces?
+(12.2;p261)
+
+Define a trait with a small number of abstract methods — the thin part of the trait’s interface — 
+and a potentially large number of concrete methods, all implemented in terms of the abstract methods.
+
+trait Rectangular {
+  def topLeft: Point
+  def bottomRight: Point
+  def left = topLeft.x
+  def right = bottomRight.x
+  def width = right left
+  // and many more geometric methods...
+}
+
+/\
+Why does Ordered trait not define equals?
+(12.4;p266)
+
+Because of type erasure, Ordered itself cannot do checking the type of the passed object.
+
+/\
+List two major use of traits
+(12.5;p266)
+
+- turning a thin interface into a rich one,
+- providing stackable modifications to classes.
+
+/\
+Show example of traits as stackable modifications.
+(12.5;p267)
+
+abstract class IntQueue {
+  def get(): Int
+  def put(x: Int)
+}
+
+class BasicIntQueue extends IntQueue {
+  private val buf = new scala.collection.mutable.ArrayBuffer[Int]
+  def get() = buf.remove(0)
+  def put(x: Int) = { buf += x }
+}
+
+trait Doubling extends IntQueue {
+  abstract override def put(x: Int) = { super.put(2 * x) }
+}
+
+class MyQueue extends BasicIntQueue with Doubling
+
+/\
+What is "abstract override"?
+(12.5;p268)
+
+The modifiers only allowed for members of traits.
+It means that the trait must be mixed into some class that has a concrete definition of the method in question.
+
+abstract class IntQueue {
+  def get(): Int
+  def put(x: Int)
+}
+
+class BasicIntQueue extends IntQueue {
+  private val buf = new scala.collection.mutable.ArrayBuffer[Int]
+  def get() = buf.remove(0)
+  def put(x: Int) = { buf += x }
+}
+
+trait Doubling extends IntQueue {
+  abstract override def put(x: Int) = { super.put(2 * x) }
+}
+
+class MyQueue extends BasicIntQueue with Doubling
+
+/\
+Show mixing in to named class and directly to new.
+(12.5;p269)
+
+class MyQueue extends BasicIntQueue with Doubling
+val queue = new MyQueue
+
+val queue = new BasicIntQueue with Doubling
+
+/\
+What is "mixin"?
+(12.5;p270)
+
+Once a trait is mixed into a class, you can alternatively call it a mixin.
+
+/\
+What is "linearization"?
+(12.6;p271)
+
+The technique to specify a single linear order for all of the ancestors of a class, 
+including the regular superclass chain and the parent chains of all of the traits.
+
+/\
+Show example of "linearization".
+(12.6;p273)
+
+class Animal
+trait Furry extends Animal
+trait HasLegs extends Animal
+trait FourLegged extends HasLegs
+class Cat extends Animal with Furry with FourLegged
+
+Animal -> AnyRef -> Any
+Furry -> Animal -> AnyRef -> Any
+FourLegged -> HasLegs -> Furry -> Animal -> AnyRef -> Any
+Cat -> FourLegged -> HasLegs -> Furry -> Animal -> AnyRef -> Any
+
+- draw UML class diagram,
+- class/trait only once,
+- mainly by inheritance order,
+- if level is te same, then the closer to left side this later.
+
+Traits further to the right take effect first.
+When any of these classes and traits invokes a method via super,
+the implementation invoked will be the first implementation to its right in the linearization.
+
+/\
+When a trait gains or loses a member, any classes that inherit from it ...
+(12.6;p274)
+
+must be recompiled, even if they have not changed.
