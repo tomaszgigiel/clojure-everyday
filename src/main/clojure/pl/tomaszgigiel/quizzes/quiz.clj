@@ -13,6 +13,7 @@
 
 (defmethod answer java.lang.String [message] (tst/is true message))
 (defmethod answer java.lang.Boolean [test] (tst/is test))
+(defmethod answer java.lang.Integer [test] (tst/is test))
 (defmethod answer :multi [test message] (tst/is test message))
 (defmethod answer :default [x] x)
 
@@ -26,3 +27,10 @@
   "question answer metadata"
   [q & body]
   (list 'tst/deftest (symbol (str q)) (cons 'tst/testing (cons q body))))
+
+(defmacro a-thrown
+ [test e]
+ ;(tst/is (thrown? java.lang.AssertionError (throw java.lang.AssertionError)))
+ ;(tst/is (thrown? Exception (throw Exception)))
+ ;(list `tst/is (list `tst/thrown? `java.lang.AssertionError ~test))
+)
