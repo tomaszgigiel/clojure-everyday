@@ -1,0 +1,180 @@
+﻿........................................................................
+Q
+What is "a gradient"?
+
+A
+The gradient:
+- of a scalar-valued differentiable function f of several variables, {\latex f: R^{n} \to R},
+- is the vector field,
+- is the vector-valued function {\latex \nabla f: R^{n} \to R},
+- whose value at a point p is the vector whose components are the partial derivatives of f at p.
+(∇ is nabla.)
+
+M
+https://en.wikipedia.org/wiki/Gradient
+
+........................................................................
+Q
+How a gradient can be interpreted?
+
+A
+The gradient can be interpreted as the "direction and rate of fastest increase".
+
+M
+https://en.wikipedia.org/wiki/Gradient
+
+........................................................................
+Q
+What is "a vector field"?
+
+A
+The vector field is an assignment of a vector to each point in a subset of space.
+Input: a space.
+Output: a space with a vector assigned to each point.
+
+M
+https://en.wikipedia.org/wiki/Vector_field
+
+........................................................................
+Q
+What is an example of "a vector field"?
+
+A
+a gravitational field,
+a magnetic field: the fieldlines can be revealed using small iron filings,
+a velocity field of a moving fluid: a velocity vector is associated to each point in the fluid.
+
+M
+https://en.wikipedia.org/wiki/Vector_field
+
+........................................................................
+Q
+What is "a vector-valued function"?
+
+A
+The vector-valued function (or a vector function) is an assignment of a vector to a scalar or a vector.
+Input: a scalar or vector.
+Output: a vector.
+
+M
+https://en.wikipedia.org/wiki/Vector-valued_function
+https://pl.wikipedia.org/wiki/Funkcja_wektorowa
+
+........................................................................
+Q
+What is an example of "a vector-valued function"?
+
+A
+- a parametric equation: defines a group of quantities as functions of one or more independent variables called parameters, i.e. in kinematics:
+-- displacement (przemieszczenie),
+-- velocity,
+-- acceleration.
+
+........................................................................
+Q
+Discuss: "a vector field" vs. "a vector-valued function".
+
+A.
+The vector field: function from each point to a vector.
+The vector-valued function: function from a scalar or a vector to a vector.
+In coordinates, "a vector field" on a domain in n-dimensional Euclidean space can be represented as "a vector-valued function" that associates an n-tuple of real numbers to each point of the domain.
+
+M
+https://en.wikipedia.org/wiki/Vector_field
+https://en.wikipedia.org/wiki/Vector-valued_function
+
+........................................................................
+Q
+What is "a value of the gradient"?
+
+A
+The value of the gradient at a point is a tangent vector - a vector at each point.
+
+M
+https://en.wikipedia.org/wiki/Gradient
+
+Q
+What is "∇"?
+
+A
+- nabla or del,
+- a convenient mathematical notation,
+- in the Cartesian coordinate system {\latex R^{n}},
+- with coordinates {\latex (x_{1},\dots ,x_{n})},
+- and standard basis {\latex \{{\vec  e}_{1}, \dots, {\vec  e}_{n}\}},
+- nabla is defined in terms of partial derivative operators as:
+{\latex \nabla = \sum_{i=1}^{n} {\vec {e}}_{i} {\partial \over \partial x_{i}}=\left({\partial \over \partial x_{1}}, \ldots, {\partial \over \partial x_{n}}\right)}
+
+M
+https://en.wikipedia.org/wiki/Del
+
+........................................................................
+Q
+What is "a gradient descent"?
+
+A
+Gradient descent:
+- is a first-order iterative optimization algorithm for finding the minimum of a function,
+- also known as steepest descent (but not "method of steepest descent"),
+- steps are proportional to the negative of the gradient (or approximate gradient) of the function at the current point.
+
+M
+https://en.wikipedia.org/wiki/Gradient_descent
+
+........................................................................
+Q
+What is "a gradient ascent"?
+
+A
+Gradient ascent:
+- like "a gradient descent",
+- but for finding the maximum of a function,
+- steps are proportional to the positive of the gradient (or approximate gradient) of the function at the current point.
+
+M
+https://en.wikipedia.org/wiki/Gradient_descent
+
+........................................................................
+Q
+Implement "a gradient descent" in Scala.
+
+A
+package pl.gigiel.miscellaneous
+
+import math._
+
+object GradientDescent extends App {
+  val curX = 6
+  val gamma = 0.01 // step size
+  val precision = 0.00001
+  val previousStepSize = 1 / precision
+
+  def df(x: Double): Double = 4 * pow(x, 3) - 9 * pow(x, 2)
+
+  def gradientDescent(precision: Double, previousStepSize: Double, curX: Double): Double = {
+    if (previousStepSize > precision) {
+      val newX = curX + -gamma * df(curX)
+      println(curX)
+      gradientDescent(precision, abs(newX - curX), newX)
+    } else curX
+  }
+
+  val ans = gradientDescent(precision, previousStepSize, curX)
+  println(s"The local minimum occurs at $ans")
+}
+
+// sbt console
+// :load C:\_tgl\workspace-scala\miscellaneous\src\main\scala\pl\gigiel\miscellaneous\GradientDescent.scala
+// GradientDescent.main(Array())
+// GradientDescent.result
+
+........................................................................
+Q
+Discuss "a step size".
+
+A
+too small: slow
+too big: never
+positive/negative: never
+
+........................................................................
