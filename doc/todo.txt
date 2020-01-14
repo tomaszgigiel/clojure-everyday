@@ -4,3 +4,4 @@ https://github.com/clojure/tools.analyzer.jvm
 https://randomseed.pl/pub/poczytaj-mi-clojure/
 /quizzes/todo/
 http://home.agh.edu.pl/~pszwed/wiki/lib/exe/fetch.php?media=med:med-w02.pdf
+https://pragprog.com/book/cjclojure/mastering-clojure-macros

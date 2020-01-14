@@ -10,11 +10,29 @@
 (qam
   (q "What is the difference between a quote and a syntax quote?")
   (q "What is the difference between \"'\" and \"`\"?")
-  (a false "todo")
+  (a "the single-quote operator:")
+  (a (= '(+ 1 2) (read-string "(+ 1 2)")) "1. yields the unevaluated form")
+  (a (= (let [x 1] '(+ ~x 2)) (read-string "(+ (clojure.core/unquote x) 2)")) "2. is not canceled out by the syntax-unquote operator")
+  (a (= (read-string "'(+ 1 2)") (read-string "(quote (+ 1 2))")) "3. syntax sugar")
+  (a "the syntax-quote operator:")
+  (a (= `(+ 1 2) (read-string "(clojure.core/+ 1 2)")) "1. yields the unevaluated form (with namespaces added)")
+  (a (= (let [x 1] `(+ ~x 2)) (read-string "(clojure.core/+ 1 2)")) "2. is canceled out by the syntax-unquote operator")
+  (a "3. no syntax sugar")
   (m "https://cljs.github.io/api/syntax/quote")
   (m "https://cljs.github.io/api/syntax/syntax-quote")
   (m "https://clojuredocs.org/clojure.core/quote")
-  (m "https://8thlight.com/blog/colin-jones/2012/05/22/quoting-without-confusion.html"))
+  (m "https://8thlight.com/blog/colin-jones/2012/05/22/quoting-without-confusion.html")
+  (m "https://stackoverflow.com/questions/26485514/clojure-difference-between-quote-and-syntax-quote"))
+
+(qam
+  (q "Discuss unquote.")
+  (a false "todo")
+  (m "https://clojuredocs.org/clojure.core/unquote"))
+
+(qam
+  (q "Discuss unquote-splicing.")
+  (a false "todo")
+  (m "https://clojuredocs.org/clojure.core/unquote-splicing"))
 
 (qam
   (q "Discuss the weird characters.")
