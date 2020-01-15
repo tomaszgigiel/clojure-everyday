@@ -2,7 +2,7 @@
   (:require [clojure.test :as tst])
   (:require [uncomplicate.fluokitten.core :as fluokitten])
   (:require [pl.tomaszgigiel.quizzes.test-config :as test-config])
-  (:require [pl.tomaszgigiel.quizzes.quiz :refer [qam q a m a-thrown]])
+  (:require [pl.tomaszgigiel.quizzes.quiz :refer [qam q a at m]])
   (:require [pl.tomaszgigiel.utils.misc :as misc]))
 
 (tst/use-fixtures :once test-config/once-fixture)
@@ -151,14 +151,9 @@
 (qam
   (q "How to constrain function with pre- or postconditions?")
   (a (defn foo [a b] {:pre [(not= a b) (int? a) (int? b)] :post [(even? %)]} (/ a b)))
-  ;(a-thrown (foo 1 1) java.lang.AssertionError)
-  ;(a (thrown? (foo 3 1) java.lang.AssertionError))
+  (at (foo 3 1) java.lang.AssertionError)
   (a (= (foo 4 2) 2))
   (m "Michael Fogus, Chris Houser: The Joy of Clojure, 2nd, page 146"))
-
-(tst/deftest todo-test
-  (tst/is (thrown? Exception (throw (Exception. "stuff"))))
-  (tst/is (= 5 (+ 2 3))))
 
 (qam
   (q "")

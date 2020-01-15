@@ -2,6 +2,7 @@
   (:require [clojure.string :as string])
   (:require [clojure.tools.logging :as log])
   (:require [pl.tomaszgigiel.quizzes.cmd :as cmd])
+  (:require [pl.tomaszgigiel.quizzes.parser :as parser])
   (:require [pl.tomaszgigiel.utils.misc :as misc])
   (:gen-class))
 

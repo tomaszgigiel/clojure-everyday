@@ -6,7 +6,8 @@
   :dependencies [[org.clojure/clojure "1.10.1"]
                  [org.clojure/tools.cli "0.4.2"]
                  [org.clojure/tools.logging "0.5.0"]
-                 [uncomplicate/fluokitten "0.9.1"]]
+                 [uncomplicate/fluokitten "0.9.1"]
+                 [instaparse/instaparse "1.4.10"]]
 
   :source-paths ["src/main/clojure"]
   :test-paths ["src/test/clojure"]
