@@ -33,7 +33,7 @@
 	</classpathentry>
 	<classpathentry exported="true" kind="con" path="ccw.LEININGEN_CONTAINER">
 		<attributes>
-			<attribute name="org.eclipse.jdt.launching.CLASSPATH_ATTR_LIBRARY_PATH_ENTRY" value="clojure-everyday/target/base+system+user+dev/native/linux/x86_64"/>
+			<attribute name="org.eclipse.jdt.launching.CLASSPATH_ATTR_LIBRARY_PATH_ENTRY" value="quizzes/target/base+system+user+dev/native/linux/x86_64"/>
 		</attributes>
 	</classpathentry>
 	<classpathentry exported="true" kind="lib" path="classes">

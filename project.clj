@@ -1,4 +1,4 @@
-(defproject clojure-everyday "1.0.0.0-SNAPSHOT"
+(defproject quizzes "1.0.0.0-SNAPSHOT"
   :description "quizzes: ask for everything, ultimately data for flashcards"
   :url "http://tomaszgigiel.pl"
   :license {:name "Apache License"
