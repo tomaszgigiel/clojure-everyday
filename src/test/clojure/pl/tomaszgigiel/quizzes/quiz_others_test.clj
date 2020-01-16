@@ -1,7 +1,7 @@
 (ns pl.tomaszgigiel.quizzes.quiz-others-test
   (:require [clojure.test :as tst])
   (:require [pl.tomaszgigiel.quizzes.test-config :as test-config])
-  (:require [pl.tomaszgigiel.quizzes.quiz :refer [qam q a m]])
+  (:require [pl.tomaszgigiel.quizzes.quiz :refer [qam q a at m]])
   (:require [pl.tomaszgigiel.utils.misc :as misc]))
 
 (tst/use-fixtures :once test-config/once-fixture)
@@ -77,4 +77,22 @@
   (a (require '(uncomplicate.fluokitten.core)))
   ;(a ((((uncomplicate.fluokitten.core/curry + 3) 1) 2) 3))
   (a false "todo")
+  (m ""))
+
+(qam
+  (q "Evaluate {:a 1 :a 2 :b 3}")
+  (at (read-string "{:a 1 :a 2 :b 3}") IllegalArgumentException)
+  (a "unable to compile source file")
+  (m ""))
+
+(qam
+  (q "Evaluate (into {:a 3} {:a 1 :b 2})")
+  (a (= {:a 1 :b 2} (into {:a 3} {:a 1 :b 2})))
+  (a false "why?")
+  (m ""))
+
+(qam
+  (q "Evaluate (into {:c 3} {:a 1 :b 2})")
+  (a (= {:c 3 :a 1 :b 2} (into {:c 3} {:a 1 :b 2})))
+  (a false "why?")
   (m ""))

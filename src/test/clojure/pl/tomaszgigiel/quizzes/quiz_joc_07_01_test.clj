@@ -1,4 +1,4 @@
-(ns pl.tomaszgigiel.quizzes.quiz-joc07-test
+(ns pl.tomaszgigiel.quizzes.quiz-joc-07-01-test
   (:require [clojure.test :as tst])
   (:require [uncomplicate.fluokitten.core :as fluokitten])
   (:require [pl.tomaszgigiel.quizzes.test-config :as test-config])
@@ -12,7 +12,7 @@
   (q "Show that complex types are functions of their elements.")
   (a (= ([:a :b] 0) :a) "vector is a function, index 0 is an argument")
   (a (= (map [:a :b :c :d :e] [0 2 4]) [:a :c :e]) "passing a vector as a function argument")
-  (m "Michael Fogus, Chris Houser: The Joy of Clojure, 2nd, page 136"))
+  (m "Michael Fogus, Chris Houser: The Joy of Clojure, 2nd, 7.1 Functions in all their forms, page 136"))
 
 (qam
   (q "Create custom dynamic OO system")
@@ -49,30 +49,30 @@
   (a (= (third [1 2 3]) 3))
   (a (defn fnth [n] (apply comp (cons first (take (dec n) (repeat rest))))) "the function fnth builds new functions on the fly based on its arguments")
   (a (= ((fnth 3 )[1 2 3]) 3))
-  (m "Michael Fogus, Chris Houser: The Joy of Clojure, 2nd, page 137"))
+  (m "Michael Fogus, Chris Houser: The Joy of Clojure, 2nd, 7.1 Functions in all their forms, page 137"))
 
 (qam
   (q "When are more than one open parenthesis in a row?")
   (a (= ((comp first rest rest) [1 2 3]) 3) "it is almost always because a function is creating and returning a function that is called immediately")
   (a (= ((partial + 5) 100 200) 305))
-  (m "Michael Fogus, Chris Houser: The Joy of Clojure, 2nd, page 138"))
+  (m "Michael Fogus, Chris Houser: The Joy of Clojure, 2nd, 7.1 Functions in all their forms, page 138"))
 
 (qam
   (q "When to use the comp (compose) function?")
   (a (= (map (comp keyword #(.toLowerCase %) name) '(a B C)) '(:a :b :c)) "if you need a function that applies a number of functions serially to the return of the former")
-  (m "Michael Fogus, Chris Houser: The Joy of Clojure, 2nd, page 138"))
+  (m "Michael Fogus, Chris Houser: The Joy of Clojure, 2nd, 7.1 Functions in all their forms, page 138"))
 
 (qam
   (q "Create function using partial function.")
   (a (= ((partial + 5) 100 200) 305) "built from the partial application of another function")
   (a (def sort-by-some-ratio (partial sort-by #(/ (:x %) (:y %)))))
   (a (= (sort-by-some-ratio [{:x 1 :y 1} {:x 1 :y 2} {:x 1 :y 3}]) [{:x 1 :y 3} {:x 1 :y 2} {:x 1 :y 1}]))
-  (m "Michael Fogus, Chris Houser: The Joy of Clojure, 2nd, page 138"))
+  (m "Michael Fogus, Chris Houser: The Joy of Clojure, 2nd, 7.1 Functions in all their forms, page 138"))
 
 (qam
   (q "Write equivalent to ((partial + 5) 100 200) with apply.")
   (a (= ((partial + 5) 100 200) (#(apply + 5 %&) 100 200) 305))
-  (m "Michael Fogus, Chris Houser: The Joy of Clojure, 2nd, page 139"))
+  (m "Michael Fogus, Chris Houser: The Joy of Clojure, 2nd, 7.1 Functions in all their forms, page 139"))
 
 (qam
   (q "How to implement currying in clojure?")
@@ -96,19 +96,19 @@
 (qam
   (q "Create function using complement.")
   (a ((complement even?) 1) "takes a function that returns a truthy value and returns the opposite truthy value")
-  (m "Michael Fogus, Chris Houser: The Joy of Clojure, 2nd, page 139"))
+  (m "Michael Fogus, Chris Houser: The Joy of Clojure, 2nd, 7.1 Functions in all their forms, page 139"))
 
 (qam
   (q "Write equivalent to (complement even?) 2) with comp.")
   (a (= ((complement even?) 1) ((comp not even?) 1) (#(not (even? %)) 1)))
-  (m "Michael Fogus, Chris Houser: The Joy of Clojure, 2nd, page 139"))
+  (m "Michael Fogus, Chris Houser: The Joy of Clojure, 2nd, 7.1 Functions in all their forms, page 139"))
 
 (qam
   (q "Example that a function is data.")
   (a "clojure.test stores and validates unit tests in the metadata of a var holding a function")
   (a (defn foo {:test (fn [] (assert (= (foo) "foo")))} [] "foo"))
   (a (test #'foo))
-  (m "Michael Fogus, Chris Houser: The Joy of Clojure, 2nd, page 139"))
+  (m "Michael Fogus, Chris Houser: The Joy of Clojure, 2nd, 7.1 Functions in all their forms, page 139"))
 
 (qam
   (q "How to assign metadata to a function using the defn macro?")
@@ -116,7 +116,7 @@
   (a (defn ^:something ^:something-else foo [] "foo"))
   (a (defn ^{:something true, :something-else true} foo [] "foo"))
   (a (defn foo ([] "foo") {:something true :something-else true}))
-  (m "Michael Fogus, Chris Houser: The Joy of Clojure, 2nd, page 139"))
+  (m "Michael Fogus, Chris Houser: The Joy of Clojure, 2nd, 7.1 Functions in all their forms, page 139"))
 
 (qam
   (q "Example use of functions as argument")
@@ -124,7 +124,7 @@
   (a (= (reduce #(conj %1 (second %2)) [] [[:a 3] [:b 2] [:c 1]]) [3 2 1]))
   (a (= (filter #(-> % second odd?) [[:a 3] [:b 2] [:c 1]]) [[:a 3] [:c 1]]))
   (a (= (sort-by second [[:a 3] [:b 2] [:c 1]]) [[:c 1] [:b 2] [:a 3]]))
-  (m "Michael Fogus, Chris Houser: The Joy of Clojure, 2nd, page 141"))
+  (m "Michael Fogus, Chris Houser: The Joy of Clojure, 2nd, 7.1 Functions in all their forms, page 141"))
 
 (qam
   (q "Sort rows based on selected columns.")
@@ -133,7 +133,7 @@
   (a (= (compare [1 3] [2 3]) -1) "vector is a closure function, so it implements the java.util.Comparator interface")
   (a "sort-by uses compare")
   (a (= (sort-by (columns [:x :z]) [{:x 2 :y 3 :z 2}{:x 2 :y 2 :z 1}{:x 1 :y 1 :z 3}]) [{:x 1 :y 1 :z 3}{:x 2 :y 2 :z 1}{:x 2 :y 3 :z 2}]))
-  (m "Michael Fogus, Chris Houser: The Joy of Clojure, 2nd, page 143"))
+  (m "Michael Fogus, Chris Houser: The Joy of Clojure, 2nd, 7.1 Functions in all their forms, page 143"))
 
 (qam
   (q "Example of a function with named arguments.")
@@ -141,36 +141,45 @@
   (a (= (slope :p1 [4 15] :p2 [3 21]) -6.0))
   (a (= (slope :p2 [2 1]) 0.5))
   (a (= (slope) 1.0))
-  (m "Michael Fogus, Chris Houser: The Joy of Clojure, 2nd, page 146"))
+  (m "Michael Fogus, Chris Houser: The Joy of Clojure, 2nd, 7.1 Functions in all their forms, page 146"))
 
 (qam
   (q "Which mechanism forms the basis for named parameters?")
   (a "the destructuring mechanism")
-  (m "Michael Fogus, Chris Houser: The Joy of Clojure, 2nd, page 146"))
+  (m "Michael Fogus, Chris Houser: The Joy of Clojure, 2nd, 7.1 Functions in all their forms, page 146"))
 
 (qam
   (q "How to constrain function with pre- or postconditions?")
-  (a (defn foo [a b] {:pre [(not= a b) (int? a) (int? b)] :post [(even? %)]} (/ a b)))
-  (at (foo 3 1) java.lang.AssertionError)
-  (a (= (foo 4 2) 2))
-  (m "Michael Fogus, Chris Houser: The Joy of Clojure, 2nd, page 146"))
+  (a (defn foo [a b] {:pre [(int? a) (int? b) (not= b 0)] :post [(even? %)]} (/ a b)))
+  (at (foo 2 0) java.lang.AssertionError)
+  (a (= (foo 2 1) 2))
+  (m "Michael Fogus, Chris Houser: The Joy of Clojure, 2nd, 7.1 Functions in all their forms, page 146"))
 
 (qam
-  (q "")
-  (a "")
-  (m ""))
+  (q "How to turn off :pre and :post checks for a specific file?")
+  (a "- add the line (set! *assert* false) to a source file")
+  (a "- somewhere near the top")
+  (a "- but after the namespace declaration")
+  (m "Michael Fogus, Chris Houser: The Joy of Clojure, 2nd, 7.1 Functions in all their forms, page 147"))
 
 (qam
-  (q "")
-  (a "")
-  (m ""))
+  (q "How to use assert instead pre- or postconditions?")
+  (a (defn foo [a b] (assert (and (int? a) (int? b) (not= b 0))) (let [r (/ a b)] (assert (even? r)) r)))
+  (at (foo 2 0) java.lang.AssertionError)
+  (a (= (foo 2 1) 2))
+  (m "Michael Fogus, Chris Houser: The Joy of Clojure, 2nd, 7.1 Functions in all their forms, page 147"))
 
 (qam
-  (q "")
-  (a "")
-  (m ""))
+  (q "Example of decoupling assertions from functions.")
+  (a (defn put-things [m] (into m {:meat "beef" :veggie "broccoli"})))
+  (a (defn vegan-constraints [f m] {:pre [(:veggie m)] :post [(:veggie %) (nil? (:meat %))]} (f m)))
+  (at (vegan-constraints put-things {:fruit "apple"}) java.lang.AssertionError)
+  (a (defn balanced-diet [f m] {:post [(:meat %) (:veggie %)]} (f m)))
+  (a (= {:fruit "apple" :meat "beef" :veggie "broccoli"} (balanced-diet put-things {:fruit "apple"})))
+  (m "Michael Fogus, Chris Houser: The Joy of Clojure, 2nd, 7.1 Functions in all their forms, page 147"))
 
 (qam
-  (q "")
-  (a "")
-  (m ""))
+  (q "What is main adventage of pulling out the assertions into a wrapper function?")
+  (a "you detach some domain-specific requirements from a potentially globally useful function and isolate them in aspects")
+  (a "you can mix in any implementation you please, knowing that as long as it fulfills the contract its interposition is transparent")
+  (m "Michael Fogus, Chris Houser: The Joy of Clojure, 2nd, 7.1 Functions in all their forms, page 148"))
