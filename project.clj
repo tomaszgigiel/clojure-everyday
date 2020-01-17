@@ -11,7 +11,7 @@
 
   :source-paths ["src/main/clojure"]
   :test-paths ["src/test/clojure"]
-  :resource-paths ["src/main/resources"]
+  :resource-paths ["src/main/resources" "src/test/clojure/pl/tomaszgigiel/quizzes"]
   :target-path "target/%s"
   :jar-name "quizzes.jar"
   :uberjar-name "quizzes-uberjar.jar"

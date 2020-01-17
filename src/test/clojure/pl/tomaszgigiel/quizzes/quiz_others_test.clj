@@ -96,3 +96,8 @@
   (a (= {:c 3 :a 1 :b 2} (into {:c 3} {:a 1 :b 2})))
   (a false "why?")
   (m ""))
+
+(qam
+  (q "Discuss dorun vs. doall.")
+  (a false "todo")
+  (m ""))
