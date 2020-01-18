@@ -135,8 +135,10 @@
   (a "a record storing a function together with an environment")
   (a "a function containing one or more free variables")
   (a "a function that has access to some variable outside its own scope")
+  (a "a function that has access to locals from the context where it was created")
   (m "https://en.wikipedia.org/wiki/Closure_(computer_programming)")
-  (m "https://stackoverflow.com/questions/36636/what-is-a-closure"))
+  (m "https://stackoverflow.com/questions/36636/what-is-a-closure")
+  (m "Michael Fogus, Chris Houser: The Joy of Clojure, 2nd, 7.2 On closures, page 148"))
 
 (qam
   (q "What is a first-class function?")

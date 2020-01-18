@@ -2,6 +2,7 @@ Michael Fogus, Chris Houser: The Joy of Clojure, 2nd ed., May 2014, ISBN 9781617
 https://fluokitten.uncomplicate.org/
 https://github.com/clojure/tools.analyzer.jvm
 https://randomseed.pl/pub/poczytaj-mi-clojure/
-/quizzes/todo/
 http://home.agh.edu.pl/~pszwed/wiki/lib/exe/fetch.php?media=med:med-w02.pdf
 https://pragprog.com/book/cjclojure/mastering-clojure-macros
+https://stackoverflow.com/questions/2497801/closures-are-poor-mans-objects-and-vice-versa-what-does-this-mean
+https://en.wikipedia.org/wiki/Man_or_boy_test
