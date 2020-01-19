@@ -38,7 +38,44 @@
 
 (qam
   (q "Example of a function returning closure.")
-  (a (defn times-n [n] (let [x n] (fn [y] (* y x)))))
+  (a (defn times-n [n] (let [nn n] (fn [x] (* nn x)))) "closing over the local nn")
   (a (def times-four (times-n 4)))
   (a (= (times-four 10) 40))
+  (a (= ((times-n 4) 10) 40))
   (m "Michael Fogus, Chris Houser: The Joy of Clojure, 2nd, 7.2 On closures, page 149"))
+
+(qam
+  (q "Example of a function returning closure over parameter.")
+  (a (defn times-n [n] (fn [x] (* n x))) "closing over the parameter n")
+  (a (def times-four (times-n 4)))
+  (a (= (times-four 10) 40))
+  (a (= ((times-n 4) 10) 40))
+  (m "Michael Fogus, Chris Houser: The Joy of Clojure, 2nd, 7.2 On closures, page 150"))
+
+(qam
+  (q "Example of a passing closure as function.")
+  (a (defn divisible [denom](fn [num] (zero? (rem num denom)))) "returns clousure")
+  (a (= (filter (divisible 4) (range 10)) [0 4 8]))
+  (m "Michael Fogus, Chris Houser: The Joy of Clojure, 2nd, 7.2 On closures, page 150"))
+
+(qam
+  (q "Example of a closure on-the-spot.")
+  (a (defn filter-divisible [denom s] (filter #(zero? (rem % denom)) s)) "closure defined on the spot where used")
+  (a (= (filter-divisible 4 (range 10)) [0 4 8]))
+  (m "Michael Fogus, Chris Houser: The Joy of Clojure, 2nd, 7.2 On closures, page 151"))
+
+(qam
+  (q "Example of sharing closure context.")
+  (a (def bearings [{:x 0 :y 1} {:x 1 :y 0} {:x 0 :y -1} {:x -1 :y 0}]))
+  (a
+(defn bot [x y bearing-num]
+  {:coords     [x y]
+   :bearing    ([:north :east :south :west] bearing-num)
+   :forward    (fn [] (bot (+ x (:x (bearings bearing-num)))
+                           (+ y (:y (bearings bearing-num)))
+                           bearing-num))
+   :turn-right (fn [] (bot x y (mod (+ 1 bearing-num) 4)))
+   :turn-left  (fn [] (bot x y (mod (- 1 bearing-num) 4)))})
+)
+  (a (= (:coords ((:forward ((:forward ((:turn-right (bot 5 5 0)))))))) [7 5]))
+  (m "Michael Fogus, Chris Houser: The Joy of Clojure, 2nd, 7.2 On closures, page 151"))

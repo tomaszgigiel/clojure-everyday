@@ -96,3 +96,17 @@
   (a (= {:c 3 :a 1 :b 2} (into {:c 3} {:a 1 :b 2})))
   (a false "why?")
   (m ""))
+
+(qam
+  (q "What is a duck typing?")
+  (a "an application of the duck test, to determine if an object can be used for a particular purpose")
+  (a "if it walks like a duck and it quacks like a duck, then it must be a duck")
+  (a "an object's suitability is determined by the presence of certain methods and properties, rather than the type of the object itself")
+  (m "https://en.wikipedia.org/wiki/Duck_typing"))
+
+(qam
+  (q "Example of a duck typing.")
+  (a (defn duck   [] {:quack (fn [] (str "i can quack, so i am a duck"))}))
+  (a (defn parrot [] {:quack (fn [] (str "i can quack, so i am a duck"))}))
+  (a (= (((duck) :quack)) (((parrot) :quack))))
+  (m "https://en.wikipedia.org/wiki/Duck_typing"))
