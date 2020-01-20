@@ -98,6 +98,11 @@
   (m ""))
 
 (qam
+  (q "Discuss dorun vs. doall.")
+  (a false "todo")
+  (m ""))
+
+(qam
   (q "What is a duck typing?")
   (a "an application of the duck test, to determine if an object can be used for a particular purpose")
   (a "if it walks like a duck and it quacks like a duck, then it must be a duck")

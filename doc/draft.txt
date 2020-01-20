@@ -1,0 +1,22 @@
+
+(def qam
+(rest
+[:QAM
+[:Q "What is main adventage of pulling out the assertions into a wrapper function?"]
+[:A "you detach some domain-specific requirements from a potentially globally useful function and isolate them in aspects"]
+[:A "you can mix in any implementation you please, knowing that as long as it fulfills the contract its interposition is transparent"]
+[:M "Michael Fogus, Chris Houser: The Joy of Clojure, 2nd, 7.1 Functions in all their forms, page 148"]
+]
+)
+)
+
+(def qam (group-by first qam))
+
+{:Q 
+[[:Q "What is main adventage of pulling out the assertions into a wrapper function?"]], 
+:A [
+[:A "you detach some domain-specific requirements from a potentially globally useful function and isolate them in aspects"] 
+[:A "you can mix in any implementation you please, knowing that as long as it fulfills the contract its interposition is transparent"]], 
+
+:M 
+[[:M "Michael Fogus, Chris Houser: The Joy of Clojure, 2nd, 7.1 Functions in all their forms, page 148"]]}
