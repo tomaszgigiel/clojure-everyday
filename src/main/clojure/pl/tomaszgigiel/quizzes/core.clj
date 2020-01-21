@@ -21,9 +21,9 @@
     (.setFallbackOnNullLoopVariable false)))
 
 (defn fishcard [q template]
-  (let [map {"qq" ["q1" "q2"] "aa" ["a1" "a2" "a3"]}]
+  (let [model (misc/group-by-better #(-> % first name) second (rest q))]
     ;(println q)
-    (.process template map *out*)))
+    (.process template model *out*)))
 
 (defn quizzes []
   (let [q (parser/parsed

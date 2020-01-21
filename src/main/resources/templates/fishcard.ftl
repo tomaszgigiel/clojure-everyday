@@ -1,8 +1,10 @@
-<#list qq as q>
-Q:${q}
+<#list Q as q>
+Q:
+${q}
 
-<#list aa as a>
-A:${a}
+A:
+<#list A as a>
+${a}
 </#list>
 
 </#list>

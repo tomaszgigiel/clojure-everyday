@@ -2,9 +2,10 @@
 <NS> = <'(ns'> [<anything>|<whitespaces>]* <')'>
 <FIXTURE> = <'(tst/use-fixtures'> <anything> <')'>
 QAM = <'('> <'qam'> <whitespaces> ([Q|A|AT|M] <whitespaces>)* <')'>
-Q = <'('> <'q'> <whitespaces> anything <whitespaces> <')'>
+Q = <'('> <'q'> <whitespaces> <quotation> anything <quotation> <whitespaces> <')'>
 A = <'('> <'a'> <whitespaces> anything <whitespaces> <')'>
 AT = <'('> <'at'> <whitespaces> anything <whitespaces> <')'>
 M = <'('> <'m'> <whitespaces> anything <whitespaces> <')'>
 <whitespaces> = #'\s*'
 anything = (#'.')*
+<quotation> = <'"'>
