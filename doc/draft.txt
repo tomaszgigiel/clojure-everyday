@@ -1,38 +1,11 @@
+TODO:
+1.
+try catch
 
-(def qam
-(rest
-[:QAM
-[:Q "What is main adventage of pulling out the assertions into a wrapper function?"]
-[:A "you detach some domain-specific requirements from a potentially globally useful function and isolate them in aspects"]
-[:A "you can mix in any implementation you please, knowing that as long as it fulfills the contract its interposition is transparent"]
-[:M "Michael Fogus, Chris Houser: The Joy of Clojure, 2nd, 7.1 Functions in all their forms, page 148"]
-]
-)
-)
+2.
+Gdzie edn po wyj¹tku w MS win, linux.
 
-(def qam2 (group-by first qam))
-
-{:Q 
-[[:Q "What is main adventage of pulling out the assertions into a wrapper function?"]], 
-:A [
-[:A "you detach some domain-specific requirements from a potentially globally useful function and isolate them in aspects"] 
-[:A "you can mix in any implementation you please, knowing that as long as it fulfills the contract its interposition is transparent"]], 
-
-:M 
-[[:M "Michael Fogus, Chris Houser: The Joy of Clojure, 2nd, 7.1 Functions in all their forms, page 148"]]}
-
-
-(group-by-better #(-> % first str) second (rest qam-0))
-
-
-(second qam-0)
-
-(def qam-0
-[:QAM
-[:Q "What is main adventage of pulling out the assertions into a wrapper function?"]
-[:A "you detach some domain-specific requirements from a potentially globally useful function and isolate them in aspects"]
-[:A "you can mix in any implementation you please, knowing that as long as it fulfills the contract its interposition is transparent"]
-[:M "Michael Fogus, Chris Houser: The Joy of Clojure, 2nd, 7.1 Functions in all their forms, page 148"]
-]
-)
-
+3.
+(require '[clojure.string :as string])
+or
+(require ['clojure.string :as 'string])
