@@ -91,11 +91,12 @@
   (a "require")
   (a "loads libs, skipping any that are already loaded")
   (a "use")
-  (a "like 'require, but also refers to each lib's namespace using clojure.core/refer")
-
-  (m "https://stackoverflow.com/questions/871997/difference-between-use-and-require")
-  (m "https://stackoverflow.com/questions/871997/difference-between-use-and-require/16429572#16429572")
+  (a "like require, but also refers to each lib's namespace using clojure.core/refer")
+  (a "but instead of (use 'clojure.string)")
+  (a "use e.g. (require '[clojure.string :as string])")
+  (a "or (require '[clojure.string :refer :all])")
   (m "https://8thlight.com/blog/colin-jones/2010/12/05/clojure-libs-and-namespaces-require-use-import-and-ns.html")
+  (m "https://stackoverflow.com/questions/871997/difference-between-use-and-require")
   (m "https://clojuredocs.org/clojure.core/require")
   (m "https://clojuredocs.org/clojure.core/use"))
 
@@ -108,8 +109,21 @@
   (m "https://clojuredocs.org/clojure.core/require"))
 
 (qam
+  (q "How to load libs in non-REPL code?")
+  (a "use ns")
+  (a (ns my-project.core
+       "This namespace is mine."
+       (:require [clojure.string :as string])
+       (:import (java.util Date GregorianCalendar))))
+  (m "https://8thlight.com/blog/colin-jones/2010/12/05/clojure-libs-and-namespaces-require-use-import-and-ns.html"))
+
+(qam
   (q "Discuss the macro hidden arguments.")
-  (a false "todo")
+  (a "inside the body of defmacro you can call &env and &form to get an information")
+  (a (defmacro show-env [] [&env]))
+  ;(a (= (show-env) [nil]) "nil, but...")
+  ;(a (not (blank? (re-matches #"\{foo .+LocalBinding.+ boo .+LocalBinding.+\}" (let [foo "a" boo "b"] (show-env))))) "not nil")
+  
   (m "https://dzone.com/articles/clojure-env-and-form")
   (m "https://stackoverflow.com/questions/25566146/multiple-arity-in-defmacro-of-clojure/25569059"))
 
