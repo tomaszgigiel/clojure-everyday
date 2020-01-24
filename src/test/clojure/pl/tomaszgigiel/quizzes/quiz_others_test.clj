@@ -118,14 +118,34 @@
   (m "https://8thlight.com/blog/colin-jones/2010/12/05/clojure-libs-and-namespaces-require-use-import-and-ns.html"))
 
 (qam
-  (q "Discuss the macro hidden arguments.")
-  (a "inside the body of defmacro you can call &env and &form to get an information")
-  (a (defmacro show-env [] [&env]))
-  ;(a (= (show-env) [nil]) "nil, but...")
-  ;(a (not (blank? (re-matches #"\{foo .+LocalBinding.+ boo .+LocalBinding.+\}" (let [foo "a" boo "b"] (show-env))))) "not nil")
-  
+  (q "List the macro hidden arguments.")
+  (a "&env")
+  (a "&form")
+  (a "inside the body of defmacro you can call it to get an information")
+  (m "https://dzone.com/articles/clojure-env-and-form"))
+
+(qam
+  (q "Discuss the macro hidden argument &env.")
+  (a (defmacro show-env [] (mapv (fn [x] [(keyword x) x]) (keys &env))))
+  (a (= (eval "(let [foo 1 boo 2] (show-env))") [[:foo 1] [:boo 1]]))
+  (a (defmacro show-env [] (mapv (fn [x] [(.name x) (.sym x)]) (vals &env))))
+  (a (= (eval "(let [foo 1 boo 2] (show-env))") [["foo" 1] ["boo" 2]]))
+  (a false "why exception without eval?")
   (m "https://dzone.com/articles/clojure-env-and-form")
-  (m "https://stackoverflow.com/questions/25566146/multiple-arity-in-defmacro-of-clojure/25569059"))
+  (m "https://www.javadoc.io/doc/org.clojure/clojure/latest/clojure/lang/Compiler.LocalBinding.html"))
+
+(qam
+  (q "Discuss the macro hidden argument &env (how to return symbol?).")
+  (a (defmacro show-env [] (mapv (fn [x] [(class x) (name x) (str x) x]) (keys &env))))
+  (a (= (eval "(let [foo 1 boo 2] (show-env))") [[clojure.lang.Symbol "foo" "foo" 1] [clojure.lang.Symbol "boo" "boo" 2]]))
+  (a false "not a symbol")
+  (a false "why exception without eval?")
+  (m "https://dzone.com/articles/clojure-env-and-form"))
+
+(qam
+  (q "Discuss the macro hidden argument &form.")
+  (a false "todo")
+  (m "https://dzone.com/articles/clojure-env-and-form"))
 
 (qam
   (q "Discuss the multi-arity macro.")
