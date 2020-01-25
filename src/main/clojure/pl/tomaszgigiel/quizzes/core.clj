@@ -13,7 +13,8 @@
 
 (defn freemarker-cfg []
   (doto (Configuration. Configuration/VERSION_2_3_29)
-    (.setClassForTemplateLoading (class pl.tomaszgigiel.quizzes.core) "/templates")
+    ;(.setClassForTemplateLoading (class pl.tomaszgigiel.quizzes.core) "/templates") ; works in Win, not in Ubuntu
+    (.setClassLoaderForTemplateLoading (.getContextClassLoader (Thread/currentThread)) "/templates")
     (.setDefaultEncoding "UTF-8")
     (.setTemplateExceptionHandler TemplateExceptionHandler/RETHROW_HANDLER)
     (.setLogTemplateExceptions false)
@@ -22,7 +23,6 @@
 
 (defn fishcard [q template]
   (let [model (misc/group-by-better #(-> % first name) second (rest q))]
-    ;(println q)
     (.process template model *out*)))
 
 (defn quizzes []
@@ -31,7 +31,7 @@
             (-> "quiz_joc_07_01_test.clj" resources/from-resources-uri .toString slurp)
             {:anything str})
         cfg (freemarker-cfg)
-        template (.getTemplate cfg "fishcard.ftl")]
+        template (.getTemplate cfg "fishcard-anki.ftl")]
     (doall (map #(fishcard % template) q))))
 
 (defn -main [& args]
