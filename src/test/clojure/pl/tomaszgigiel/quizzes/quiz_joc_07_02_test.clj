@@ -65,7 +65,7 @@
   (m "Michael Fogus, Chris Houser: The Joy of Clojure, 2nd, 7.2 On closures, page 151"))
 
 (qam
-  (q "Example of sharing closure context.")
+  (q "Example of multiple closures sharing the same environment.")
   (a (def bearings [{:x 0 :y 1} {:x 1 :y 0} {:x 0 :y -1} {:x -1 :y 0}]))
   (a
 (defn bot [x y bearing-num]
@@ -79,3 +79,16 @@
 )
   (a (= (:coords ((:forward ((:forward ((:turn-right (bot 5 5 0)))))))) [7 5]))
   (m "Michael Fogus, Chris Houser: The Joy of Clojure, 2nd, 7.2 On closures, page 151"))
+
+(qam
+  (q "Example of a polymorphism with multiple closures sharing the same environment.")
+  (a (defn normal-bot [x] {:coords [x] :forward (fn [] (normal-bot (+ x 1))) :backward (fn [] (normal-bot (- x 1)))}))
+  (a (defn mirror-bot [x] {:coords [x] :forward (fn [] (mirror-bot (- x 1))) :backward (fn [] (mirror-bot (+ x 1)))}))
+  (a (= (:coords ((:forward ((:forward (normal-bot 0)))))) [ 2]))
+  (a (= (:coords ((:forward ((:forward (mirror-bot 0)))))) [-2]))
+  (m "Michael Fogus, Chris Houser: The Joy of Clojure, 2nd, 7.2 On closures, page 153"))
+
+(qam
+  (q "How to avoid an implementation of a polymorphism using closures?")
+  (a false "use reify macro, section 9.3.2")
+  (m "Michael Fogus, Chris Houser: The Joy of Clojure, 2nd, 7.2 On closures, page 154"))
