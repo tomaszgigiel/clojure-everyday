@@ -1,3 +1,5 @@
+https://stackoverflow.com/questions/2181774/calling-clojure-from-java
+
 Michael Fogus, Chris Houser: The Joy of Clojure, 2nd ed., May 2014, ISBN 9781617291418, 520 pages
 https://fluokitten.uncomplicate.org/
 https://github.com/clojure/tools.analyzer.jvm
@@ -6,7 +8,5 @@ https://randomseed.pl/pub/poczytaj-mi-clojure/
 http://home.agh.edu.pl/~pszwed/wiki/lib/exe/fetch.php?media=med:med-w02.pdf
 https://pragprog.com/book/cjclojure/mastering-clojure-macros
 https://github.com/Engelberg/instaparse
-https://stackoverflow.com/questions/2497801/closures-are-poor-mans-objects-and-vice-versa-what-does-this-mean
-https://en.wikipedia.org/wiki/Man_or_boy_test
 http://benashford.github.io/blog/2014/12/27/group-by-and-transducers/
 https://8thlight.com/blog/colin-jones/2010/12/05/clojure-libs-and-namespaces-require-use-import-and-ns.html

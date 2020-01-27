@@ -1,0 +1,27 @@
+(ns pl.tomaszgigiel.quizzes.quiz-clojure-java-interop-test
+  (:require [clojure.test :as tst])
+  (:require [pl.tomaszgigiel.quizzes.test-config :as test-config])
+  (:require [pl.tomaszgigiel.quizzes.quiz :refer [qam q a m]])
+  (:require [pl.tomaszgigiel.utils.misc :as misc]))
+
+(tst/use-fixtures :once test-config/once-fixture)
+(tst/use-fixtures :each test-config/each-fixture)
+
+(qam
+  (q "How to lookup and call a Clojure function in Java?")
+  (a "package pl.tomaszgigiel.quizzes;")
+  (a "import clojure.java.api.Clojure;")
+  (a "import clojure.lang.IFn;")
+  (a "//<dependency>")
+  (a "//  <groupId>org.clojure</groupId>")
+  (a "//  <artifactId>clojure</artifactId>")
+  (a "//  <version>1.10.1</version>")
+  (a "//</dependency>")
+  (a "class MySimplestJavaWithClojureApp {")
+  (a "	public static void main(String[] args) {")
+  (a "    IFn plus = Clojure.var(\"clojure.core\", \"+\");")
+  (a "    long result = (Long) plus.invoke(1, 2, 3);")
+  (a "    System.out.println(result);")
+  (a "	}")
+  (a "}")
+  (m "https://clojure.org/reference/java_interop#_calling_clojure_from_java"))

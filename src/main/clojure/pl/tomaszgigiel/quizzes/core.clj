@@ -14,8 +14,7 @@
 (defn freemarker-cfg []
   (doto (Configuration. Configuration/VERSION_2_3_29)
     ;(.setClassForTemplateLoading (class pl.tomaszgigiel.quizzes.core) "/templates") ; Win: OK, Ubuntu: TemplateNotFoundException
-    ;(.setClassForTemplateLoading (class pl.tomaszgigiel.quizzes.core$_main) "/templates") ; Win: OK, Ubuntu: TemplateNotFoundException
-    (.setClassLoaderForTemplateLoading (.getContextClassLoader (Thread/currentThread)) "/templates")
+    (.setClassLoaderForTemplateLoading (.getContextClassLoader (Thread/currentThread)) "/templates") ; Win: OK, Ubuntu: OK
     (.setDefaultEncoding "UTF-8")
     (.setTemplateExceptionHandler TemplateExceptionHandler/RETHROW_HANDLER)
     (.setLogTemplateExceptions false)

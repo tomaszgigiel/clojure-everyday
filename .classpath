@@ -6,17 +6,13 @@
 			<attribute name="optional" value="true"/>
 		</attributes>
 	</classpathentry>
+	<classpathentry kind="src" path="src/main/java"/>
 	<classpathentry kind="src" path="src/test/clojure">
 		<attributes>
 			<attribute name="optional" value="true"/>
 		</attributes>
 	</classpathentry>
 	<classpathentry kind="src" path="src/test/resources">
-		<attributes>
-			<attribute name="optional" value="true"/>
-		</attributes>
-	</classpathentry>
-	<classpathentry kind="src" path="dev-resources">
 		<attributes>
 			<attribute name="optional" value="true"/>
 		</attributes>

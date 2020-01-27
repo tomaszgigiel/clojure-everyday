@@ -1,4 +1,4 @@
-(ns pl.tomaszgigiel.quizzes.quiz-joc-07-02-test
+(ns pl.tomaszgigiel.quizzes.joc.quiz-joc-07-02-test
   (:require [clojure.test :as tst])
   (:require [uncomplicate.fluokitten.core :as fluokitten])
   (:require [pl.tomaszgigiel.quizzes.test-config :as test-config])
