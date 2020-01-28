@@ -12,12 +12,10 @@
 
   :source-paths ["src/main/clojure"]
   :test-paths ["src/test/clojure"]
-  :resource-paths ["src/main/resources" "src/test/clojure/pl/tomaszgigiel/quizzes"]
+  :resource-paths ["src/main/resources"]
   :target-path "target/%s"
-  :jar-name "quizzes.jar"
-  :uberjar-name "quizzes-uberjar.jar"
-  :main pl.tomaszgigiel.quizzes.core
-  :aot [pl.tomaszgigiel.quizzes.core]
-  :profiles {:test {:resource-paths ["src/test/resources"]}
-             :interop {:main pl.tomaszgigiel.quizzes.others.myclojureforjava :aot :all}}
+  :jar-name "java-interop.jar"
+  :uberjar-name "java-interop-uberjar.jar"
+  :main pl.tomaszgigiel.quizzes.others.myclojureforjava
+  :aot :all
 )

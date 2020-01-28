@@ -17,7 +17,7 @@
   (a "//  <artifactId>clojure</artifactId>")
   (a "//  <version>1.10.1</version>")
   (a "//</dependency>")
-  (a "class MySimplestJavaWithClojureApp {")
+  (a "class JavaWithClojureSimplestApp {")
   (a "	public static void main(String[] args) {")
   (a "    IFn plus = Clojure.var(\"clojure.core\", \"+\");")
   (a "    long result = (Long) plus.invoke(1, 2, 3);")

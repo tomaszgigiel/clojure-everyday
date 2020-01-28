@@ -9,7 +9,7 @@ import clojure.lang.IFn;
 //  <version>1.10.1</version>
 //</dependency>
 
-class MySimplestJavaWithClojureApp {
+class JavaWithClojureSimplestApp {
 	public static void main(String[] args) {
 		IFn plus = Clojure.var("clojure.core", "+");
 		long result = (Long) plus.invoke(1, 2, 3);
