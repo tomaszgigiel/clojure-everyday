@@ -1,4 +1,4 @@
-(ns pl.tomaszgigiel.quizzes.quiz-man-or-boy-test
+(ns pl.tomaszgigiel.quizzes.packs.man-or-boy-test
   (:require [clojure.test :as tst])
   (:require [pl.tomaszgigiel.quizzes.test-config :as test-config])
   (:require [pl.tomaszgigiel.quizzes.quiz :refer [qam q a m]])

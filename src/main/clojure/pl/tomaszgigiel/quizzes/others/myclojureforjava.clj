@@ -1,6 +1,4 @@
 (ns pl.tomaszgigiel.quizzes.others.myclojureforjava
-  (:require [clojure.string :as string])
-  (:require [clojure.tools.logging :as log])
   (:gen-class
     :name pl.tomaszgigiel.quizzes.others.myclojureforjava
     :methods [#^{:static true} [foo [int int] int]]))

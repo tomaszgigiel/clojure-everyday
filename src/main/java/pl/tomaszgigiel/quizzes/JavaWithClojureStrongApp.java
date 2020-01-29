@@ -1,3 +1,6 @@
+// <classpathentry excluding="pl/tomaszgigiel/quizzes/JavaWithClojureStrongApp.java" kind="src" path="src/main/java"/>
+// because "pl.tomaszgigiel.quizzes.others.myclojureforjava" in this jar
+// see run-java-interop.bat
 package pl.tomaszgigiel.quizzes;
 
 import pl.tomaszgigiel.quizzes.others.myclojureforjava;

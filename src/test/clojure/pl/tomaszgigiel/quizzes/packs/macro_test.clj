@@ -1,4 +1,4 @@
-(ns pl.tomaszgigiel.quizzes.quiz-others-test
+(ns pl.tomaszgigiel.quizzes.packs.macro-test
   (:require [clojure.test :as tst])
   (:require [pl.tomaszgigiel.quizzes.test-config :as test-config])
   (:require [pl.tomaszgigiel.quizzes.quiz :refer [qam q a at m]])
@@ -47,77 +47,6 @@
   (m "https://clojuredocs.org/clojure.core/unquote-splicing"))
 
 (qam
-  (q "Discuss the weird characters.")
-  (a "() - list")
-  (a "[] - vector")
-  (a "{} - map")
-  (a "# - dispatch character")
-  (a "#{} - set")
-  (a "#_ - discard")
-  (a "#\".\" - regular expression")
-  (a "#() - anonymous function")
-  (a "#' - var quote")
-  (a "## - symbolic values")
-  (a "#inst, #uuid, and #js etc. - tagged literals")
-  (a "%, %n, %& - anonymous function arguments")
-  (a "@ - deref")
-  (a "^ (and #^) - metadata")
-  (a "' - quote")
-  (a "; - comment")
-  (a ": - keyword")
-  (a ":: - auto-resolved keyword")
-  (a "#: and #:: - namespace map syntax")
-  (a "/ - namespace separator")
-  (a "\\ - character literal")
-  (a "$ - inner class reference")
-  (a "->, ->>, some->, cond->, as-> etc. - threading macros")
-  (a "` - syntax quote")
-  (a "~ - unquote")
-  (a "~@ - unquote splicing")
-  (a "<symbol># - gensym")
-  (a "#? - reader conditional")
-  (a "#?@ - splicing reader conditional")
-  (a "*var-name* - \"earmuffs\"")
-  (a ">!!, <!!, >!, and <! - core.async channel macros")
-  (a "<symbol>? - predicate suffix")
-  (a "<symbol>! - unsafe operations")
-  (a "_ - unused argument")
-  (a ", - whitespace character")
-  (a "#= reader eval")
-  (m "https://clojure.org/guides/weird_characters"))
-
-(qam
-  (q "What is the difference between require and use?")
-  (a "require")
-  (a "loads libs, skipping any that are already loaded")
-  (a "use")
-  (a "like require, but also refers to each lib's namespace using clojure.core/refer")
-  (a "but instead of (use 'clojure.string)")
-  (a "use e.g. (require '[clojure.string :as string])")
-  (a "or (require '[clojure.string :refer :all])")
-  (m "https://8thlight.com/blog/colin-jones/2010/12/05/clojure-libs-and-namespaces-require-use-import-and-ns.html")
-  (m "https://stackoverflow.com/questions/871997/difference-between-use-and-require")
-  (m "https://clojuredocs.org/clojure.core/require")
-  (m "https://clojuredocs.org/clojure.core/use"))
-
-(qam
-  (q "How to load libs in REPL?")
-  (a "(require '(clojure.string))")
-  (a "(clojure.string/upper-case \"aa\")")
-  (a "(require '[clojure.string :as s])")
-  (a "(s/upper-case \"aa\")")
-  (m "https://clojuredocs.org/clojure.core/require"))
-
-(qam
-  (q "How to load libs in non-REPL code?")
-  (a "use ns")
-  (a (ns my-project.core
-       "This namespace is mine."
-       (:require [clojure.string :as string])
-       (:import (java.util Date GregorianCalendar))))
-  (m "https://8thlight.com/blog/colin-jones/2010/12/05/clojure-libs-and-namespaces-require-use-import-and-ns.html"))
-
-(qam
   (q "List the macro hidden arguments.")
   (a "&env")
   (a "&form")
@@ -160,47 +89,3 @@
   ;(a (= (call john :get-full-name) "John Smith"))
   (a false "todo")
   (m "https://stackoverflow.com/questions/5024211/clojure-adding-functions-to-defrecord-without-defining-a-new-protocol"))
-
-(qam
-  (q "Why did the syntaxt error occur?")
-  (a (require '(uncomplicate.fluokitten.core)))
-  ;(a ((((uncomplicate.fluokitten.core/curry + 3) 1) 2) 3))
-  (a false "todo")
-  (m ""))
-
-(qam
-  (q "Evaluate {:a 1 :a 2 :b 3}")
-  (at (read-string "{:a 1 :a 2 :b 3}") IllegalArgumentException)
-  (a "unable to compile source file")
-  (m ""))
-
-(qam
-  (q "Evaluate (into {:a 3} {:a 1 :b 2})")
-  (a (= {:a 1 :b 2} (into {:a 3} {:a 1 :b 2})))
-  (a false "why?")
-  (m ""))
-
-(qam
-  (q "Evaluate (into {:c 3} {:a 1 :b 2})")
-  (a (= {:c 3 :a 1 :b 2} (into {:c 3} {:a 1 :b 2})))
-  (a false "why?")
-  (m ""))
-
-(qam
-  (q "Discuss dorun vs. doall.")
-  (a false "todo")
-  (m ""))
-
-(qam
-  (q "What is a duck typing?")
-  (a "an application of the duck test, to determine if an object can be used for a particular purpose")
-  (a "if it walks like a duck and it quacks like a duck, then it must be a duck")
-  (a "an object's suitability is determined by the presence of certain methods and properties, rather than the type of the object itself")
-  (m "https://en.wikipedia.org/wiki/Duck_typing"))
-
-(qam
-  (q "Example of a duck typing.")
-  (a (defn duck   [] {:quack (fn [] (str "i can quack, so i am a duck"))}))
-  (a (defn parrot [] {:quack (fn [] (str "i can quack, so i am a duck"))}))
-  (a (= (((duck) :quack)) (((parrot) :quack))))
-  (m "https://en.wikipedia.org/wiki/Duck_typing"))

@@ -1,4 +1,4 @@
-(ns pl.tomaszgigiel.quizzes.quiz-functional-programming-test
+(ns pl.tomaszgigiel.quizzes.packs.functional-programming-test
   (:require [clojure.test :as tst])
   (:require [pl.tomaszgigiel.quizzes.test-config :as test-config])
   (:require [pl.tomaszgigiel.quizzes.quiz :refer [qam q a m]])
@@ -232,15 +232,27 @@
 
 (qam
   (q "What is the difference between purity and referential transparency?")
-  (a "1. idempotent, no side effects")
-  (a "2. an ability to be replaced"))
+  (a "purity: idempotent, no side effects")
+  (a "referential transparency: an ability to be replaced"))
 
 (qam
   (q "Can a pure function be not referentially transparent?")
-  (a "")
-  (m ""))
+  (a "no, by definition (idempotent, no side effects)")
+  (a "If all functions involved in the expression are pure functions, then the expression is referentially transparent.")
+  (m "https://en.wikipedia.org/wiki/Referential_transparency"))
 
 (qam
   (q "Can a referentially transparent function be not pure?")
-  (a "")
-  (m ""))
+  (a "to think about")
+  (a "int f() {logToDB(); return 3;}")
+  (a "int f() {logToFile(); return 3;}")
+  (a "not pure")
+  (a "can be replaced")
+  (m "https://en.wikipedia.org/wiki/Referential_transparency"))
+
+(qam
+  (q "What is a referential transparency?")
+  (a "no agreement on the definition")
+  (a "the referential transparency is not useful")
+  (a "don't use it")
+  (m "https://stackoverflow.com/questions/4865616/purity-vs-referential-transparency"))

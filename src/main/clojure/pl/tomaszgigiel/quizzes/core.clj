@@ -28,7 +28,7 @@
 (defn quizzes []
   (let [q (parser/parsed
             (-> "quiz-grammar.bnf" resources/from-resources-uri .toString)
-            (-> "quiz_joc_07_01_test.clj" resources/from-resources-uri .toString slurp)
+            (-> "packs/joc/joc_07_01_test.clj" resources/from-resources-uri .toString slurp)
             {:anything str})
         cfg (freemarker-cfg)
         template (.getTemplate cfg "fishcard-anki.ftl")]
