@@ -1,5 +1,3 @@
-https://8thlight.com/blog/colin-jones/2010/12/05/clojure-libs-and-namespaces-require-use-import-and-ns.html
-
 Michael Fogus, Chris Houser: The Joy of Clojure, 2nd ed., May 2014, ISBN 9781617291418, 520 pages
 https://fluokitten.uncomplicate.org/
 https://github.com/clojure/tools.analyzer.jvm
@@ -12,3 +10,4 @@ http://benashford.github.io/blog/2014/12/27/group-by-and-transducers/
 https://stackoverflow.com/questions/210835/what-is-referential-transparency
 REPL
 lein
+https://stackoverflow.com/questions/30108137/why-does-lisp-use-gensym-and-other-languages-dont
