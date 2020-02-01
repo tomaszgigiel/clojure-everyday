@@ -8,7 +8,7 @@
 (tst/use-fixtures :each test-config/each-fixture)
 
 (qam
-  (q "Discuss the weird characters.")
+  (q "Enumerate the weird characters.")
   (a "() - list")
   (a "[] - vector")
   (a "{} - map")

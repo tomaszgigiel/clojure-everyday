@@ -89,6 +89,13 @@
   (m "Michael Fogus, Chris Houser: The Joy of Clojure, 2nd, 7.2 On closures, page 153"))
 
 (qam
-  (q "How to avoid an implementation of a polymorphism using closures?")
+  (q "How to avoid an ad hoc implementation of a polymorphism using closures?")
   (a false "use reify macro, section 9.3.2")
+  (m "Michael Fogus, Chris Houser: The Joy of Clojure, 2nd, 7.2 On closures, page 154"))
+
+(qam
+  (q "How is the work distributed between compile-time and runtime in case of closure?")
+  (a "bytecode for the bodies of functions (regular, closure) is generated during compilation")
+  (a "each function definition gets its own class")
+  (a "the creation of an instance of class is lightweight and fast")
   (m "Michael Fogus, Chris Houser: The Joy of Clojure, 2nd, 7.2 On closures, page 154"))
