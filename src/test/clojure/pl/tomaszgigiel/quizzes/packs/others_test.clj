@@ -50,3 +50,8 @@
   (a (defn parrot [] {:quack (fn [] (str "i can quack, so i am a duck"))}))
   (a (= (((duck) :quack)) (((parrot) :quack))))
   (m "https://en.wikipedia.org/wiki/Duck_typing"))
+
+(qam
+  (q "Discuss = vs. ==.")
+  (a false "todo")
+  (m ""))
