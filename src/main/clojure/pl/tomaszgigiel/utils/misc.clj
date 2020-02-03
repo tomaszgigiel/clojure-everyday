@@ -10,3 +10,10 @@
         (assoc m k (conj v (val-f d)))))
     {}
     data))
+
+; https://github.com/clojure/clojure/blob/clojure-1.10.1/src/clj/clojure/core.clj#L3884
+(defmacro time-msecs
+  [expr]
+  `(let [start# (. System (nanoTime))
+         ret# ~expr]
+     (/ (double (- (. System (nanoTime)) start#)) 1000000.0)))
