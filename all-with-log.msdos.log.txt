@@ -65,7 +65,7 @@ A subdirectory or file \Users\tgigiel\_delete_content\ already exists.
 <p style="text-align:left;">How to use assert instead pre- or postconditions?</p>	<ol style="text-align:left;"><li>(defn foo [a b] (assert (and (int? a) (int? b) (not= b 0))) (let [r (/ a b)] (assert (even? r)) r))</li><li>(= (foo 2 1) 2)</li></ol>
 <p style="text-align:left;">Example of decoupling assertions from functions.</p>	<ol style="text-align:left;"><li>(defn put-things [m] (into m {:meat "beef" :veggie "broccoli"}))</li><li>(defn vegan-constraints [f m] {:pre [(:veggie m)] :post [(:veggie %) (nil? (:meat %))]} (f m))</li><li>(defn balanced-diet [f m] {:post [(:meat %) (:veggie %)]} (f m))</li><li>(= {:fruit "apple" :meat "beef" :veggie "broccoli"} (balanced-diet put-things {:fruit "apple"}))</li></ol>
 <p style="text-align:left;">What is main adventage of pulling out the assertions into a wrapper function?</p>	<ol style="text-align:left;"><li>"you detach some domain-specific requirements from a potentially globally useful function and isolate them in aspects"</li><li>"you can mix in any implementation you please, knowing that as long as it fulfills the contract its interposition is transparent"</li></ol>
-sty 29, 2020 6:15:49 PM clojure.tools.logging$eval136$fn__139 invoke
+lut 04, 2020 3:08:45 PM clojure.tools.logging$eval136$fn__139 invoke
 INFO: ok
 Press any key to continue . . . 
 A subdirectory or file \Users\tgigiel\_delete_content\ already exists.
@@ -94,179 +94,23 @@ Compiling pl.tomaszgigiel.quizzes.core
 <p style="text-align:left;">How to use assert instead pre- or postconditions?</p>	<ol style="text-align:left;"><li>(defn foo [a b] (assert (and (int? a) (int? b) (not= b 0))) (let [r (/ a b)] (assert (even? r)) r))</li><li>(= (foo 2 1) 2)</li></ol>
 <p style="text-align:left;">Example of decoupling assertions from functions.</p>	<ol style="text-align:left;"><li>(defn put-things [m] (into m {:meat "beef" :veggie "broccoli"}))</li><li>(defn vegan-constraints [f m] {:pre [(:veggie m)] :post [(:veggie %) (nil? (:meat %))]} (f m))</li><li>(defn balanced-diet [f m] {:post [(:meat %) (:veggie %)]} (f m))</li><li>(= {:fruit "apple" :meat "beef" :veggie "broccoli"} (balanced-diet put-things {:fruit "apple"}))</li></ol>
 <p style="text-align:left;">What is main adventage of pulling out the assertions into a wrapper function?</p>	<ol style="text-align:left;"><li>"you detach some domain-specific requirements from a potentially globally useful function and isolate them in aspects"</li><li>"you can mix in any implementation you please, knowing that as long as it fulfills the contract its interposition is transparent"</li></ol>
-sty 29, 2020 6:16:02 PM clojure.tools.logging$eval155$fn__158 invoke
+lut 04, 2020 3:09:01 PM clojure.tools.logging$eval155$fn__158 invoke
 INFO: ok
 Press any key to continue . . . 
 A subdirectory or file \Users\tgigiel\_delete_content\ already exists.
 Compiling pl.tomaszgigiel.quizzes.core
 
-lein test pl.tomaszgigiel.quizzes.packs.joc.joc-07-01-test
+lein test pl.tomaszgigiel.quizzes.packs.joc.joc-07-03-test
 
-Ran 24 tests containing 78 assertions.
-0 failures, 0 errors.
-
-lein test pl.tomaszgigiel.quizzes.parser-test
-
-Ran 1 tests containing 1 assertions.
+Ran 7 tests containing 21 assertions.
 0 failures, 0 errors.
 Press any key to continue . . . 
 A subdirectory or file \Users\tgigiel\_delete_content\ already exists.
+Syntax error compiling at (pl\tomaszgigiel\quizzes\packs\clojure_recursion_test.clj:16:42).
+Unable to resolve symbol: pow-mundane in this context
 
-lein test pl.tomaszgigiel.quizzes.packs.clojure-java-interop-test
-
-lein test pl.tomaszgigiel.quizzes.packs.clojure-libs-test
-
-lein test :only pl.tomaszgigiel.quizzes.packs.clojure-libs-test/(q "How to load libs in non-REPL code?")
-
-FAIL in ((q "How to load libs in non-REPL code?")) (clojure_libs_test.clj:42)
-How to load libs in non-REPL code?
-expected: (ns my-project.core "This namespace is mine." (:require [clojure.string :as string]) (:import (java.util Date GregorianCalendar)))
-  actual: nil
-
-lein test pl.tomaszgigiel.quizzes.packs.functional-programming-test
-
-lein test pl.tomaszgigiel.quizzes.packs.joc.joc-07-01-test
-
-lein test pl.tomaszgigiel.quizzes.packs.joc.joc-07-02-test
-
-lein test :only pl.tomaszgigiel.quizzes.packs.joc.joc-07-02-test/(q "How to avoid an implementation of a polymorphism using closures?")
-
-FAIL in ((q "How to avoid an implementation of a polymorphism using closures?")) (joc_07_02_test.clj:93)
-How to avoid an implementation of a polymorphism using closures?
-use reify macro, section 9.3.2
-expected: false
-  actual: false
-
-lein test pl.tomaszgigiel.quizzes.packs.macro-test
-
-lein test :only pl.tomaszgigiel.quizzes.packs.macro-test/(q "Discuss the macro hidden argument &env (how to return symbol?).")
-
-FAIL in ((q "Discuss the macro hidden argument &env (how to return symbol?).")) (macro_test.clj:69)
-Discuss the macro hidden argument &env (how to return symbol?).
-expected: (= (eval "(let [foo 1 boo 2] (show-env))") [[clojure.lang.Symbol "foo" "foo" 1] [clojure.lang.Symbol "boo" "boo" 2]])
-  actual: (not (= "(let [foo 1 boo 2] (show-env))" [[clojure.lang.Symbol "foo" "foo" 1] [clojure.lang.Symbol "boo" "boo" 2]]))
-
-lein test :only pl.tomaszgigiel.quizzes.packs.macro-test/(q "Discuss the macro hidden argument &env (how to return symbol?).")
-
-FAIL in ((q "Discuss the macro hidden argument &env (how to return symbol?).")) (macro_test.clj:70)
-Discuss the macro hidden argument &env (how to return symbol?).
-not a symbol
-expected: false
-  actual: false
-
-lein test :only pl.tomaszgigiel.quizzes.packs.macro-test/(q "Discuss the macro hidden argument &env (how to return symbol?).")
-
-FAIL in ((q "Discuss the macro hidden argument &env (how to return symbol?).")) (macro_test.clj:71)
-Discuss the macro hidden argument &env (how to return symbol?).
-why exception without eval?
-expected: false
-  actual: false
-
-lein test :only pl.tomaszgigiel.quizzes.packs.macro-test/(q "Discuss the multi-arity macro.")
-
-FAIL in ((q "Discuss the multi-arity macro.")) (macro_test.clj:81)
-Discuss the multi-arity macro.
-todo
-expected: false
-  actual: false
-
-lein test :only pl.tomaszgigiel.quizzes.packs.macro-test/(q "Discuss the macro hidden argument &env.")
-
-FAIL in ((q "Discuss the macro hidden argument &env.")) (macro_test.clj:59)
-Discuss the macro hidden argument &env.
-expected: (= (eval "(let [foo 1 boo 2] (show-env))") [[:foo 1] [:boo 1]])
-  actual: (not (= "(let [foo 1 boo 2] (show-env))" [[:foo 1] [:boo 1]]))
-
-lein test :only pl.tomaszgigiel.quizzes.packs.macro-test/(q "Discuss the macro hidden argument &env.")
-
-FAIL in ((q "Discuss the macro hidden argument &env.")) (macro_test.clj:61)
-Discuss the macro hidden argument &env.
-expected: (= (eval "(let [foo 1 boo 2] (show-env))") [["foo" 1] ["boo" 2]])
-  actual: (not (= "(let [foo 1 boo 2] (show-env))" [["foo" 1] ["boo" 2]]))
-
-lein test :only pl.tomaszgigiel.quizzes.packs.macro-test/(q "Discuss the macro hidden argument &env.")
-
-FAIL in ((q "Discuss the macro hidden argument &env.")) (macro_test.clj:62)
-Discuss the macro hidden argument &env.
-why exception without eval?
-expected: false
-  actual: false
-
-lein test :only pl.tomaszgigiel.quizzes.packs.macro-test/(q "Why did the exception occur?")
-
-FAIL in ((q "Why did the exception occur?")) (macro_test.clj:90)
-Why did the exception occur?
-todo
-expected: false
-  actual: false
-
-lein test :only pl.tomaszgigiel.quizzes.packs.macro-test/(q "Discuss the macro hidden argument &form.")
-
-FAIL in ((q "Discuss the macro hidden argument &form.")) (macro_test.clj:76)
-Discuss the macro hidden argument &form.
-todo
-expected: false
-  actual: false
-
-lein test pl.tomaszgigiel.quizzes.packs.man-or-boy-test
-
-lein test pl.tomaszgigiel.quizzes.packs.others-test
-
-lein test :only pl.tomaszgigiel.quizzes.packs.others-test/(q "Discuss dorun vs. doall.")
-
-FAIL in ((q "Discuss dorun vs. doall.")) (others_test.clj:37)
-Discuss dorun vs. doall.
-todo
-expected: false
-  actual: false
-
-lein test :only pl.tomaszgigiel.quizzes.packs.others-test/(q "Why did the syntaxt error occur?")
-
-FAIL in ((q "Why did the syntaxt error occur?")) (others_test.clj:12)
-Why did the syntaxt error occur?
-expected: (require (quote (uncomplicate.fluokitten.core)))
-  actual: (not (require (uncomplicate.fluokitten.core)))
-
-lein test :only pl.tomaszgigiel.quizzes.packs.others-test/(q "Why did the syntaxt error occur?")
-
-FAIL in ((q "Why did the syntaxt error occur?")) (others_test.clj:14)
-Why did the syntaxt error occur?
-todo
-expected: false
-  actual: false
-
-lein test :only pl.tomaszgigiel.quizzes.packs.others-test/(q "Evaluate (into {:c 3} {:a 1 :b 2})")
-
-FAIL in ((q "Evaluate (into {:c 3} {:a 1 :b 2})")) (others_test.clj:32)
-Evaluate (into {:c 3} {:a 1 :b 2})
-why?
-expected: false
-  actual: false
-
-lein test :only pl.tomaszgigiel.quizzes.packs.others-test/(q "Evaluate (into {:a 3} {:a 1 :b 2})")
-
-FAIL in ((q "Evaluate (into {:a 3} {:a 1 :b 2})")) (others_test.clj:26)
-Evaluate (into {:a 3} {:a 1 :b 2})
-why?
-expected: false
-  actual: false
-
-lein test pl.tomaszgigiel.quizzes.packs.poor-man-test
-
-lein test pl.tomaszgigiel.quizzes.packs.weird-characters-test
-
-lein test pl.tomaszgigiel.quizzes.parser-test
-
-lein test pl.tomaszgigiel.quizzes.test-config
-
-lein test pl.tomaszgigiel.utils.misc-test
-
-lein test pl.tomaszgigiel.utils.resources-test
-
-lein test pl.tomaszgigiel.utils.test-config
-
-Ran 100 tests containing 387 assertions.
-16 failures, 0 errors.
+Full report at:
+C:\Users\tgigiel\AppData\Local\Temp\2\clojure-4296569902176866913.edn
 Tests failed.
 Press any key to continue . . . 
 A subdirectory or file \Users\tgigiel\_delete_content\ already exists.

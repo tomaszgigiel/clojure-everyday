@@ -32,13 +32,24 @@
   (m "Michael Fogus, Chris Houser: The Joy of Clojure, 2nd, 7.3 On closures, page 155"))
 
 (qam
+  (q "List two common techniques for converting mundane recursion to tail recursion.")
+  (a "a helper inner function that does the majority of the work")
+  (a "an accumulator that holds the result of some operation")
+  (m ""))
+
+(qam
   (q "Example of converting mundane recursion to tail recursion.")
   (a (defn pow-mundane [x n] (if (zero? n) 1 (* x (pow-mundane x (dec n))))))
   (a (defn pow-tail-recursion [x n]
-       (letfn [(pow-tail-recursion [x n acc] (if (zero? n) acc (recur x (dec n) (* x acc))))]
-         (pow-tail-recursion x n 1))))
+       (letfn [(inner [x n acc] (if (zero? n) acc (recur x (dec n) (* x acc))))] (inner x n 1))))
   (a (== (Math/pow 2 3) (pow-mundane 2 3) (pow-tail-recursion 2 3)))
   (m "Michael Fogus, Chris Houser: The Joy of Clojure, 2nd, 7.3 On closures, page 155"))
+
+(qam
+  (q "Why to use lazy-seq in the context of mundane recursion?")
+  (a "to avoid stack-overflow exceptions")
+  (a "to stay with the mundane (regular) recursion, often the most natural")
+  (m ""))
 
 (qam
   (q "Example of converting mundane recursion to mundane recursion with lazy-seq.")

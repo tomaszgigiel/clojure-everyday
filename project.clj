@@ -8,7 +8,8 @@
                  [org.clojure/tools.logging "0.5.0"]
                  [uncomplicate/fluokitten "0.9.1"]
                  [instaparse/instaparse "1.4.10"]
-                 [org.freemarker/freemarker "2.3.29"]]
+                 [org.freemarker/freemarker "2.3.29"]
+                 [org.clojure/math.numeric-tower "0.0.4"]]
 
   :source-paths ["src/main/clojure"]
   :test-paths ["src/test/clojure"]
