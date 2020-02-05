@@ -59,3 +59,50 @@
          (nth (multiply x x) (dec n)))))
   (a (== (Math/pow 2 3) (pow-mundane 2 3) (pow-lazy-seq 2 3)))
   (m "Michael Fogus, Chris Houser: The Joy of Clojure, 2nd, 7.3 On closures, page 156"))
+
+(qam
+  (q "Implement function to recursively convert units of measure")
+  (a (defn convert [context descriptor]
+       (reduce (fn [result [mag unit]]
+                   (+ result
+                     (let [val (get context unit)]
+                       (if (vector? val)
+                           (* mag (convert context val))
+                           (* mag val)))))
+               0
+               (partition 2 descriptor))))
+  (a (= (convert {:meter 1, :km 1000, :cm 1/100, :mm [1/10 :cm]} [3 :km 10 :meter 80 :cm 10 :mm]) 301081/100))
+  (a (= (convert {:bit 1, :byte 8, :nibble [1/2 :byte]} [32 :nibble]) 128N))
+  (m ""))
+
+(qam
+  (q "Discuss a generalized tail-call optimization.")
+  (a "if you know that function A calls B in the tail position")
+  (a "then you also know that A's resources are no longer needed")
+  (a "allowing Scheme to deallocate them and defer to B for the return call instead")
+  (a "but JVM can only provide a subset of generalized TCO (tail-call optimizations)")
+  (m "Michael Fogus, Chris Houser: The Joy of Clojure, 2nd, 7.3.2. Tail calls and recur"))
+
+(qam
+  (q "Implement gcd using mundane recursion and tail recursion.")
+  (a (defn gcd-mundane [x y] (if (zero? y) x (gcd-mundane y (mod x y)))) "Clojure does not detect and optimize recursive tail calls, Scala does")
+  (a (defn gcd-tail [x y] (if (zero? y) x (recur y (mod x y)))))
+  (a (= (gcd-mundane 1023 858) (gcd-tail 1023 858) (.gcd (biginteger 1023) (biginteger 858))))
+  (a (= (convert {:bit 1, :byte 8, :nibble [1/2 :byte]} [32 :nibble]) 128N))
+  (m "Michael Fogus, Chris Houser: The Joy of Clojure, 2nd, 7.3.2. Tail calls and recur"))
+
+(qam
+  (q "Why Clojure provides recur?")
+  (a "1. to explicit perform TCO (tail-call optimizations)")
+  (a "JVM can only provide a subset of generalized TCO")
+  (a "Clojure doesn't give the pretense of providing full TCO")
+  (a "2. for the compiler to check if we're dealing with tail recursion")
+  (a "3. it allows the forms fn and loop to act as anonymous recursion points")
+  (m "Michael Fogus, Chris Houser: The Joy of Clojure, 2nd, 7.3.2. Tail calls and recur"))
+
+(qam
+  (q "What is the difference between defining function in let and letfn?")
+  (a "a function defined in a let can't refer to a function defined later in the bindings vector")
+  (a "because let doesn't set up forward declarations")
+  (a "whereas letfn does")
+  (m "Michael Fogus, Chris Houser: The Joy of Clojure, 2nd, 7.3.3. Don't forget your trampoline"))

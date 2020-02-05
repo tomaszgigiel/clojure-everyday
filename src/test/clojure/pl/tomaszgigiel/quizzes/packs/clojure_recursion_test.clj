@@ -17,9 +17,3 @@
 
 (foo 2 3)
 (boo 2 3)
-
-(qam
-  (q "Why to use recur?")
-  (a false)
-  (a "for the compiler to check if we're dealing with tail recursion")
-  (m ""))
