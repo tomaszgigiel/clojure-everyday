@@ -16,3 +16,5 @@ https://github.com/danielmiladinov/joy-of-clojure
 https://www.geeksforgeeks.org/recursion-practice-problems-solutions/
 https://blog.usejournal.com/500-data-structures-and-algorithms-practice-problems-35afe8a1e222
 https://clojure.org/guides/equality (= 1 1.0)
+https://en.wikipedia.org/wiki/Tail_call
+https://en.wikipedia.org/wiki/Continuation-passing_style

@@ -106,3 +106,90 @@
   (a "because let doesn't set up forward declarations")
   (a "whereas letfn does")
   (m "Michael Fogus, Chris Houser: The Joy of Clojure, 2nd, 7.3.3. Don't forget your trampoline"))
+
+(qam
+  (q "What is a mutual recursion?")
+  (a "is a form of recursion where two mathematical or computational objects, such as functions or data types, are defined in terms of each other")
+  (m "https://en.wikipedia.org/wiki/Mutual_recursion"))
+
+(qam
+  (q "Show problem with a mutual recursion in Clojure.")
+  (a (declare my-odd?))
+  (a (defn my-even? [n] (if (zero? n) true (my-odd? (dec (Math/abs n))))))
+  (a (defn my-odd? [n] (if (zero? n) false (my-even? (dec (Math/abs n))))))
+  (at (my-even? 1000000) StackOverflowError)
+  (m "https://jakemccrary.com/blog/2010/12/06/trampolining-through-mutual-recursion/"))
+
+(qam
+  (q "How to solve problem with a mutual recursion in Clojure?")
+  (a "use trampoline like recur")
+  (a (declare my-odd?))
+  (a (defn my-even? [n] (if (zero? n) true #(my-odd? (dec (Math/abs n))))))
+  (a (defn my-odd? [n] (if (zero? n) false #(my-even? (dec (Math/abs n))))))
+  (a (trampoline my-even? 1000000))
+  (m "https://jakemccrary.com/blog/2010/12/06/trampolining-through-mutual-recursion/"))
+
+(qam
+  (q "How to use trampoline inside the function?")
+  (a (defn my-even? [n]
+       (letfn [(e? [n] (if (zero? n) true #(o? (dec (Math/abs n)))))
+               (o? [n] (if (zero? n) false #(e? (dec (Math/abs n)))))]
+         (trampoline e? n))))
+  (a (defn my-odd? [n] (not (my-even? n))))
+  (a (trampoline my-even? 1000000))
+  (a (= (trampoline my-odd? 1000000) false))
+  (m "https://jakemccrary.com/blog/2010/12/06/trampolining-through-mutual-recursion/"))
+
+(qam
+  (q "How to implement finite state machine or automaton (FSM or FSA)?")
+  (a "use trampoline")
+  (a (defn my-fsa [commands] (letfn [(a-> [[_ & rs]] #(case _ :a-b (b-> rs) :a-c (c-> rs) false))
+                                     (b-> [[_ & rs]] #(case _ :b-a (a-> rs) :b-c (c-> rs) false))
+                                     (c-> [[_ & rs]] #(case _ :c-a (a-> rs) :c-b (c-> rs) :final true false))]
+                               (trampoline a-> commands))))
+  (a (my-fsa [:a-b :b-c :c-a :a-c :final]))
+  (m "Michael Fogus, Chris Houser: The Joy of Clojure, 2nd, 7.3.3. Don't forget your trampoline")
+  (m "https://clojuredocs.org/clojure.core/trampoline"))
+
+(qam
+  (q "What are the rules for mutual recursion?")
+  (a "1. Make all functions return a function instead of their normal result")
+  (a "tack a # onto the front of the outer level of the function body")
+  (a "2. Invoke the first function in the mutual chain via the trampoline function")
+  (m "Michael Fogus, Chris Houser: The Joy of Clojure, 2nd, 7.3.3. Don't forget your trampoline"))
+
+(qam
+  (q "What is CPS?")
+  (a "continuation-passing style (CPS) is a hybrid between recursion and mutual recursion")
+  (a "it is a way of generalizing a computation by viewing it in terms of up to three functions:")
+  (a "Accept - Decides when a computation should terminate")
+  (a "Return - Wraps the return values")
+  (a "Continuation - Provides the next step in the computation")
+  (m "Michael Fogus, Chris Houser: The Joy of Clojure, 2nd, 7.3.4. Continuation-passing style")
+  (m "https://en.wikipedia.org/wiki/Continuation-passing_style"))
+
+(qam
+  (q "Implement the factorial function using CPS.")
+  (a (defn factorial-cps [n k] (letfn [(cont [v] (k (* v n)))] (if (zero? n) (k 1) (recur (dec n) cont)))))
+  (a (defn factorial [n] (factorial-cps n identity)))
+  (a (= (factorial 10) 3628800))
+  (m "Michael Fogus, Chris Houser: The Joy of Clojure, 2nd, 7.3.4. Continuation-passing style"))
+
+(qam
+  (q "Implement the generic function builder using CPS.")
+  (a (defn builder-cps [accept? kend kont] (fn [n] ((fn [n k] (let [cont (fn [v] (k ((partial kont v) n)))]
+                                                                (if (accept? n) (k 1) (recur (dec n) cont)))) n kend))))
+  (a (def factorial (builder-cps zero? identity #(* %1 %2))))
+  (a (= (factorial 10) 3628800))
+  (a (def triangular-number (builder-cps #(== 1 %) identity #(+ %1 %2))))
+  (a (= (triangular-number 10) 55))
+  (m "Michael Fogus, Chris Houser: The Joy of Clojure, 2nd, 7.3.4. Continuation-passing style"))
+
+(qam
+  (q "What are the disadventages CPS in Clojure?")
+  (a "no generalized tail-call optimization in JVM, so StackOverflowError possibility")
+  (a "the exception difficult to track down")
+  (a "- if continuation function is supposed to throw the error, but an outer layer function is doing so instead")
+  (a "- on deferred computations (delay, future, promise)")
+  (a "CPS isn't conducive to parallelization, which is antithetical to Clojure's nature")
+  (m "Michael Fogus, Chris Houser: The Joy of Clojure, 2nd, 7.3.4. Continuation-passing style"))

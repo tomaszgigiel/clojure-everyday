@@ -65,7 +65,7 @@ A subdirectory or file \Users\tgigiel\_delete_content\ already exists.
 <p style="text-align:left;">How to use assert instead pre- or postconditions?</p>	<ol style="text-align:left;"><li>(defn foo [a b] (assert (and (int? a) (int? b) (not= b 0))) (let [r (/ a b)] (assert (even? r)) r))</li><li>(= (foo 2 1) 2)</li></ol>
 <p style="text-align:left;">Example of decoupling assertions from functions.</p>	<ol style="text-align:left;"><li>(defn put-things [m] (into m {:meat "beef" :veggie "broccoli"}))</li><li>(defn vegan-constraints [f m] {:pre [(:veggie m)] :post [(:veggie %) (nil? (:meat %))]} (f m))</li><li>(defn balanced-diet [f m] {:post [(:meat %) (:veggie %)]} (f m))</li><li>(= {:fruit "apple" :meat "beef" :veggie "broccoli"} (balanced-diet put-things {:fruit "apple"}))</li></ol>
 <p style="text-align:left;">What is main adventage of pulling out the assertions into a wrapper function?</p>	<ol style="text-align:left;"><li>"you detach some domain-specific requirements from a potentially globally useful function and isolate them in aspects"</li><li>"you can mix in any implementation you please, knowing that as long as it fulfills the contract its interposition is transparent"</li></ol>
-lut 04, 2020 3:08:45 PM clojure.tools.logging$eval136$fn__139 invoke
+lut 06, 2020 6:12:17 PM clojure.tools.logging$eval136$fn__139 invoke
 INFO: ok
 Press any key to continue . . . 
 A subdirectory or file \Users\tgigiel\_delete_content\ already exists.
@@ -94,7 +94,7 @@ Compiling pl.tomaszgigiel.quizzes.core
 <p style="text-align:left;">How to use assert instead pre- or postconditions?</p>	<ol style="text-align:left;"><li>(defn foo [a b] (assert (and (int? a) (int? b) (not= b 0))) (let [r (/ a b)] (assert (even? r)) r))</li><li>(= (foo 2 1) 2)</li></ol>
 <p style="text-align:left;">Example of decoupling assertions from functions.</p>	<ol style="text-align:left;"><li>(defn put-things [m] (into m {:meat "beef" :veggie "broccoli"}))</li><li>(defn vegan-constraints [f m] {:pre [(:veggie m)] :post [(:veggie %) (nil? (:meat %))]} (f m))</li><li>(defn balanced-diet [f m] {:post [(:meat %) (:veggie %)]} (f m))</li><li>(= {:fruit "apple" :meat "beef" :veggie "broccoli"} (balanced-diet put-things {:fruit "apple"}))</li></ol>
 <p style="text-align:left;">What is main adventage of pulling out the assertions into a wrapper function?</p>	<ol style="text-align:left;"><li>"you detach some domain-specific requirements from a potentially globally useful function and isolate them in aspects"</li><li>"you can mix in any implementation you please, knowing that as long as it fulfills the contract its interposition is transparent"</li></ol>
-lut 04, 2020 3:09:01 PM clojure.tools.logging$eval155$fn__158 invoke
+lut 06, 2020 6:12:29 PM clojure.tools.logging$eval155$fn__158 invoke
 INFO: ok
 Press any key to continue . . . 
 A subdirectory or file \Users\tgigiel\_delete_content\ already exists.
@@ -102,7 +102,7 @@ Compiling pl.tomaszgigiel.quizzes.core
 
 lein test pl.tomaszgigiel.quizzes.packs.joc.joc-07-03-test
 
-Ran 7 tests containing 21 assertions.
+Ran 22 tests containing 78 assertions.
 0 failures, 0 errors.
 Press any key to continue . . . 
 A subdirectory or file \Users\tgigiel\_delete_content\ already exists.
@@ -110,7 +110,7 @@ Syntax error compiling at (pl\tomaszgigiel\quizzes\packs\clojure_recursion_test.
 Unable to resolve symbol: pow-mundane in this context
 
 Full report at:
-C:\Users\tgigiel\AppData\Local\Temp\2\clojure-4296569902176866913.edn
+C:\Users\tgigiel\AppData\Local\Temp\2\clojure-4454280470910791397.edn
 Tests failed.
 Press any key to continue . . . 
 A subdirectory or file \Users\tgigiel\_delete_content\ already exists.
