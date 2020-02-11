@@ -18,3 +18,7 @@ https://blog.usejournal.com/500-data-structures-and-algorithms-practice-problems
 https://clojure.org/guides/equality (= 1 1.0)
 https://en.wikipedia.org/wiki/Tail_call
 https://en.wikipedia.org/wiki/Continuation-passing_style
+http://blog.higher-order.net/2009/02/01/understanding-clojures-persistentvector-implementation.html
+https://github.com/krukow/ants-demo
+https://en.wikipedia.org/wiki/Binary_tree
+https://en.wikipedia.org/wiki/Red%E2%80%93black_tree
