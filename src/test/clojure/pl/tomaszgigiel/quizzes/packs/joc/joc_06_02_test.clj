@@ -42,7 +42,7 @@
   (m "Michael Fogus, Chris Houser: The Joy of Clojure, 2nd, 6.2. Structural sharing: a persistent toy"))
 
 (qam
-  (q "Characterize all of Clojure's persistent collections.")
+  (q "Characterize Clojure's persistent collections.")
   (a "values and unchanged branches are never copied")
   (a "references could be copied")
   (a "implementation is thread-safe")
