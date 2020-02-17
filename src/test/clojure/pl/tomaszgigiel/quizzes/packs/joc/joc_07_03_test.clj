@@ -48,3 +48,24 @@
          (nth (multiply x x) (dec n)))))
   (a (== (Math/pow 2 3) (pow-mundane 2 3) (pow-lazy-seq 2 3)))
   (m "Michael Fogus, Chris Houser: The Joy of Clojure, 2nd, 7.3 On closures, page 156"))
+
+(qam
+  (q "Implement convert.")
+  (a (defn pow-mundane [x n] (if (zero? n) 1 (* x (pow-mundane x (dec n))))))
+  (a (defn pow-lazy-seq [x n]
+       (letfn [(multiply [a factor] (lazy-seq (cons a (multiply (* a factor) factor))))]
+         (nth (multiply x x) (dec n)))))
+  (a (== (Math/pow 2 3) (pow-mundane 2 3) (pow-lazy-seq 2 3)))
+  (m "Michael Fogus, Chris Houser: The Joy of Clojure, 2nd, 7.3 On closures, page 156"))
+
+(defn convert [context descriptor]
+  (reduce (fn [result [mag unit]] (+ result (let [val (get context unit)]
+                                              (if (vector? val)
+                                                (* mag (convert context val))
+                                                (* mag val)))))
+          0
+          calculation
+  (partition 2 descriptor)))
+
+(float (convert simple-metric [3 :km 10 :meter 80 :cm 10 :mm]))
+(convert {:bit 1, :byte 8, :nibble [1/2 :byte]} [32 :nibble])
