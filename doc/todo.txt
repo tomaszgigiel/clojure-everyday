@@ -1,4 +1,5 @@
-Michael Fogus, Chris Houser: The Joy of Clojure, 2nd ed., May 2014, ISBN 9781617291418, 520 pages
+Michael Fogus, Chris Houser: The Joy of Clojure, 2nd ed.
+
 https://fluokitten.uncomplicate.org/
 https://github.com/clojure/tools.analyzer.jvm
 https://randomseed.pl/pub/poczytaj-mi-clojure/
@@ -15,3 +16,9 @@ https://github.com/danielmiladinov/joy-of-clojure
 https://www.geeksforgeeks.org/recursion-practice-problems-solutions/
 https://blog.usejournal.com/500-data-structures-and-algorithms-practice-problems-35afe8a1e222
 https://clojure.org/guides/equality (= 1 1.0)
+https://en.wikipedia.org/wiki/Tail_call
+https://en.wikipedia.org/wiki/Continuation-passing_style
+http://blog.higher-order.net/2009/02/01/understanding-clojures-persistentvector-implementation.html
+https://github.com/krukow/ants-demo
+https://en.wikipedia.org/wiki/Binary_tree
+https://en.wikipedia.org/wiki/Red%E2%80%93black_tree
