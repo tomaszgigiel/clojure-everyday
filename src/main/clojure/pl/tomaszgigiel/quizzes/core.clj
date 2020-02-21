@@ -30,6 +30,7 @@
             (-> "quiz-grammar.bnf" resources/from-resources-uri .toString)
             (-> "packs/joc/joc_07_01_test.clj" resources/from-resources-uri .toString slurp)
             {:anything str})
+        ;q [[:QAM [:Q 'qqq] [:A "aaa"] [:A "bbb"] [:M "mmm"]]]
         cfg (freemarker-cfg)
         template (.getTemplate cfg "fishcard-anki.ftl")]
     (doall (map #(fishcard % template) q))))

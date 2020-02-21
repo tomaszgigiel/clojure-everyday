@@ -19,3 +19,13 @@
   (q "What kinds of problems do macros solve?")
   (a "to transform an expression into something else, before runtime")
   (m "Michael Fogus, Chris Houser: The Joy of Clojure, 2nd, Chapter 8. Macros"))
+
+(qam
+  (q "What can you do with macro?")
+  (a "combine forms")
+  (a "change forms")
+  (a "control evaluation of arguments")
+  (a "control resolution of arguments")
+  (a "manage resources")
+  (a "build functions")
+  (m "Michael Fogus, Chris Houser: The Joy of Clojure, 2nd, Chapter 8. Macros"))

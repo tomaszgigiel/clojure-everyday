@@ -22,3 +22,4 @@ http://blog.higher-order.net/2009/02/01/understanding-clojures-persistentvector-
 https://github.com/krukow/ants-demo
 https://en.wikipedia.org/wiki/Binary_tree
 https://en.wikipedia.org/wiki/Red%E2%80%93black_tree
+https://stackoverflow.com/questions/2235173/file-name-path-name-base-name-naming-standard-for-pieces-of-a-path
