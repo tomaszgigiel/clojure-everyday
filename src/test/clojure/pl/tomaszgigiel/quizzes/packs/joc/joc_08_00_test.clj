@@ -29,3 +29,9 @@
   (a "manage resources")
   (a "build functions")
   (m "Michael Fogus, Chris Houser: The Joy of Clojure, 2nd, Chapter 8. Macros"))
+
+(qam
+  (q "What is ->?")
+  (a "thread macro")
+  (a (= (-> 25 Math/sqrt int (list 10)) (list (int (Math/sqrt 25)) 10)))
+  (m "Michael Fogus, Chris Houser: The Joy of Clojure, 2nd, Chapter 8. Macros"))

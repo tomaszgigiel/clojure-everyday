@@ -1,0 +1,32 @@
+.
+Q
+What is Node.js?
+
+A
+Node.js is an open-source, cross-platform, JavaScript runtime environment that executes JavaScript code outside of a browser.
+
+M
+https://en.wikipedia.org/wiki/Node.js
+
+.
+Q
+What is NPM?
+
+A
+NPM is the default package manager for the JavaScript runtime environment Node.js.
+
+M
+https://en.wikipedia.org/wiki/Npm_(software)
+
+.
+Q
+What is ng?
+
+A
+
+M
+
+
+.
+npm install -g @angular/cli
+
