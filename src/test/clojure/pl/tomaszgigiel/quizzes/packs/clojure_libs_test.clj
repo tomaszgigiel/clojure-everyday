@@ -39,8 +39,8 @@
 (qam
   (q "How to load libs in non-REPL code?")
   (a "use ns")
-  (a (ns my-project.core
-       "This namespace is mine."
-       (:require [clojure.string :as string])
-       (:import (java.util Date GregorianCalendar))))
+  (a (nil? (ns my-project.core
+             "This namespace is mine."
+             (:require [clojure.string :as string])
+             (:import (java.util Date GregorianCalendar)))))
   (m "https://8thlight.com/blog/colin-jones/2010/12/05/clojure-libs-and-namespaces-require-use-import-and-ns.html"))

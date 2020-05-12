@@ -11,7 +11,7 @@
   (q "Why did the syntaxt error occur?")
   (a (require '(uncomplicate.fluokitten.core)))
   ;(a ((((uncomplicate.fluokitten.core/curry + 3) 1) 2) 3))
-  (a false "todo")
+  (a false "TODO:")
   (m ""))
 
 (qam
@@ -23,18 +23,18 @@
 (qam
   (q "Evaluate (into {:a 3} {:a 1 :b 2})")
   (a (= {:a 1 :b 2} (into {:a 3} {:a 1 :b 2})))
-  (a false "why?")
+  (a false "TODO: why?")
   (m ""))
 
 (qam
   (q "Evaluate (into {:c 3} {:a 1 :b 2})")
   (a (= {:c 3 :a 1 :b 2} (into {:c 3} {:a 1 :b 2})))
-  (a false "why?")
+  (a false "TODO: why?")
   (m ""))
 
 (qam
   (q "Discuss dorun vs. doall.")
-  (a false "todo")
+  (a false "TODO:")
   (m ""))
 
 (qam
@@ -53,5 +53,5 @@
 
 (qam
   (q "Discuss = vs. ==.")
-  (a false "todo")
+  (a false "TODO:")
   (m ""))

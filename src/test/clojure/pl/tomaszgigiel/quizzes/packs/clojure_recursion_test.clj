@@ -11,9 +11,10 @@
 ; https://clojuredocs.org/clojure.core/trampoline
 ; https://clojuredocs.org/clojure.core/recur
 
-(defn tail-recur [x n] (letfn [(inner [x n acc] (if (zero? n) acc (recur x (dec n) (* x acc))))] (inner x n 1)))
-(defn tail [x n] (letfn [(inner [x n acc] (if (zero? n) acc (inner x (dec n) (* x acc))))] (inner x n 1)))
-(defn mundane [x n] (if (zero? n) 1 (* x (pow-mundane x (dec n)))))
+(defn pow-tail-recur [x n] (letfn [(inner [x n acc] (if (zero? n) acc (recur x (dec n) (* x acc))))] (inner x n 1)))
+(defn pow-tail [x n] (letfn [(inner [x n acc] (if (zero? n) acc (inner x (dec n) (* x acc))))] (inner x n 1)))
+(defn pow-mundane [x n] (if (zero? n) 1 (* x (pow-mundane x (dec n)))))
 
-(foo 2 3)
-(boo 2 3)
+(pow-tail-recur 12 2)
+(pow-tail 12 2)
+(pow-mundane 12 2)

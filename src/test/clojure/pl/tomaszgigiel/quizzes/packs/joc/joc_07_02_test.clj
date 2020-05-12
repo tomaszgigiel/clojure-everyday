@@ -90,7 +90,7 @@
 
 (qam
   (q "How to avoid an ad hoc implementation of a polymorphism using closures?")
-  (a false "use reify macro, section 9.3.2")
+  (a false "TODO: use reify macro, section 9.3.2")
   (m "Michael Fogus, Chris Houser: The Joy of Clojure, 2nd, 7.2 On closures, page 154"))
 
 (qam

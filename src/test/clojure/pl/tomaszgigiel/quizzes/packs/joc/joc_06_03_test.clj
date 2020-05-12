@@ -32,6 +32,7 @@
   (a "short-circuit evaluation")
   (a "if (txt != null && !txt.isEmpty()) { System.out.println(txt); return true; }")
   (a (and txt (complement (.isEmpty txt)) (do (println txt) true)))
+  (a false "TODO: avoid print ok during test")
   (m "Michael Fogus, Chris Houser: The Joy of Clojure, 2nd, 6.3.1. Familiar laziness with logical-and"))
 
 (qam
