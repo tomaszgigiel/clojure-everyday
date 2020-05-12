@@ -12,7 +12,7 @@
 
 (defmacro at
   "answer thrown?"
-  ([form c] (list 'tst/is (list 'thrown? c (list 'throw form)))))
+  ([form c & msg] (list 'tst/is (list 'thrown? c (list 'throw form)))))
 
 (defmacro m "metadata" [s] s)
 
