@@ -22,6 +22,7 @@
 
 (qam
   (q "What can you do with macro?")
+  (a "transform forms")
   (a "combine forms")
   (a "change forms")
   (a "control evaluation of arguments")
@@ -35,3 +36,29 @@
   (a "thread macro")
   (a (= (-> 25 Math/sqrt int (list 10)) (list (int (Math/sqrt 25)) 10)))
   (m "Michael Fogus, Chris Houser: The Joy of Clojure, 2nd, Chapter 8. Macros"))
+
+(qam
+  (q "List differences textual form of program vs. actual form of program")
+  (a "there is no distinction")
+  (a "a program is the data that composes the program")
+  (m "Michael Fogus, Chris Houser: The Joy of Clojure, 2nd, Chapter 8.1 Data is code is data"))
+
+(qam
+  (q "Execute (eval '(list 1 2))")
+  (a (list 1 2))
+  (m "Michael Fogus, Chris Houser: The Joy of Clojure, 2nd, Chapter 8.1 Data is code is data"))
+
+(qam
+  (q "Execute (eval (list 1 2))")
+  (at (eval (list 1 2)) ClassCastException "Integer cannot be cast to clojure.lang.IFn")
+  (m "Michael Fogus, Chris Houser: The Joy of Clojure, 2nd, Chapter 8.1 Data is code is data"))
+
+(qam
+  (q "Execute (eval (list (symbol \"+\") 1 2))")
+  (a (= (eval (list (symbol "+") 1 2)) 3))
+  (m "Michael Fogus, Chris Houser: The Joy of Clojure, 2nd, Chapter 8.1 Data is code is data"))
+
+(qam
+  (q "")
+  (a "")
+  (m "Michael Fogus, Chris Houser: The Joy of Clojure, 2nd, Chapter 8.1 Data is code is data"))
