@@ -23,3 +23,20 @@ https://github.com/krukow/ants-demo
 https://en.wikipedia.org/wiki/Binary_tree
 https://en.wikipedia.org/wiki/Red%E2%80%93black_tree
 https://stackoverflow.com/questions/2235173/file-name-path-name-base-name-naming-standard-for-pieces-of-a-path
+
+
+;(tst/deftest lingo-test
+;  (test #'lingo/line-to-terms))
+
+(tst/run-tests 'pl.tomaszgigiel.lingo.lingo)
+
+(tst/with-test
+  (defn line-to-terms [line]
+    (str/split line #"[\s\.\"“()’—\,!*?;:'/”‘\[\]]+"))
+  (tst/is (= (line-to-terms "wordw ??? 'spider-man' as--is! a1") ["word" "spider-man" "as--is" "a1"])))
+
+  
+  
+.
+odpowiedz na:
+https://stackoverflow.com/questions/37471253/how-can-i-write-unit-tests-for-private-clojure-functions
