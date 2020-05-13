@@ -59,6 +59,48 @@
   (m "Michael Fogus, Chris Houser: The Joy of Clojure, 2nd, Chapter 8.1 Data is code is data"))
 
 (qam
+  (q "What is the main reason that eval is problematic?")
+  (a "the binding used for evaluation are global")
+  (m "Michael Fogus, Chris Houser: The Joy of Clojure, 2nd, Chapter 8.1.1 Syntax-quote, unquote, and splicing"))
+
+(qam
+  (q "How to make eval less evil?")
+  (a "restrict the use of specific bindings to eval")
+  (m "Michael Fogus, Chris Houser: The Joy of Clojure, 2nd, Chapter 8.1.1 Syntax-quote, unquote, and splicing"))
+
+(qam
+  (q "What is `?")
+  (a "syntax-quote")
+  (m "Michael Fogus, Chris Houser: The Joy of Clojure, 2nd, Chapter 8.1.1 Syntax-quote, unquote, and splicing"))
+
+(qam
+  (q "What is ~?")
+  (a "~unqote")
+  (m "Michael Fogus, Chris Houser: The Joy of Clojure, 2nd, Chapter 8.1.1 Syntax-quote, unquote, and splicing"))
+
+(qam
+  (q "What is ~@?")
+  (a "unquote-splice")
+  (m "Michael Fogus, Chris Houser: The Joy of Clojure, 2nd, Chapter 8.1.1 Syntax-quote, unquote, and splicing"))
+
+(qam
+  (q "How to garner the value of the built bindings at runtime?")
+  (a "`'~x")
+  (m "Michael Fogus, Chris Houser: The Joy of Clojure, 2nd, Chapter 8.1.1 Syntax-quote, unquote, and splicing"))
+
+(qam
+  (q "Example of build let bindings at compile time")
+  (a (defn contextual-eval [ctx expr] (eval `(let [~@(mapcat (fn [[k v]] [k `'~v]) ctx)] ~expr))))
+  (a (= (contextual-eval '{a 1 b 2} '(+ a b)) 3))
+  (a (= (contextual-eval '{a 1 b 2} '(let [a 1000] (+ a b))) 1002))
+  (m "Michael Fogus, Chris Houser: The Joy of Clojure, 2nd, Chapter 8.1.1 Syntax-quote, unquote, and splicing"))
+
+(qam
   (q "")
   (a "")
-  (m "Michael Fogus, Chris Houser: The Joy of Clojure, 2nd, Chapter 8.1 Data is code is data"))
+  (m "Michael Fogus, Chris Houser: The Joy of Clojure, 2nd, Chapter 8.1.1 Syntax-quote, unquote, and splicing"))
+
+(qam
+  (q "")
+  (a "")
+  (m "Michael Fogus, Chris Houser: The Joy of Clojure, 2nd, Chapter 8.1.1 Syntax-quote, unquote, and splicing"))
