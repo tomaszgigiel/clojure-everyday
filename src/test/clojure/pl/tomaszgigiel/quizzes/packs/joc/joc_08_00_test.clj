@@ -96,11 +96,49 @@
   (m "Michael Fogus, Chris Houser: The Joy of Clojure, 2nd, Chapter 8.1.1 Syntax-quote, unquote, and splicing"))
 
 (qam
-  (q "")
-  (a "")
+  (q "Execute (let [x 9 y '(- x)] [`y ``y ``~y ``~~y (contextual-eval {'x 36} ``~~y)])")
+  (a (defn contextual-eval [ctx expr] (eval `(let [~@(mapcat (fn [[k v]] [k `'~v]) ctx)] ~expr))))
+  (a (= (let [x 9 y '(- x)] (str `y)) "pl.tomaszgigiel.quizzes.packs.joc.joc-08-00-test/y"))
+  (a (= (let [x 9 y '(- x)] (str ``y)) "(quote pl.tomaszgigiel.quizzes.packs.joc.joc-08-00-test/y)"))
+  (a (= (let [x 9 y '(- x)] (str ``~y)) "pl.tomaszgigiel.quizzes.packs.joc.joc-08-00-test/y"))
+  (a (= (let [x 9 y '(- x)] (str ``~~y)) "(- x)"))
+  (a (= (let [x 9 y '(- x)] (str (contextual-eval {'x 36} ``~~y))) "-36"))
   (m "Michael Fogus, Chris Houser: The Joy of Clojure, 2nd, Chapter 8.1.1 Syntax-quote, unquote, and splicing"))
+
+(qam
+  (q "List macro rules of thumb")
+  (a "dont write a macro if a function will do")
+  (a "write an example usage")
+  (a "expand an example by hand")
+  (a "use macroexpand, macroexpand-1, clojure.walk/macroexpand-all to undersand")
+  (a "remember macroexpand-all doesnt use the same logic as compiler")
+  (a "experiment at the REPL")
+  (a "break complicated into smaller")
+  (a "")
+  (m "Michael Fogus, Chris Houser: The Joy of Clojure, 2nd, Chapter 8.1.2 Macro rules of thumb"))
+
+(qam
+  (q "Indicate the macro's advantage over HOF.")
+  (a "code in way natural to your problem domain")
+  (a "and maintain runtime efficiency")
+  (m "Michael Fogus, Chris Houser: The Joy of Clojure, 2nd, Chapter 8.2 Defining control structures"))
+
+(qam
+  (q "What is implemented via macros in Clojure?")
+  (a "most control structures")
+  (m "Michael Fogus, Chris Houser: The Joy of Clojure, 2nd, Chapter 8.2 Defining control structures"))
 
 (qam
   (q "")
   (a "")
-  (m "Michael Fogus, Chris Houser: The Joy of Clojure, 2nd, Chapter 8.1.1 Syntax-quote, unquote, and splicing"))
+  (m "Michael Fogus, Chris Houser: The Joy of Clojure, 2nd, Chapter 8.2 Defining control structures"))
+
+(qam
+  (q "")
+  (a "")
+  (m "Michael Fogus, Chris Houser: The Joy of Clojure, 2nd, Chapter 8.2 Defining control structures"))
+
+(qam
+  (q "")
+  (a "")
+  (m "Michael Fogus, Chris Houser: The Joy of Clojure, 2nd, Chapter 8.2 Defining control structures"))
