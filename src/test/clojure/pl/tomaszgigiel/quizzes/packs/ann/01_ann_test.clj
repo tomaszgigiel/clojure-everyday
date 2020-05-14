@@ -13,6 +13,58 @@
   (m "Ryszard Tadeusiewicz, Tomasz Gąciarz, Barbara Borowik, Bartosz Leper: Odkrywanie właściwości sieci neuronowych"))
 
 (qam
+  (q "What are artificial neural networks?")
+  (a "artificial neural networks or connectionist systems")
+  (a "computing systems inspired by the biological neural networks that constitute animal brains")
+  (m "https://en.wikipedia.org/wiki/Artificial_neural_network"))
+
+(qam
+  (q "What does ANN stand for?")
+  (a "Artificial neural networks")
+  (m "https://en.wikipedia.org/wiki/Artificial_neural_network"))
+
+(qam
+  (q "What are the advantages of artificial neural network?")
+  (a "ability to learn to perform tasks by considering examples, generally without being programmed with task-specific rules")
+  (m "https://en.wikipedia.org/wiki/Artificial_neural_network"))
+
+(qam
+  (q "How are artificial neural networks built?")
+  (a "a collection of connected units")
+  (a "constructed from 3 type of layers: input layer, hidden layers, output layer")
+  (a "elementary unit is an artificial neuron")
+  (m "https://en.wikipedia.org/wiki/Artificial_neural_network"))
+
+(qam
+  (q "What is learning in ANN?")
+  (a "the adaptation of the network to better handle a task by considering sample observations")
+  (m "https://en.wikipedia.org/wiki/Artificial_neural_network"))
+
+(qam
+  (q "What does learning in ANN involve?")
+  (a "Learning ANN involves adjusting the weights (and optional thresholds) of the network to improve the accuracy of the result.")
+  (m "https://en.wikipedia.org/wiki/Artificial_neural_network"))
+
+(qam
+  (q "What is an artificial neuron?")
+  (a "a mathematical function conceived as a model of a biological neuron")
+  (m "https://en.wikipedia.org/wiki/Artificial_neuron"))
+
+(qam
+  (q "How are artificial (a real biological) neurons built?")
+  (a "a body in which computations are performed (soma)")
+  (a "a number of input channels (dendrites)")
+  (a "one output channel (a single axon)")
+  (m "https://en.wikipedia.org/wiki/Artificial_neuron"))
+
+(qam
+  (q "How to model an artificial neuron?")
+  (a "(activation-function (reduce + (map * (conj inputs bias) (conj weights 1))))")
+  (m "https://en.wikipedia.org/wiki/Artificial_neuron"))
+
+
+
+(qam
   (q "Compare ann vs. brain")
   (a "simplified structure: homogeneous, each with each vs. different ways of connecting in different places")
   (a "simplified neuron: very simple, inputs, weights, activation function, output vs. very complicated, different kinds")
@@ -32,32 +84,8 @@
   (a "usually as specialized devices")
   (m "Ryszard Tadeusiewicz, Tomasz Gąciarz, Barbara Borowik, Bartosz Leper: Odkrywanie właściwości sieci neuronowych, ch.1.9"))
 
-(qam
-  (q "What are the main parts of an artificial neuron?")
-  (a "body (soma): ")
-  (m "https://en.wikipedia.org/wiki/Artificial_neural_network"))
 
-(qam
-  (q "How many axons does a neuron have?")
-  (a "a typical neuron consists of a cell body (soma), dendrites, and a SINGLE axon")
-  An artificial neuron has a body in which computations are performed, and a number of input channels and one output channel, similar to a real biological neuron.
-  (m "https://en.wikipedia.org/wiki/Neuron")
-  (m "https://www.sciencedirect.com/topics/earth-and-planetary-sciences/artificial-neural-network"))
 
-(qam
-  (q "What does ANN stand for?")
-  (a "Artificial neural networks")
-  (m "https://en.wikipedia.org/wiki/Artificial_neural_network"))
-
-(qam
-  (q "What is learning in ANN?")
-  (a "Learning is the adaptation of the network to better handle a task by considering sample observations.")
-  (m "https://en.wikipedia.org/wiki/Artificial_neural_network"))
-
-(qam
-  (q "What does learning in ANN involve?")
-  (a "Learning ANN involves adjusting the weights (and optional thresholds) of the network to improve the accuracy of the result.")
-  (m "https://en.wikipedia.org/wiki/Artificial_neural_network"))
 
 ; Every input has a weight associated with it; the larger the weight, the more impact the corresponding input channel has on the output.
 ; A neuron also has a bias, which, for convenience, can be considered as an additional input to the neuron, x0, that is equal to 1 and has the weight identical to the value of the bias, w0 = b.
@@ -85,6 +113,9 @@
 ; bias
 ; positive weight
 ; negative weight
+
+; https://en.wikipedia.org/wiki/Mathematics_of_artificial_neural_networks
+; https://en.wikipedia.org/wiki/Connectionism
 
 (qam
   (q "")
